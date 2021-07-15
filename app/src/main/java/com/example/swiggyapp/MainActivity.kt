@@ -25,6 +25,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -104,7 +105,7 @@ fun MyScreenContent() {
             )
         )
 
-    Surface(color = MaterialTheme.colors.background) {
+    MaterialTheme(typography = Typography)  {
         Column(modifier = Modifier.fillMaxHeight()) {
             StickyTopAppBar()
             TopHelloBar(prepareHelloBarContent())
@@ -125,22 +126,25 @@ fun AllRestaurantsNearby(restaurantsList: List<Restaurant>, modifier: Modifier =
 
 @Composable
 fun RestaurantItem(r: Restaurant) {
+    val height = 120.dp
+
     Row(
         modifier = Modifier
-            .padding(horizontal = 5.dp, vertical = 10.dp)
+            .padding(horizontal = 15.dp, vertical = 15.dp)
+            .heightIn(0.dp, height)
     ) {
         Box(
             modifier = Modifier
                 .padding(horizontal = 2.dp, vertical = 0.dp)
-                .width(130.dp)
-                .height(128.dp),
+                .width(90.dp)
+                .height(height),
         ) {
             Image(
                 painterResource(id = r.image),
                 contentDescription = null,
                 modifier = Modifier
-                    .height(120.dp)
-                    .width(130.dp)
+                    .height(110.dp)
+                    .width(90.dp)
                     .clip(RoundedCornerShape(5.dp)),
                 contentScale = ContentScale.Crop
             )
@@ -157,49 +161,80 @@ fun RestaurantItem(r: Restaurant) {
                             .padding(horizontal = 10.dp, vertical = 3.dp)
                             .align(Alignment.BottomCenter),
                         color = Color.White,
-                        fontSize = 18.sp
+                        fontSize = 13.sp
                     )
                 }
                 OfferSnackType.FLAT_DEAL -> {
-
+                    val roundShape = RoundedCornerShape(5.dp)
+                    Text(
+                        text = r.offerSnack.message,
+                        maxLines = 1,
+                        style = Typography.h1,
+                        modifier = Modifier
+                            .shadow(8.dp, roundShape)
+                            .background(Color.White, roundShape)
+                            .padding(horizontal = 10.dp, vertical = 3.dp)
+                            .align(Alignment.BottomCenter),
+                        color = Color(0xFFFF5722),
+                        fontSize = 18.sp
+                    )
                 }
             }
         }
 
         Column(
             modifier = Modifier
-                .padding(horizontal = 5.dp)
+                .align(Alignment.CenterVertically)
+                .padding(horizontal = 15.dp)
                 .fillMaxHeight(),
+            verticalArrangement = Arrangement.SpaceEvenly
         ) {
             Text(
                 text = r.name,
-                style = Typography.h1,
+                style = Typography.h2,
                 maxLines = 1
             )
-            Text(text = r.dishTagline, maxLines = 1)
+            Text(
+                text = r.dishTagline,
+                maxLines = 1,
+            )
             Text(text = r.location, maxLines = 1)
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .align(Alignment.CenterHorizontally),
             ) {
                 Icon(
                     painterResource(id = R.drawable.ic_rating),
                     contentDescription = null,
-                    tint = Color.DarkGray
+                    tint = Color.DarkGray,
+                    modifier = Modifier.padding(0.dp, 0.dp, 2.dp, 0.dp)
                 )
-                Text(text = r.rating.toString())
-                Text(text = ".")
-                Text(text = "₹${r.averagePricingForTwo} for two")
+                Text(
+                    text = r.rating.toString(),
+                    modifier = Modifier.padding(horizontal = 3.dp, vertical = 0.dp)
+                )
+                Text(
+                    text = ".",
+                    modifier = Modifier.padding(horizontal = 3.dp, vertical = 0.dp)
+                )
+                Text(
+                    text = "₹${r.averagePricingForTwo} for two",
+                    modifier = Modifier.padding(horizontal = 3.dp, vertical = 0.dp)
+                )
             }
-            Divider()
-            LazyRow {
+
+            if (!r.allOffers.isNullOrEmpty()) {
+                Divider()
+            }
+
+            LazyColumn {
                 if (!r.allOffers.isNullOrEmpty()) {
                     items(items = r.allOffers) { offer ->
                         Row() {
                             Icon(
-                                painterResource(id = R.drawable.ic_offers),
-                                contentDescription = null
+                                painterResource(id = R.drawable.ic_offers_filled),
+                                contentDescription = null,
+                                modifier = Modifier.padding(horizontal = 5.dp, vertical = 0.dp)
                             )
                             Text(text = offer.offerMessage)
                         }
@@ -221,16 +256,16 @@ fun TopHelloBar(contentList: List<HelloContent>) {
             .padding(horizontal = 6.dp, vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Image(
-            painterResource(R.drawable.ic_rain),
-            contentDescription = null,
-            modifier = Modifier
-                .align(Alignment.CenterVertically)
-                .padding(2.dp)
-                .background(Color(0xF5ECECEC), roundShape)
-                .clip(roundShape),
-            contentScale = ContentScale.Inside,
-        )
+//        Image(
+//            painterResource(R.drawable.ic_rain),
+//            contentDescription = null,
+//            modifier = Modifier
+//                .align(Alignment.CenterVertically)
+//                .padding(2.dp)
+//                .background(Color(0xF5ECECEC), roundShape)
+//                .clip(roundShape),
+//            contentScale = ContentScale.Inside,
+//        )
 
 
         val value by animateIntAsState(
@@ -241,6 +276,7 @@ fun TopHelloBar(contentList: List<HelloContent>) {
                 easing = LinearOutSlowInEasing
             )
         )
+
 
         Text(
             text = singleTitle,
@@ -271,19 +307,20 @@ fun StickyTopAppBar() {
                         )
                         Text(
                             text = "Home",
-                            style = Typography.h1,
+                            fontWeight = FontWeight.ExtraBold
                         )
                     }
                     Text(
                         "Tra-32 (last House On Right), Elamakkara Mamangalam, Ernakulam",
                         fontSize = 12.sp,
                         maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
+                        overflow = TextOverflow.Ellipsis,
+                        color = Color(0xD9000000)
                     )
                 }
                 Column(
                     modifier = Modifier
-                        .padding(1.dp)
+                        .padding(2.dp)
                         .weight(2f)
                         .align(Alignment.CenterVertically),
                 ) {
@@ -315,10 +352,10 @@ fun BoxItemList(content: LinkedHashMap<String, String>, modifier: Modifier = Mod
 
 @Composable
 fun BoxItem(heading: String, tagline: String) {
-    val roundShape = RoundedCornerShape(20.dp)
+    val roundShape = RoundedCornerShape(15.dp)
     Column(
         modifier = Modifier
-            .width(130.dp)
+            .width(115.dp)
             .padding(5.dp)
             .clickable { },
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -327,7 +364,8 @@ fun BoxItem(heading: String, tagline: String) {
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(5.dp)
-                .border(1.dp, Color(0x32323299), shape = roundShape),
+                .shadow(2.dp, roundShape)
+                .border(0.7.dp, Color(0x1A000000), shape = roundShape),
         ) {
             Text(
                 text = heading,
@@ -336,7 +374,9 @@ fun BoxItem(heading: String, tagline: String) {
                     .padding(horizontal = 3.dp, vertical = 10.dp)
                     .fillMaxWidth(),
                 textAlign = TextAlign.Center,
-                style = Typography.h1
+                style = Typography.h2,
+                fontWeight = FontWeight.ExtraBold,
+                color = Color(0xB3000000)
             )
             Image(
                 painter = painterResource(R.drawable.ic_deliveryman),

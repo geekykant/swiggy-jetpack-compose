@@ -11,7 +11,9 @@ import com.example.swiggyapp.R
 // Set of Material typography styles to start with
 val Prox = FontFamily(
         Font(R.font.prox_regular),
-        Font(R.font.prox_semibold, FontWeight.SemiBold)
+        Font(R.font.prox_semibold, FontWeight.SemiBold),
+        Font(R.font.prox_bold, FontWeight.Bold),
+        Font(R.font.prox_ebold, FontWeight.ExtraBold)
 )
 
 val Typography = Typography(
@@ -23,13 +25,13 @@ val Typography = Typography(
         ),
         h1 = TextStyle(
                 fontFamily = Prox,
-                fontWeight = FontWeight.SemiBold,
+                fontWeight = FontWeight.Bold,
                 fontSize = 20.sp
         ),
         h2 = TextStyle(
                 fontFamily = Prox,
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 16.sp
+                fontWeight = FontWeight.Bold,
+                fontSize = 17.sp
         )
 
         /* Other default text styles to override
