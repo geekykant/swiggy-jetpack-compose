@@ -3,9 +3,7 @@ package com.example.swiggyapp
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.animation.core.LinearOutSlowInEasing
-import androidx.compose.animation.core.animateIntAsState
-import androidx.compose.animation.core.tween
+import androidx.compose.animation.*
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -16,8 +14,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -32,7 +29,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
+import com.example.swiggyapp.ui.theme.SwiggyTheme
 import com.example.swiggyapp.ui.theme.Typography
+import com.google.accompanist.coil.rememberCoilPainter
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import kotlinx.coroutines.delay
 
 
 class MainActivity : ComponentActivity() {
@@ -57,22 +58,46 @@ class HelloContent(
 
 class Offer(val icon: Int, val offerMessage: String)
 class Restaurant(
-    val name: String, val dishTagline: String, val location: String, val distance: String,
-    val rating: Float, val distanceTimeMinutes: Int, val averagePricingForTwo: Int, val image: Int,
-    val allOffers: List<Offer>?, val offerSnack: OfferSnack?, val isBestSafety: Boolean = false
+    val name: String,
+    val dishTagline: String,
+    val location: String,
+    val distance: String,
+    val rating: Float,
+    val distanceTimeMinutes: Int,
+    val averagePricingForTwo: Int,
+    val imageUrl: String,
+    val allOffers: List<Offer>?,
+    val offerSnack: OfferSnack?,
+    val isBestSafety: Boolean = false
 )
+
+class TagTagline(val title: String, val tagLine: String, val imageUrl: String)
 
 @Composable
 fun MyScreenContent() {
-    fun prepareContent(): LinkedHashMap<String, String> {
-        val tagTaglineMap = LinkedHashMap<String, String>()
-        tagTaglineMap["Restaurant"] = "Enjoy your favourite treats"
-        tagTaglineMap["Genie"] = "Anything you need, delivered"
-        tagTaglineMap["Meat"] = "Fresh meat & seafood"
-        tagTaglineMap["Book Shops"] = "Delivery from Book Shops"
-        tagTaglineMap["Care Corner"] = "Find essentials & help loved ones"
-        return tagTaglineMap
-    }
+    fun prepareContent(): List<TagTagline> =
+        listOf(
+            TagTagline(
+                "Restaurant", "Enjoy your favourite treats",
+                "https://res.cloudinary.com/swiggy/image/upload/fl_lossy,f_auto,q_auto,w_220,h_220,c_fill/yy09xti5d3buoklibtuc"
+            ),
+            TagTagline(
+                "Genie", "Anything you need, delivered",
+                "https://res.cloudinary.com/paavam/image/upload/fl_lossy,f_auto,q_auto,w_220,h_220,c_fill/ic_deliveryman_fstjt2"
+            ),
+            TagTagline(
+                "Meat", "Fresh meat & seafood",
+                "https://res.cloudinary.com/paavam/image/upload/fl_lossy,f_auto,q_auto,w_220,h_220/pexels-geraud-pfeiffer-6542791_my49hm.jpg"
+            ),
+            TagTagline(
+                "Book Shops", "Delivery from Book Shops",
+                "https://res.cloudinary.com/paavam/image/upload/fl_lossy,f_auto,q_auto,w_220,h_220,c_fill/pexels-martin-de-arriba-7171398_mtyiv4.jpg"
+            ),
+            TagTagline(
+                "Care Corner", "Find essentials & help loved ones",
+                "https://res.cloudinary.com/paavam/image/upload/fl_lossy,f_auto,q_auto,w_220,h_220,c_fill/pexels-karolina-grabowska-4226773_ju5e0w.jpg"
+            )
+        )
 
     fun prepareHelloBarContent(): List<HelloContent> =
         listOf(
@@ -94,24 +119,117 @@ fun MyScreenContent() {
                 4.2f,
                 53,
                 400,
-                R.drawable.ic_restaurant1,
+                "https://res.cloudinary.com/swiggy/image/upload/fl_lossy,f_auto,q_auto,w_200,h_220,c_fill/jmkzdtpvr6njj3wvokrj",
                 listOf(Offer(R.drawable.ic_offers, "40% off upto ₹80")),
                 OfferSnack("40% OFF", OfferSnackType.BASIC)
             ), Restaurant(
-                "McDonald's", "American, Continental, Fast Food, Desserts",
-                "Edapally", "3.6 kms", 3.2f, 39,
-                200, R.drawable.ic_restaurant1, null,
+                "McDonald's",
+                "American, Continental, Fast Food, Desserts",
+                "Edapally",
+                "3.6 kms",
+                3.2f,
+                39,
+                200,
+                "https://res.cloudinary.com/swiggy/image/upload/fl_lossy,f_auto,q_auto,w_200,h_220,c_fill/ndxghfzqe4qc2dacxiwd",
+                null,
                 null
+            ), Restaurant(
+                "Hotel Matoshri",
+                "Chinese, Fast Food",
+                "Kaveri Hospital, Shingoli",
+                "1.2 kms",
+                3.8f,
+                53,
+                200,
+                "https://res.cloudinary.com/swiggy/image/upload/fl_lossy,f_auto,q_auto,w_200,h_220,c_fill/shxshuxficcjcwyixw0s",
+                listOf(Offer(R.drawable.ic_offers, "40% off upto ₹80")),
+                OfferSnack("20% OFF", OfferSnackType.BASIC)
             )
         )
 
-    MaterialTheme(typography = Typography)  {
+    SwiggyTheme {
+        // Remember a SystemUiController
+        val systemUiController = rememberSystemUiController()
+        val useDarkIcons = MaterialTheme.colors.isLight
+
+        SideEffect {
+            // Update all of the system bar colors to be transparent, and use
+            // dark icons if we're in light theme
+            systemUiController.setSystemBarsColor(
+                color = Color.Transparent,
+                darkIcons = useDarkIcons
+            )
+            // setStatusBarsColor() and setNavigationBarsColor() also exist
+        }
+
         Column(modifier = Modifier.fillMaxHeight()) {
             StickyTopAppBar()
             TopHelloBar(prepareHelloBarContent())
             BoxItemList(prepareContent())
-            AllRestaurantsNearby(prepareRestaurants())
+            var prepList = prepareRestaurants()
+            for(i in 1..20){
+                prepList = prepList.plus(
+                    prepList.get(i%3)
+                )
+            }
+
+            AllRestaurantsNearby(prepList)
         }
+    }
+}
+
+@Composable
+fun TopHelloBar(contentList: List<HelloContent>) {
+    val roundShape = RoundedCornerShape(50)
+    var i by remember { mutableStateOf(0) }
+    val helloCount = contentList.size
+
+    LaunchedEffect(true) {
+        while (true) {
+            delay(3000) // set here your delay between animations
+            i = ((i + 1) % helloCount)
+        }
+    }
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 6.dp, vertical = 6.dp),
+        verticalAlignment = Alignment.Top
+    ) {
+        Image(
+            painter = painterResource(R.drawable.ic_rain),
+            contentDescription = null,
+            modifier = Modifier
+                .align(Alignment.Top)
+                .padding(2.dp, 8.dp)
+                .background(Color(0xF5ECECEC), roundShape)
+                .clip(roundShape),
+            contentScale = ContentScale.Inside,
+        )
+        AnimateUpDown(contentList[i].message)
+    }
+}
+
+@OptIn(ExperimentalAnimationApi::class)
+@Composable
+private fun AnimateUpDown(message: String) {
+    AnimatedContent(targetState = message,
+        transitionSpec = {
+            if (targetState > initialState) {
+                slideInVertically({ height -> height }) + fadeIn() with
+                        slideOutVertically({ height -> -height }) + fadeOut()
+            } else {
+                slideInVertically({ height -> -height }) + fadeIn() with
+                        slideOutVertically({ height -> height }) + fadeOut()
+            }.using(SizeTransform(clip = false))
+        }
+    ) {
+        Text(
+            text = message,
+            modifier = Modifier.padding(3.dp).height(28.dp),
+            maxLines = 2
+        )
     }
 }
 
@@ -140,13 +258,17 @@ fun RestaurantItem(r: Restaurant) {
                 .height(height),
         ) {
             Image(
-                painterResource(id = r.image),
+                rememberCoilPainter(
+                    r.imageUrl,
+                    fadeInDurationMs = 300,
+                    previewPlaceholder = R.drawable.ic_restaurant1
+                ),
                 contentDescription = null,
                 modifier = Modifier
                     .height(110.dp)
                     .width(90.dp)
                     .clip(RoundedCornerShape(5.dp)),
-                contentScale = ContentScale.Crop
+                contentScale = ContentScale.Crop,
             )
             when (r.offerSnack?.offerType) {
                 OfferSnackType.BASIC -> {
@@ -161,7 +283,7 @@ fun RestaurantItem(r: Restaurant) {
                             .padding(horizontal = 10.dp, vertical = 3.dp)
                             .align(Alignment.BottomCenter),
                         color = Color.White,
-                        fontSize = 13.sp
+                        fontSize = 15.sp
                     )
                 }
                 OfferSnackType.FLAT_DEAL -> {
@@ -247,46 +369,6 @@ fun RestaurantItem(r: Restaurant) {
 }
 
 @Composable
-fun TopHelloBar(contentList: List<HelloContent>) {
-    val singleTitle = contentList[0].message
-    val roundShape = RoundedCornerShape(50)
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 6.dp, vertical = 10.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-//        Image(
-//            painterResource(R.drawable.ic_rain),
-//            contentDescription = null,
-//            modifier = Modifier
-//                .align(Alignment.CenterVertically)
-//                .padding(2.dp)
-//                .background(Color(0xF5ECECEC), roundShape)
-//                .clip(roundShape),
-//            contentScale = ContentScale.Inside,
-//        )
-
-
-        val value by animateIntAsState(
-            targetValue = 1,
-            animationSpec = tween(
-                durationMillis = 300,
-                delayMillis = 50,
-                easing = LinearOutSlowInEasing
-            )
-        )
-
-
-        Text(
-            text = singleTitle,
-            modifier = Modifier.padding(3.dp),
-            maxLines = 2,
-        )
-    }
-}
-
-@Composable
 fun StickyTopAppBar() {
     TopAppBar(
         title = {
@@ -296,8 +378,8 @@ fun StickyTopAppBar() {
             ) {
                 Column(
                     modifier = Modifier
-                        .padding(2.dp, 0.dp)
-                        .weight(6f)
+                        .padding(0.dp, 0.dp)
+                        .weight(0.6f)
                 ) {
                     Row {
                         Image(
@@ -320,8 +402,9 @@ fun StickyTopAppBar() {
                 }
                 Column(
                     modifier = Modifier
-                        .padding(2.dp)
-                        .weight(2f)
+                        .clickable { }
+                        .padding(4.dp)
+                        .weight(0.2f)
                         .align(Alignment.CenterVertically),
                 ) {
                     Row(
@@ -330,32 +413,32 @@ fun StickyTopAppBar() {
                         Image(
                             painter = painterResource(R.drawable.ic_offers),
                             contentDescription = null,
-                            modifier = Modifier.padding(3.dp)
+                            modifier = Modifier.padding(3.dp),
                         )
-                        Text(text = "Offers", maxLines = 1)
+                        Text(text = "Offers", maxLines = 1, style = Typography.h2)
                     }
                 }
             }
         },
-        backgroundColor = Color.White
+        backgroundColor = MaterialTheme.colors.surface
     )
 }
 
 @Composable
-fun BoxItemList(content: LinkedHashMap<String, String>, modifier: Modifier = Modifier) {
-    LazyRow(modifier = modifier) {
+fun BoxItemList(content: List<TagTagline>, modifier: Modifier = Modifier) {
+    LazyRow(modifier = modifier.height(150.dp)) {
         items(items = content.toList()) {
-            BoxItem(it.first, it.second)
+            BoxItem(it.title, it.tagLine, it.imageUrl)
         }
     }
 }
 
 @Composable
-fun BoxItem(heading: String, tagline: String) {
+fun BoxItem(heading: String, tagline: String, imageUrl: String) {
     val roundShape = RoundedCornerShape(15.dp)
     Column(
         modifier = Modifier
-            .width(115.dp)
+            .width(120.dp)
             .padding(5.dp)
             .clickable { },
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -371,15 +454,18 @@ fun BoxItem(heading: String, tagline: String) {
                 text = heading,
                 modifier = Modifier
                     .zIndex(2f)
-                    .padding(horizontal = 3.dp, vertical = 10.dp)
+                    .padding(horizontal = 2.dp, vertical = 10.dp)
                     .fillMaxWidth(),
                 textAlign = TextAlign.Center,
                 style = Typography.h2,
-                fontWeight = FontWeight.ExtraBold,
-                color = Color(0xB3000000)
+                fontWeight = FontWeight.ExtraBold
             )
             Image(
-                painter = painterResource(R.drawable.ic_deliveryman),
+                painter = rememberCoilPainter(
+                    imageUrl,
+                    fadeInDurationMs = 300,
+                    previewPlaceholder = R.drawable.ic_deliveryman
+                ),
                 contentDescription = null,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -390,7 +476,7 @@ fun BoxItem(heading: String, tagline: String) {
         Text(
             text = tagline,
             modifier = Modifier
-                .padding(horizontal = 3.dp, vertical = 2.dp),
+                .padding(horizontal = 0.dp, vertical = 2.dp),
             maxLines = 2,
             textAlign = TextAlign.Center,
             fontSize = 12.sp

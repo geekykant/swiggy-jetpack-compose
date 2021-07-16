@@ -6,31 +6,24 @@ import androidx.compose.material.darkColors
 import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
 
-private val DarkColorPalette = darkColors(
-        primary = Purple200,
-        primaryVariant = Purple700,
-        secondary = Teal200
+val LightColorPalette = lightColors(
+    primary = Orange400,
+    primaryVariant = Orange600,
+    surface = WhiteSurface
+    // Using default values for onPrimary, surface, error, etc.
 )
 
-private val LightColorPalette = lightColors(
-        primary = Purple500,
-        primaryVariant = Purple700,
-        secondary = Teal200
-
-        /* Other default colors to override
-    background = Color.White,
-    surface = Color.White,
-    onPrimary = Color.White,
-    onSecondary = Color.Black,
-    onBackground = Color.Black,
-    onSurface = Color.Black,
-    */
+val DarkColorPalette = darkColors(
+    primary = Orange400,
+    primaryVariant = Orange600,
+    // secondaryVariant == secondary in dark theme
 )
 
 @Composable
-fun TestAppTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Composable() () -> Unit) {
+fun SwiggyTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Composable() () -> Unit) {
     val colors = if (darkTheme) {
-        DarkColorPalette
+//        DarkColorPalette
+        LightColorPalette
     } else {
         LightColorPalette
     }
