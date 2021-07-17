@@ -32,6 +32,11 @@ val Typography = Typography(
                 fontFamily = Prox,
                 fontWeight = FontWeight.Bold,
                 fontSize = 16.sp
+        ),
+        h3 = TextStyle(
+                fontFamily = Prox,
+                fontWeight = FontWeight.Normal,
+                fontSize = 14.sp
         )
 
         /* Other default text styles to override

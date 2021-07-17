@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
@@ -26,6 +27,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
@@ -147,6 +149,13 @@ fun MyScreenContent() {
             )
         )
 
+    var prepList = prepareRestaurants()
+    for (i in 1..20) {
+        prepList = prepList.plus(
+            prepList[i % 3]
+        )
+    }
+
     SwiggyTheme {
         // Remember a SystemUiController
         val systemUiController = rememberSystemUiController()
@@ -162,24 +171,75 @@ fun MyScreenContent() {
             // setStatusBarsColor() and setNavigationBarsColor() also exist
         }
 
-        Column(modifier = Modifier.fillMaxHeight()) {
-            StickyTopAppBar()
-            TopHelloBar(prepareHelloBarContent())
-            BoxItemList(prepareContent())
-            var prepList = prepareRestaurants()
-            for(i in 1..20){
-                prepList = prepList.plus(
-                    prepList.get(i%3)
-                )
-            }
+        val scrollState = rememberLazyListState()
+        var topBarElevation by remember { mutableStateOf(0.dp) }
 
-            AllRestaurantsNearby(prepList)
-        }
+        Scaffold(
+            topBar = {
+                val modifier: Modifier
+                when (scrollState.firstVisibleItemIndex) {
+                    0 -> {
+                        topBarElevation = 0.dp
+                        modifier = Modifier
+                            .fillMaxWidth()
+                    }
+                    else -> {
+                        topBarElevation = 12.dp
+                        modifier = Modifier
+                            .fillMaxWidth()
+                    }
+                }
+                StickyTopAppBar(topBarElevation, modifier)
+            },
+            content = {
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    state = scrollState
+                ) {
+                    // My Books section
+                    item {
+                        TopHelloBar(prepareHelloBarContent())
+                    }
+
+                    item {
+                        Column(modifier = Modifier.fillMaxWidth()) {
+                            BoxItemList(prepareContent())
+                        }
+                    }
+                    item {
+                        SectionHeading(
+                            "All Restaurants Nearby",
+                            "Discover unique tastes near you", R.drawable.ic_shopicon
+                        )
+                    }
+                    items(items = prepList) {
+                        RestaurantItem(it)
+                    }
+
+                    // Turning the list in a list of lists of two elements each
+//                    items(wishlisted.windowed(2, 1, true)) { sublist ->
+//                        Row(Modifier.fillMaxWidth()) {
+//                            sublist.forEach { item ->
+//                                Text(
+//                                    item, modifier = Modifier
+//                                        .height(40.dp)
+//                                        .padding(4.dp)
+//                                        .background(Color.Yellow)
+//                                        .fillParentMaxWidth(.5f)
+//                                )
+//                            }
+//                        }
+//                    }
+
+                }
+            }
+        )
+
     }
 }
 
 @Composable
-fun TopHelloBar(contentList: List<HelloContent>) {
+fun TopHelloBar(contentList: List<HelloContent>, modifier: Modifier = Modifier) {
     val roundShape = RoundedCornerShape(50)
     var i by remember { mutableStateOf(0) }
     val helloCount = contentList.size
@@ -192,7 +252,7 @@ fun TopHelloBar(contentList: List<HelloContent>) {
     }
 
     Row(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 6.dp, vertical = 6.dp),
         verticalAlignment = Alignment.Top
@@ -227,25 +287,49 @@ private fun AnimateUpDown(message: String) {
     ) {
         Text(
             text = message,
-            modifier = Modifier.padding(3.dp).height(28.dp),
+            modifier = Modifier
+                .padding(3.dp)
+                .height(28.dp),
             maxLines = 2
         )
     }
 }
 
 @Composable
-fun AllRestaurantsNearby(restaurantsList: List<Restaurant>, modifier: Modifier = Modifier) {
-    LazyColumn(modifier = modifier) {
-        items(items = restaurantsList) {
-            RestaurantItem(it)
+fun SectionHeading(title: String, tagline: String, iconResId: Int) {
+    Column(
+        modifier = Modifier
+            .padding(15.dp, 8.dp)
+            .fillMaxWidth(),
+    ) {
+        Row {
+            Image(
+                painter = painterResource(iconResId),
+                contentDescription = null,
+                modifier = Modifier
+                    .padding(3.dp)
+                    .align(Alignment.CenterVertically)
+            )
+            Text(
+                text = title,
+                fontWeight = FontWeight.ExtraBold,
+                style = MaterialTheme.typography.h1,
+                modifier = Modifier
+                    .padding(5.dp, 0.dp)
+                    .alignByBaseline()
+            )
         }
+        Text(
+            text = tagline,
+            color = Color(0xD9000000),
+            style = MaterialTheme.typography.h3
+        )
     }
 }
 
 @Composable
 fun RestaurantItem(r: Restaurant) {
-    val height = 120.dp
-
+    val height = 110.dp
     Row(
         modifier = Modifier
             .padding(horizontal = 15.dp, vertical = 15.dp)
@@ -265,7 +349,7 @@ fun RestaurantItem(r: Restaurant) {
                 ),
                 contentDescription = null,
                 modifier = Modifier
-                    .height(110.dp)
+                    .height(100.dp)
                     .width(90.dp)
                     .clip(RoundedCornerShape(5.dp)),
                 contentScale = ContentScale.Crop,
@@ -369,15 +453,16 @@ fun RestaurantItem(r: Restaurant) {
 }
 
 @Composable
-fun StickyTopAppBar() {
+fun StickyTopAppBar(scrolledElevation: Dp = 0.dp, modifier: Modifier) {
     TopAppBar(
         title = {
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = modifier,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Column(
                     modifier = Modifier
+                        .clickable { }
                         .padding(0.dp, 0.dp)
                         .weight(0.6f)
                 ) {
@@ -420,13 +505,18 @@ fun StickyTopAppBar() {
                 }
             }
         },
-        backgroundColor = MaterialTheme.colors.surface
+        backgroundColor = MaterialTheme.colors.surface,
+        elevation = scrolledElevation,
     )
 }
 
 @Composable
 fun BoxItemList(content: List<TagTagline>, modifier: Modifier = Modifier) {
-    LazyRow(modifier = modifier.height(150.dp)) {
+    LazyRow(
+        modifier = modifier
+            .height(150.dp)
+            .fillMaxWidth()
+    ) {
         items(items = content.toList()) {
             BoxItem(it.title, it.tagLine, it.imageUrl)
         }
