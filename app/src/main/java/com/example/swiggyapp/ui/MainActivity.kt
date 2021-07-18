@@ -1,4 +1,4 @@
-package com.example.swiggyapp
+package com.example.swiggyapp.ui
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -31,12 +31,13 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
+import com.example.swiggyapp.R
+import com.example.swiggyapp.data.*
 import com.example.swiggyapp.ui.theme.SwiggyTheme
 import com.example.swiggyapp.ui.theme.Typography
 import com.google.accompanist.coil.rememberCoilPainter
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.delay
-
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -47,115 +48,8 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-enum class OfferSnackType {
-    FLAT_DEAL, BASIC
-}
-
-class OfferSnack(val message: String, val offerType: OfferSnackType)
-class HelloContent(
-    val message: String,
-    val isClickable: Boolean = false,
-    val navTarget: Boolean = false
-)
-
-class Offer(val icon: Int, val offerMessage: String)
-class Restaurant(
-    val name: String,
-    val dishTagline: String,
-    val location: String,
-    val distance: String,
-    val rating: Float,
-    val distanceTimeMinutes: Int,
-    val averagePricingForTwo: Int,
-    val imageUrl: String,
-    val allOffers: List<Offer>?,
-    val offerSnack: OfferSnack?,
-    val isBestSafety: Boolean = false
-)
-
-class TagTagline(val title: String, val tagLine: String, val imageUrl: String)
-
 @Composable
 fun MyScreenContent() {
-    fun prepareContent(): List<TagTagline> =
-        listOf(
-            TagTagline(
-                "Restaurant", "Enjoy your favourite treats",
-                "https://res.cloudinary.com/swiggy/image/upload/fl_lossy,f_auto,q_auto,w_220,h_220,c_fill/yy09xti5d3buoklibtuc"
-            ),
-            TagTagline(
-                "Genie", "Anything you need, delivered",
-                "https://res.cloudinary.com/paavam/image/upload/fl_lossy,f_auto,q_auto,w_220,h_220,c_fill/ic_deliveryman_fstjt2"
-            ),
-            TagTagline(
-                "Meat", "Fresh meat & seafood",
-                "https://res.cloudinary.com/paavam/image/upload/fl_lossy,f_auto,q_auto,w_220,h_220/pexels-geraud-pfeiffer-6542791_my49hm.jpg"
-            ),
-            TagTagline(
-                "Book Shops", "Delivery from Book Shops",
-                "https://res.cloudinary.com/paavam/image/upload/fl_lossy,f_auto,q_auto,w_220,h_220,c_fill/pexels-martin-de-arriba-7171398_mtyiv4.jpg"
-            ),
-            TagTagline(
-                "Care Corner", "Find essentials & help loved ones",
-                "https://res.cloudinary.com/paavam/image/upload/fl_lossy,f_auto,q_auto,w_220,h_220,c_fill/pexels-karolina-grabowska-4226773_ju5e0w.jpg"
-            )
-        )
-
-    fun prepareHelloBarContent(): List<HelloContent> =
-        listOf(
-            HelloContent("Rainy weather! Additional fee will apply to reward delivery partners for being out on the streets"),
-            HelloContent(
-                "Why not let us cover the delivery fee on your food orders?",
-                isClickable = true,
-                navTarget = true
-            )
-        )
-
-    fun prepareRestaurants(): List<Restaurant> =
-        listOf(
-            Restaurant(
-                "Aryaas",
-                "South Indian, Chineese, Arabian, North India",
-                "Kakkanad",
-                "7.2 kms",
-                4.2f,
-                53,
-                400,
-                "https://res.cloudinary.com/swiggy/image/upload/fl_lossy,f_auto,q_auto,w_200,h_220,c_fill/jmkzdtpvr6njj3wvokrj",
-                listOf(Offer(R.drawable.ic_offers, "40% off upto ₹80")),
-                OfferSnack("40% OFF", OfferSnackType.BASIC)
-            ), Restaurant(
-                "McDonald's",
-                "American, Continental, Fast Food, Desserts",
-                "Edapally",
-                "3.6 kms",
-                3.2f,
-                39,
-                200,
-                "https://res.cloudinary.com/swiggy/image/upload/fl_lossy,f_auto,q_auto,w_200,h_220,c_fill/ndxghfzqe4qc2dacxiwd",
-                null,
-                null
-            ), Restaurant(
-                "Hotel Matoshri",
-                "Chinese, Fast Food",
-                "Kaveri Hospital, Shingoli",
-                "1.2 kms",
-                3.8f,
-                53,
-                200,
-                "https://res.cloudinary.com/swiggy/image/upload/fl_lossy,f_auto,q_auto,w_200,h_220,c_fill/shxshuxficcjcwyixw0s",
-                listOf(Offer(R.drawable.ic_offers, "40% off upto ₹80")),
-                OfferSnack("20% OFF", OfferSnackType.BASIC)
-            )
-        )
-
-    var prepList = prepareRestaurants()
-    for (i in 1..20) {
-        prepList = prepList.plus(
-            prepList[i % 3]
-        )
-    }
-
     SwiggyTheme {
         // Remember a SystemUiController
         val systemUiController = rememberSystemUiController()
@@ -201,9 +95,13 @@ fun MyScreenContent() {
                         TopHelloBar(prepareHelloBarContent())
                     }
 
+                    item{
+                        AnnouncementHeading(message = "As per state mandates, we will be operational till 8:00 PM")
+                    }
+
                     item {
                         Column(modifier = Modifier.fillMaxWidth()) {
-                            BoxItemList(prepareContent())
+                            BoxItemList(prepareTilesContent())
                         }
                     }
                     item {
@@ -212,7 +110,7 @@ fun MyScreenContent() {
                             "Discover unique tastes near you", R.drawable.ic_shopicon
                         )
                     }
-                    items(items = prepList) {
+                    items(items = prepareRestaurants()) {
                         RestaurantItem(it)
                     }
 
@@ -239,7 +137,7 @@ fun MyScreenContent() {
 }
 
 @Composable
-fun TopHelloBar(contentList: List<HelloContent>, modifier: Modifier = Modifier) {
+fun TopHelloBar(contentList: List<HelloBar>, modifier: Modifier = Modifier) {
     val roundShape = RoundedCornerShape(50)
     var i by remember { mutableStateOf(0) }
     val helloCount = contentList.size
@@ -511,7 +409,7 @@ fun StickyTopAppBar(scrolledElevation: Dp = 0.dp, modifier: Modifier) {
 }
 
 @Composable
-fun BoxItemList(content: List<TagTagline>, modifier: Modifier = Modifier) {
+fun BoxItemList(content: List<QuickTile>, modifier: Modifier = Modifier) {
     LazyRow(
         modifier = modifier
             .height(150.dp)
@@ -578,4 +476,30 @@ fun BoxItem(heading: String, tagline: String, imageUrl: String) {
 @Composable
 fun DefaultPreview() {
     MyScreenContent()
+}
+
+@Composable
+fun AnnouncementHeading(message: String, modifier: Modifier = Modifier) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(15.dp, 15.dp),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ){
+        Box(
+            modifier = Modifier
+                .width(12.dp)
+                .height(70.dp)
+                .clip(RoundedCornerShape(0.dp,25.dp, 25.dp, 0.dp))
+                .background(Color.Red)
+        ) { }
+        Text(
+            text = message,
+            style = Typography.h2,
+            color = Color.Black,
+            modifier = modifier
+                .padding(start = 15.dp, end = 3.dp)
+                .align(Alignment.CenterVertically)
+        )
+    }
 }

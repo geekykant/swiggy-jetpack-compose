@@ -21,12 +21,14 @@ val Typography = Typography(
         body1 = TextStyle(
                 fontFamily = Prox,
                 fontWeight = FontWeight.Normal,
-                fontSize = 12.sp
+                fontSize = 12.sp,
+                lineHeight = 16.sp
         ),
         h1 = TextStyle(
                 fontFamily = Prox,
                 fontWeight = FontWeight.Bold,
-                fontSize = 20.sp
+                fontSize = 20.sp,
+                letterSpacing = (-1.5).sp
         ),
         h2 = TextStyle(
                 fontFamily = Prox,
