@@ -28,7 +28,7 @@ val Typography = Typography(
                 fontFamily = Prox,
                 fontWeight = FontWeight.Bold,
                 fontSize = 20.sp,
-                letterSpacing = (-1.5).sp
+                letterSpacing = (-0.5).sp
         ),
         h2 = TextStyle(
                 fontFamily = Prox,

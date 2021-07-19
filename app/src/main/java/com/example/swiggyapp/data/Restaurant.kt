@@ -49,12 +49,12 @@ fun prepareRestaurants(): List<Restaurant> {
             53,
             200,
             "https://res.cloudinary.com/swiggy/image/upload/fl_lossy,f_auto,q_auto,w_200,h_220,c_fill/shxshuxficcjcwyixw0s",
-            listOf(Offer(R.drawable.ic_offers, "40% off upto ₹80")),
-            OfferSnack("20% OFF", OfferSnackType.BASIC)
+            listOf(Offer(R.drawable.ic_offers, "20% off upto ₹180")),
+            OfferSnack("20% OFF", OfferSnackType.INVERT_BASIC)
         )
     )
 
-    for (i in 1..20) {
+    for (i in 1..5) {
         prepList = prepList.plus(
             prepList[i % 3]
         )

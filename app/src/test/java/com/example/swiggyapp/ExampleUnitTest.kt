@@ -1,7 +1,8 @@
 package com.example.swiggyapp
 
-import org.junit.Assert.assertEquals
+//import androidx.compose.ui.Modifier
 import org.junit.Test
+import kotlin.math.min
 
 /**
  * Example local unit test, which will execute on the development machine (host).
@@ -10,25 +11,36 @@ import org.junit.Test
  */
 class ExampleUnitTest {
     @Test
-    fun addition_isCorrect() {
-        assertEquals(4, 2 + 2)
+    fun check() {
+        /* Spotlight Restaurants are in 6 columns x 2 rows
+           We need to check and see they are in the limits for the sublist windowing.
+        */
+
+        val spotlightRestaurants = List(1) { it + 1 }
+
+        val spotlightRestaurantsSublist =
+            spotlightRestaurants.subList(0, min(12, nearestEven(spotlightRestaurants.size)))
+        val windowSize = spotlightRestaurantsSublist.size / 2
+
+        if(spotlightRestaurantsSublist.isNotEmpty()){
+            println("Window size: $windowSize")
+            println("before: ${spotlightRestaurants.size}")
+            println("after: ${spotlightRestaurantsSublist.size}")
+
+            spotlightRestaurantsSublist.windowed(windowSize, windowSize, true) { sublist ->
+                println(sublist.size)
+                sublist.forEach { item ->
+                    println("## $item")
+                }
+            }
+        }
     }
 
-    @Test
-    fun check(){
-        fun prepareContent(): HashMap<String, String> {
-            val tagTaglineMap = HashMap<String, String>()
-            tagTaglineMap["Restaurant"] = "Enjoy your favourite treats"
-            tagTaglineMap["Genie"] = "Anything you need, delivered"
-            tagTaglineMap["Meat"] = "Fresh meat & seafood"
-            tagTaglineMap["Book Shops"] = "Delivery from Book Shops"
-            tagTaglineMap["Care Corner"] = "Find essentials & help loved ones"
-            return tagTaglineMap
-        }
-
-        val content = prepareContent()
-        for((key, value) in content){
-            println("First: $key Second: $value")
+    private fun nearestEven(size: Int): Int {
+        return if (size % 2 == 0) {
+            size
+        } else {
+            size.dec()
         }
     }
 }

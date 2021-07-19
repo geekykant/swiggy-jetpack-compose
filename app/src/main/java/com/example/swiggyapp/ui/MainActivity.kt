@@ -4,10 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.*
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
@@ -48,6 +45,7 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun MyScreenContent() {
     SwiggyTheme {
@@ -90,44 +88,73 @@ fun MyScreenContent() {
                     modifier = Modifier.fillMaxSize(),
                     state = scrollState
                 ) {
-                    // My Books section
+                    // Top messages section
                     item {
                         TopHelloBar(prepareHelloBarContent())
-                    }
-
-                    item{
                         AnnouncementHeading(message = "As per state mandates, we will be operational till 8:00 PM")
                     }
 
+                    //Categories or Quick Tiles
                     item {
                         Column(modifier = Modifier.fillMaxWidth()) {
                             BoxItemList(prepareTilesContent())
                         }
                     }
+
                     item {
                         SectionHeading(
                             "All Restaurants Nearby",
-                            "Discover unique tastes near you", R.drawable.ic_shopicon
+                            "Discover unique tastes near you",
+                            R.drawable.ic_shopicon,
+                            showSeeAllIcon = true
                         )
                     }
+
                     items(items = prepareRestaurants()) {
-                        RestaurantItem(it)
+                        RestaurantItem(it, Modifier.fillMaxWidth())
                     }
 
-                    // Turning the list in a list of lists of two elements each
-//                    items(wishlisted.windowed(2, 1, true)) { sublist ->
-//                        Row(Modifier.fillMaxWidth()) {
-//                            sublist.forEach { item ->
-//                                Text(
-//                                    item, modifier = Modifier
-//                                        .height(40.dp)
-//                                        .padding(4.dp)
-//                                        .background(Color.Yellow)
-//                                        .fillParentMaxWidth(.5f)
-//                                )
-//                            }
-//                        }
-//                    }
+                    item {
+                        SectionHeading(
+                            "Top Offers",
+                            "Big Savings On Your Loved Eateries",
+                            R.drawable.ic_offers_filled,
+                            showSeeAllIcon = true
+                        )
+//                        DoubleSectionRestaurants(
+//                            spotlightRestaurants = prepareRestaurants(),
+//                            lazyListScope = this@LazyColumn
+//                        )
+                    }
+
+                    val spotlightRestaurants = prepareRestaurants()
+                    fun nearestEven(size: Int): Int = if (size % 2 == 0) size else size.dec()
+                    val spotlightRestaurantsSublist =
+                        spotlightRestaurants.subList(
+                            0,
+                            12.coerceAtMost(nearestEven(spotlightRestaurants.size))
+                        )
+                    val windowSize = spotlightRestaurantsSublist.size / 2
+
+                    items(
+                        spotlightRestaurantsSublist.windowed(
+                            windowSize,
+                            windowSize,
+                            true
+                        )
+                    ) { sublist ->
+                        LazyRow(
+                            modifier = Modifier.fillMaxWidth(),
+                        ) {
+                            items(items = sublist) {
+                                RestaurantItem(
+                                    it,
+                                    modifier = Modifier.fillParentMaxWidth(0.8f)
+                                )
+                            }
+                        }
+                    }
+
 
                 }
             }
@@ -135,6 +162,43 @@ fun MyScreenContent() {
 
     }
 }
+
+//@Composable
+//fun DoubleSectionRestaurants(
+//    spotlightRestaurants: List<Restaurant>,
+//    lazyListScope: LazyListScope,
+//    modifier: Modifier = Modifier
+//) {
+//    /* Spotlight Restaurants are in 6 columns x 2 rows
+//       We need to check and see they are in the limits for the sublist windowing.
+//    */
+//    fun nearestEven(size: Int): Int = if (size % 2 == 0) size else size.dec()
+//    val spotlightRestaurantsSublist =
+//        spotlightRestaurants.subList(
+//            0,
+//            12.coerceAtMost(nearestEven(spotlightRestaurants.size))
+//        )
+//    val windowSize = spotlightRestaurantsSublist.size / 2
+//
+//    lazyListScope.items(
+//        spotlightRestaurantsSublist.windowed(
+//            windowSize,
+//            windowSize,
+//            true
+//        )
+//    ) { sublist ->
+//        LazyRow(
+//            modifier = Modifier.fillMaxWidth(),
+//        ) {
+//            items(items = sublist) {
+//                RestaurantItem(
+//                    it,
+//                    modifier = Modifier.fillParentMaxWidth(0.8f)
+//                )
+//            }
+//        }
+//    }
+//}
 
 @Composable
 fun TopHelloBar(contentList: List<HelloBar>, modifier: Modifier = Modifier) {
@@ -187,49 +251,84 @@ private fun AnimateUpDown(message: String) {
             text = message,
             modifier = Modifier
                 .padding(3.dp)
-                .height(28.dp),
+                .height(30.dp),
             maxLines = 2
         )
     }
 }
 
 @Composable
-fun SectionHeading(title: String, tagline: String, iconResId: Int) {
+fun SectionHeading(
+    title: String,
+    tagline: String? = null,
+    iconResId: Int? = null,
+    showSeeAllIcon: Boolean = false
+) {
     Column(
         modifier = Modifier
             .padding(15.dp, 8.dp)
             .fillMaxWidth(),
     ) {
-        Row {
-            Image(
-                painter = painterResource(iconResId),
-                contentDescription = null,
-                modifier = Modifier
-                    .padding(3.dp)
-                    .align(Alignment.CenterVertically)
-            )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Row {
+                if (iconResId != null) {
+                    Image(
+                        painter = painterResource(iconResId),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .padding(3.dp)
+                            .align(Alignment.CenterVertically)
+                    )
+                }
+                Text(
+                    text = title,
+                    fontWeight = FontWeight.ExtraBold,
+                    style = MaterialTheme.typography.h1,
+                    modifier = Modifier
+                        .padding(5.dp, 0.dp)
+                        .alignByBaseline()
+                )
+            }
+            if (showSeeAllIcon) {
+                Row {
+                    Text(
+                        text = "SEE ALL",
+                        style = MaterialTheme.typography.h3,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier
+                            .padding(5.dp, 0.dp)
+                            .align(Alignment.CenterVertically)
+                    )
+                    Image(
+                        painter = painterResource(R.drawable.ic_see_all),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .padding(3.dp)
+                            .align(Alignment.CenterVertically)
+                    )
+                }
+            }
+        }
+
+        if (tagline != null) {
             Text(
-                text = title,
-                fontWeight = FontWeight.ExtraBold,
-                style = MaterialTheme.typography.h1,
-                modifier = Modifier
-                    .padding(5.dp, 0.dp)
-                    .alignByBaseline()
+                text = tagline,
+                color = Color(0xD9000000),
+                style = MaterialTheme.typography.h3
             )
         }
-        Text(
-            text = tagline,
-            color = Color(0xD9000000),
-            style = MaterialTheme.typography.h3
-        )
     }
 }
 
 @Composable
-fun RestaurantItem(r: Restaurant) {
-    val height = 110.dp
+fun RestaurantItem(r: Restaurant, modifier: Modifier = Modifier) {
+    val height = 120.dp
     Row(
-        modifier = Modifier
+        modifier = modifier
+            .fillMaxWidth()
             .padding(horizontal = 15.dp, vertical = 15.dp)
             .heightIn(0.dp, height)
     ) {
@@ -247,42 +346,30 @@ fun RestaurantItem(r: Restaurant) {
                 ),
                 contentDescription = null,
                 modifier = Modifier
-                    .height(100.dp)
+                    .height(110.dp)
                     .width(90.dp)
                     .clip(RoundedCornerShape(5.dp)),
                 contentScale = ContentScale.Crop,
             )
+            val snackModifier = Modifier.align(Alignment.BottomCenter)
             when (r.offerSnack?.offerType) {
-                OfferSnackType.BASIC -> {
-                    val roundShape = RoundedCornerShape(5.dp)
-                    Text(
-                        text = r.offerSnack.message,
-                        maxLines = 1,
-                        style = Typography.h1,
-                        modifier = Modifier
-                            .shadow(8.dp, roundShape)
-                            .background(Color(0xFFFF5722), roundShape)
-                            .padding(horizontal = 10.dp, vertical = 3.dp)
-                            .align(Alignment.BottomCenter),
-                        color = Color.White,
-                        fontSize = 15.sp
+                OfferSnackType.BASIC ->
+                    BasicOfferSnackComposable(
+                        message = r.offerSnack.message,
+                        invert = false,
+                        modifier = snackModifier
                     )
-                }
-                OfferSnackType.FLAT_DEAL -> {
-                    val roundShape = RoundedCornerShape(5.dp)
-                    Text(
-                        text = r.offerSnack.message,
-                        maxLines = 1,
-                        style = Typography.h1,
-                        modifier = Modifier
-                            .shadow(8.dp, roundShape)
-                            .background(Color.White, roundShape)
-                            .padding(horizontal = 10.dp, vertical = 3.dp)
-                            .align(Alignment.BottomCenter),
-                        color = Color(0xFFFF5722),
-                        fontSize = 18.sp
+                OfferSnackType.INVERT_BASIC ->
+                    BasicOfferSnackComposable(
+                        message = r.offerSnack.message,
+                        invert = true,
+                        modifier = snackModifier
                     )
-                }
+                OfferSnackType.FLAT_DEAL ->
+                    FlatDealOfferSnackComposable(
+                        message = r.offerSnack.message,
+                        modifier = snackModifier
+                    )
             }
         }
 
@@ -301,6 +388,7 @@ fun RestaurantItem(r: Restaurant) {
             Text(
                 text = r.dishTagline,
                 maxLines = 1,
+                overflow = TextOverflow.Ellipsis
             )
             Text(text = r.location, maxLines = 1)
             Row(
@@ -311,7 +399,7 @@ fun RestaurantItem(r: Restaurant) {
                     painterResource(id = R.drawable.ic_rating),
                     contentDescription = null,
                     tint = Color.DarkGray,
-                    modifier = Modifier.padding(0.dp, 0.dp, 2.dp, 0.dp)
+                    modifier = Modifier.padding(end = 2.dp)
                 )
                 Text(
                     text = r.rating.toString(),
@@ -334,13 +422,17 @@ fun RestaurantItem(r: Restaurant) {
             LazyColumn {
                 if (!r.allOffers.isNullOrEmpty()) {
                     items(items = r.allOffers) { offer ->
-                        Row() {
+                        Row {
                             Icon(
                                 painterResource(id = R.drawable.ic_offers_filled),
                                 contentDescription = null,
-                                modifier = Modifier.padding(horizontal = 5.dp, vertical = 0.dp)
+                                modifier = Modifier.padding(end = 5.dp),
+                                tint = Color(0xFFFA5520)
                             )
-                            Text(text = offer.offerMessage)
+                            Text(
+                                text = offer.offerMessage,
+                                modifier = Modifier.align(Alignment.CenterVertically)
+                            )
                         }
                     }
                 }
@@ -348,6 +440,55 @@ fun RestaurantItem(r: Restaurant) {
 
         }
     }
+}
+
+@Composable
+fun FlatDealOfferSnackComposable(
+    message: String,
+    modifier: Modifier,
+    roundShape: RoundedCornerShape = RoundedCornerShape(5.dp)
+) {
+    Text(
+        text = message,
+        maxLines = 1,
+        style = Typography.h1,
+        modifier = modifier
+            .shadow(8.dp, roundShape)
+            .background(Color.White, roundShape)
+            .padding(horizontal = 10.dp, vertical = 3.dp),
+        color = Color(0xFFFF5722),
+        fontSize = 18.sp
+    )
+}
+
+@Composable
+fun BasicOfferSnackComposable(message: String, invert: Boolean, modifier: Modifier) {
+    val roundShape = RoundedCornerShape(5.dp)
+    var textColor = Color.White
+    var backgroundColor = MaterialTheme.colors.primaryVariant
+    var borderColor = Color(0x0)
+    var fontWeight = FontWeight.Bold
+
+    if (invert) {
+        backgroundColor = Color.White
+        textColor = MaterialTheme.colors.primaryVariant
+        fontWeight = FontWeight.ExtraBold
+        borderColor = Color(0x1A000000)
+    }
+
+    Text(
+        text = message,
+        maxLines = 1,
+        style = Typography.h1,
+        modifier = modifier
+            .shadow(8.dp, roundShape)
+            .background(backgroundColor, roundShape)
+            .border(1.dp, borderColor, shape = roundShape)
+            .padding(horizontal = 10.dp, vertical = 3.dp),
+        color = textColor,
+        fontSize = 15.sp,
+        fontWeight = fontWeight
+    )
 }
 
 @Composable
@@ -412,8 +553,9 @@ fun StickyTopAppBar(scrolledElevation: Dp = 0.dp, modifier: Modifier) {
 fun BoxItemList(content: List<QuickTile>, modifier: Modifier = Modifier) {
     LazyRow(
         modifier = modifier
-            .height(150.dp)
-            .fillMaxWidth()
+            .wrapContentHeight()
+            .fillMaxWidth(),
+        contentPadding = PaddingValues(start = 10.dp)
     ) {
         items(items = content.toList()) {
             BoxItem(it.title, it.tagLine, it.imageUrl)
@@ -426,7 +568,7 @@ fun BoxItem(heading: String, tagline: String, imageUrl: String) {
     val roundShape = RoundedCornerShape(15.dp)
     Column(
         modifier = Modifier
-            .width(120.dp)
+            .width(118.dp)
             .padding(5.dp)
             .clickable { },
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -464,7 +606,7 @@ fun BoxItem(heading: String, tagline: String, imageUrl: String) {
         Text(
             text = tagline,
             modifier = Modifier
-                .padding(horizontal = 0.dp, vertical = 2.dp),
+                .padding(vertical = 2.dp),
             maxLines = 2,
             textAlign = TextAlign.Center,
             fontSize = 12.sp
@@ -472,25 +614,20 @@ fun BoxItem(heading: String, tagline: String, imageUrl: String) {
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun DefaultPreview() {
-    MyScreenContent()
-}
-
 @Composable
 fun AnnouncementHeading(message: String, modifier: Modifier = Modifier) {
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .padding(15.dp, 15.dp),
+            .padding(15.dp, 10.dp),
         horizontalArrangement = Arrangement.SpaceBetween
-    ){
+    ) {
         Box(
             modifier = Modifier
                 .width(12.dp)
-                .height(70.dp)
-                .clip(RoundedCornerShape(0.dp,25.dp, 25.dp, 0.dp))
+                .height(60.dp)
+                .align(Alignment.CenterVertically)
+                .clip(RoundedCornerShape(topEnd = 25.dp, bottomEnd = 25.dp))
                 .background(Color.Red)
         ) { }
         Text(
@@ -502,4 +639,10 @@ fun AnnouncementHeading(message: String, modifier: Modifier = Modifier) {
                 .align(Alignment.CenterVertically)
         )
     }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun DefaultPreview() {
+    MyScreenContent()
 }

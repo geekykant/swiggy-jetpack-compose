@@ -1,7 +1,7 @@
 package com.example.swiggyapp.data
 
 enum class OfferSnackType {
-    FLAT_DEAL, BASIC
+    FLAT_DEAL, BASIC, INVERT_BASIC
 }
 
 data class OfferSnack(
