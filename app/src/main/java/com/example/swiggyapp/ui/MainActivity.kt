@@ -1,15 +1,13 @@
 package com.example.swiggyapp.ui
 
+import LazyHorizontalGrid
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.*
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.lazy.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
@@ -34,6 +32,7 @@ import com.example.swiggyapp.ui.theme.SwiggyTheme
 import com.example.swiggyapp.ui.theme.Typography
 import com.google.accompanist.coil.rememberCoilPainter
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import items
 import kotlinx.coroutines.delay
 
 class MainActivity : ComponentActivity() {
@@ -81,24 +80,46 @@ fun MyScreenContent() {
                             .fillMaxWidth()
                     }
                 }
+
                 StickyTopAppBar(topBarElevation, modifier)
+//                if (scrollState.firstVisibleItemIndex == 0) {
+//                    Divider(color = Color(0xF5ECECEC), thickness = 1.dp)
+//                }
             },
             content = {
+                val widgetBottomPadding = 10.dp
+
                 LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(bottom = widgetBottomPadding),
                     state = scrollState
                 ) {
                     // Top messages section
                     item {
                         TopHelloBar(prepareHelloBarContent())
-                        AnnouncementHeading(message = "As per state mandates, we will be operational till 8:00 PM")
+                        AnnouncementHeading(
+                            message = "As per state mandates, we will be operational till 8:00 PM",
+                            modifier = Modifier.padding(bottom = widgetBottomPadding),
+                        )
                     }
 
                     //Categories or Quick Tiles
                     item {
-                        Column(modifier = Modifier.fillMaxWidth()) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(bottom = widgetBottomPadding)
+                        ) {
                             BoxItemList(prepareTilesContent())
                         }
+                    }
+
+                    item {
+                        SingleImageComposable(
+                            imageUrl = "https://res.cloudinary.com/paavam/image/upload/fl_lossy,f_auto,q_auto,w_550,h_310,c_fill//edilicious_eszbcy.png",
+                            modifier = Modifier.padding(bottom = widgetBottomPadding)
+                        )
                     }
 
                     item {
@@ -121,40 +142,11 @@ fun MyScreenContent() {
                             R.drawable.ic_offers_filled,
                             showSeeAllIcon = true
                         )
-//                        DoubleSectionRestaurants(
-//                            spotlightRestaurants = prepareRestaurants(),
-//                            lazyListScope = this@LazyColumn
-//                        )
-                    }
-
-                    val spotlightRestaurants = prepareRestaurants()
-                    fun nearestEven(size: Int): Int = if (size % 2 == 0) size else size.dec()
-                    val spotlightRestaurantsSublist =
-                        spotlightRestaurants.subList(
-                            0,
-                            12.coerceAtMost(nearestEven(spotlightRestaurants.size))
+                        DoubleSectionRestaurants(
+                            spotlightRestaurants = prepareRestaurants(),
+                            lazyListScope = this@LazyColumn
                         )
-                    val windowSize = spotlightRestaurantsSublist.size / 2
-
-                    items(
-                        spotlightRestaurantsSublist.windowed(
-                            windowSize,
-                            windowSize,
-                            true
-                        )
-                    ) { sublist ->
-                        LazyRow(
-                            modifier = Modifier.fillMaxWidth(),
-                        ) {
-                            items(items = sublist) {
-                                RestaurantItem(
-                                    it,
-                                    modifier = Modifier.fillParentMaxWidth(0.8f)
-                                )
-                            }
-                        }
                     }
-
 
                 }
             }
@@ -163,42 +155,56 @@ fun MyScreenContent() {
     }
 }
 
-//@Composable
-//fun DoubleSectionRestaurants(
-//    spotlightRestaurants: List<Restaurant>,
-//    lazyListScope: LazyListScope,
-//    modifier: Modifier = Modifier
-//) {
-//    /* Spotlight Restaurants are in 6 columns x 2 rows
-//       We need to check and see they are in the limits for the sublist windowing.
-//    */
-//    fun nearestEven(size: Int): Int = if (size % 2 == 0) size else size.dec()
-//    val spotlightRestaurantsSublist =
-//        spotlightRestaurants.subList(
-//            0,
-//            12.coerceAtMost(nearestEven(spotlightRestaurants.size))
-//        )
-//    val windowSize = spotlightRestaurantsSublist.size / 2
-//
-//    lazyListScope.items(
-//        spotlightRestaurantsSublist.windowed(
-//            windowSize,
-//            windowSize,
-//            true
-//        )
-//    ) { sublist ->
-//        LazyRow(
-//            modifier = Modifier.fillMaxWidth(),
-//        ) {
-//            items(items = sublist) {
-//                RestaurantItem(
-//                    it,
-//                    modifier = Modifier.fillParentMaxWidth(0.8f)
-//                )
-//            }
-//        }
-//    }
-//}
+@Composable
+fun SingleImageComposable(imageUrl: String, modifier: Modifier = Modifier) {
+    Box(
+        modifier = modifier
+            .clickable { }
+            .padding(horizontal = 15.dp, vertical = 15.dp)
+            .fillMaxWidth()
+    ) {
+        Image(
+            rememberCoilPainter(
+                imageUrl,
+                fadeInDurationMs = 300,
+                previewPlaceholder = R.drawable.ic_restaurant1
+            ),
+            contentDescription = null,
+            modifier = Modifier
+                .height(210.dp)
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(15.dp)),
+            contentScale = ContentScale.Crop,
+        )
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun DoubleSectionRestaurants(
+    spotlightRestaurants: List<Restaurant>,
+    lazyListScope: LazyListScope,
+    modifier: Modifier = Modifier
+) {
+    /* Spotlight Restaurants are in 6 columns x 2 rows
+       We need to check and see they are in the limits for the sublist windowing.
+    */
+    fun nearestEven(size: Int): Int = if (size % 2 == 0) size else size.dec()
+    val spotlightRestaurantsSublist =
+        spotlightRestaurants.subList(
+            0,
+            12.coerceAtMost(nearestEven(spotlightRestaurants.size))
+        )
+    val windowSize = spotlightRestaurantsSublist.size / 2
+
+    LazyHorizontalGrid(
+        cells = GridCells.Fixed(2)
+    ) {
+        items(items = spotlightRestaurantsSublist){
+            RestaurantItem(r = it, modifier = Modifier.fillParentMaxWidth(0.8f))
+        }
+    }
+}
 
 @Composable
 fun TopHelloBar(contentList: List<HelloBar>, modifier: Modifier = Modifier) {
