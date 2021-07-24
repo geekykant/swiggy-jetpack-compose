@@ -33,7 +33,7 @@ val Typography = Typography(
         h2 = TextStyle(
                 fontFamily = Prox,
                 fontWeight = FontWeight.Bold,
-                fontSize = 16.sp
+                fontSize = 17.sp
         ),
         h3 = TextStyle(
                 fontFamily = Prox,

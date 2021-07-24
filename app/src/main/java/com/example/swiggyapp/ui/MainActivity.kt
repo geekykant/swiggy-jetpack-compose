@@ -26,12 +26,16 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.example.swiggyapp.R
 import com.example.swiggyapp.data.*
 import com.example.swiggyapp.ui.theme.SwiggyTheme
 import com.example.swiggyapp.ui.theme.Typography
 import com.google.accompanist.coil.rememberCoilPainter
-import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import items
 import kotlinx.coroutines.delay
 
@@ -39,120 +43,114 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            MyScreenContent()
+            SwiggyTheme {
+                MainContent()
+            }
         }
     }
 }
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun MyScreenContent() {
-    SwiggyTheme {
-        // Remember a SystemUiController
-        val systemUiController = rememberSystemUiController()
-        val useDarkIcons = MaterialTheme.colors.isLight
+private fun MainContent() {
+    val scrollState = rememberLazyListState()
+    var topBarElevation by remember { mutableStateOf(0.dp) }
+    val navController = rememberNavController()
 
-        SideEffect {
-            // Update all of the system bar colors to be transparent, and use
-            // dark icons if we're in light theme
-            systemUiController.setSystemBarsColor(
-                color = Color.Transparent,
-                darkIcons = useDarkIcons
-            )
-            // setStatusBarsColor() and setNavigationBarsColor() also exist
-        }
-
-        val scrollState = rememberLazyListState()
-        var topBarElevation by remember { mutableStateOf(0.dp) }
-
-        Scaffold(
-            topBar = {
-                val modifier: Modifier
-                when (scrollState.firstVisibleItemIndex) {
-                    0 -> {
-                        topBarElevation = 0.dp
-                        modifier = Modifier
-                            .fillMaxWidth()
-                    }
-                    else -> {
-                        topBarElevation = 12.dp
-                        modifier = Modifier
-                            .fillMaxWidth()
-                    }
-                }
-
-                StickyTopAppBar(topBarElevation, modifier)
-//                if (scrollState.firstVisibleItemIndex == 0) {
-//                    Divider(color = Color(0xF5ECECEC), thickness = 1.dp)
-//                }
-            },
-            content = {
-                val widgetBottomPadding = 10.dp
-
-                LazyColumn(
+    Scaffold(
+        topBar = {
+            val modifier: Modifier
+            when (scrollState.firstVisibleItemIndex) {
+                0 -> {
+                    topBarElevation = 0.dp
                     modifier = Modifier
-                        .fillMaxSize()
-                        .padding(bottom = widgetBottomPadding),
-                    state = scrollState
-                ) {
-                    // Top messages section
-                    item {
-                        TopHelloBar(prepareHelloBarContent())
-                        AnnouncementHeading(
-                            message = "As per state mandates, we will be operational till 8:00 PM",
-                            modifier = Modifier.padding(bottom = widgetBottomPadding),
-                        )
-                    }
-
-                    //Categories or Quick Tiles
-                    item {
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(bottom = widgetBottomPadding)
-                        ) {
-                            BoxItemList(prepareTilesContent())
-                        }
-                    }
-
-                    item {
-                        SingleImageComposable(
-                            imageUrl = "https://res.cloudinary.com/paavam/image/upload/fl_lossy,f_auto,q_auto,w_550,h_310,c_fill//edilicious_eszbcy.png",
-                            modifier = Modifier.padding(bottom = widgetBottomPadding)
-                        )
-                    }
-
-                    item {
-                        SectionHeading(
-                            "All Restaurants Nearby",
-                            "Discover unique tastes near you",
-                            R.drawable.ic_shopicon,
-                            showSeeAllIcon = true
-                        )
-                    }
-
-                    items(items = prepareRestaurants()) {
-                        RestaurantItem(it, Modifier.fillMaxWidth())
-                    }
-
-                    item {
-                        SectionHeading(
-                            "Top Offers",
-                            "Big Savings On Your Loved Eateries",
-                            R.drawable.ic_offers_filled,
-                            showSeeAllIcon = true
-                        )
-                        DoubleSectionRestaurants(
-                            spotlightRestaurants = prepareRestaurants(),
-                            lazyListScope = this@LazyColumn
-                        )
-                    }
-
+                        .fillMaxWidth()
+                }
+                else -> {
+                    topBarElevation = 12.dp
+                    modifier = Modifier
+                        .fillMaxWidth()
                 }
             }
-        )
+            StickyTopAppBar(topBarElevation, modifier)
+        },
+        bottomBar = { BottomNavigationBar(navController) }
+    ) { paddingValues ->
+        Navigation(navController, scrollState, paddingValues)
+    }
+}
+
+@Composable
+fun HomeScreen(
+    scrollState: LazyListState,
+    paddingValues: PaddingValues
+) {
+    val widgetBottomPadding = 10.dp
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(bottom = paddingValues.calculateBottomPadding()),
+        state = scrollState
+    ) {
+        // Top messages section
+        item {
+            TopHelloBar(prepareHelloBarContent())
+            AnnouncementHeading(
+                message = "As per state mandates,\nwe will be operational till 8:00 PM",
+                modifier = Modifier.padding(bottom = widgetBottomPadding),
+            )
+        }
+
+        //Categories or Quick Tiles
+        item {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = widgetBottomPadding)
+            ) {
+                BoxItemList(prepareTilesContent())
+            }
+        }
+
+        item {
+            SingleImageComposable(
+                imageUrl = "https://res.cloudinary.com/paavam/image/upload/fl_lossy,f_auto,q_auto,w_550,h_310,c_fill//edilicious_eszbcy.png",
+                modifier = Modifier.padding(bottom = widgetBottomPadding)
+            )
+        }
+
+        item {
+            SectionHeading(
+                "All Restaurants Nearby",
+                "Discover unique tastes near you",
+                R.drawable.ic_shopicon,
+                showSeeAllIcon = true
+            )
+        }
+
+        items(items = prepareRestaurants()) {
+            RestaurantItem(it, Modifier.fillMaxWidth())
+        }
+
+        item {
+            SectionHeading(
+                "Top Offers",
+                "Big Savings On Your Loved Eateries",
+                R.drawable.ic_offers_filled,
+                showSeeAllIcon = true
+            )
+            DoubleSectionRestaurants(
+                spotlightRestaurants = prepareRestaurants(),
+                lazyListScope = this@LazyColumn
+            )
+        }
 
     }
+}
+
+@Composable
+fun NoScreen() {
+    Text("No Screen", modifier = Modifier.fillMaxSize())
 }
 
 @Composable
@@ -160,7 +158,7 @@ fun SingleImageComposable(imageUrl: String, modifier: Modifier = Modifier) {
     Box(
         modifier = modifier
             .clickable { }
-            .padding(horizontal = 15.dp, vertical = 15.dp)
+            .padding(horizontal = 15.dp, vertical = 0.dp)
             .fillMaxWidth()
     ) {
         Image(
@@ -200,7 +198,7 @@ fun DoubleSectionRestaurants(
     LazyHorizontalGrid(
         cells = GridCells.Fixed(2)
     ) {
-        items(items = spotlightRestaurantsSublist){
+        items(items = spotlightRestaurantsSublist) {
             RestaurantItem(r = it, modifier = Modifier.fillParentMaxWidth(0.8f))
         }
     }
@@ -222,7 +220,7 @@ fun TopHelloBar(contentList: List<HelloBar>, modifier: Modifier = Modifier) {
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 6.dp, vertical = 6.dp),
+            .padding(horizontal = 10.dp, vertical = 6.dp),
         verticalAlignment = Alignment.Top
     ) {
         Image(
@@ -241,7 +239,7 @@ fun TopHelloBar(contentList: List<HelloBar>, modifier: Modifier = Modifier) {
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
-private fun AnimateUpDown(message: String) {
+private fun AnimateUpDown(message: String, modifier: Modifier = Modifier) {
     AnimatedContent(targetState = message,
         transitionSpec = {
             if (targetState > initialState) {
@@ -255,8 +253,8 @@ private fun AnimateUpDown(message: String) {
     ) {
         Text(
             text = message,
-            modifier = Modifier
-                .padding(3.dp)
+            modifier = modifier
+                .padding(horizontal = 5.dp, vertical = 3.dp)
                 .height(30.dp),
             maxLines = 2
         )
@@ -626,15 +624,15 @@ fun AnnouncementHeading(message: String, modifier: Modifier = Modifier) {
         modifier = modifier
             .fillMaxWidth()
             .padding(15.dp, 10.dp),
-        horizontalArrangement = Arrangement.SpaceBetween
+        horizontalArrangement = Arrangement.Start
     ) {
         Box(
             modifier = Modifier
-                .width(12.dp)
+                .width(9.dp)
                 .height(60.dp)
                 .align(Alignment.CenterVertically)
-                .clip(RoundedCornerShape(topEnd = 25.dp, bottomEnd = 25.dp))
-                .background(Color.Red)
+                .clip(RoundedCornerShape(topEnd = 30.dp, bottomEnd = 30.dp))
+                .background(MaterialTheme.colors.primaryVariant)
         ) { }
         Text(
             text = message,
@@ -647,8 +645,91 @@ fun AnnouncementHeading(message: String, modifier: Modifier = Modifier) {
     }
 }
 
+@Composable
+fun Navigation(
+    navController: NavHostController,
+    scrollState: LazyListState,
+    paddingValues: PaddingValues
+) {
+    NavHost(navController, startDestination = ScreenItem.Home.route) {
+        composable(ScreenItem.Home.route) {
+            HomeScreen(scrollState, paddingValues)
+        }
+        composable(ScreenItem.Search.route) {
+            NoScreen()
+        }
+        composable(ScreenItem.Cart.route) {
+            NoScreen()
+        }
+        composable(ScreenItem.Account.route) {
+            NoScreen()
+        }
+    }
+}
+
+@Composable
+fun BottomNavigationBar(navController: NavController) {
+    val items = listOf(
+        ScreenItem.Home,
+        ScreenItem.Search,
+        ScreenItem.Cart,
+        ScreenItem.Account
+    )
+
+    var selectedRoute by remember { mutableStateOf(ScreenItem.Home.route) }
+    BottomNavigation(
+        backgroundColor = Color.White,
+        contentColor = MaterialTheme.colors.primaryVariant,
+        elevation = 8.dp
+    ) {
+        items.forEach { screen ->
+            BottomNavigationItem(
+                icon = {
+                    when (screen.route) {
+                        selectedRoute -> Icon(
+                            painterResource(id = screen.icon_pressed),
+                            contentDescription = screen.title
+                        )
+                        else -> Icon(
+                            painterResource(id = screen.icon),
+                            contentDescription = screen.title
+                        )
+                    }
+                },
+                label = { Text(text = screen.title) },
+                selectedContentColor = MaterialTheme.colors.primaryVariant,
+                unselectedContentColor = Color.Black.copy(0.65f),
+                alwaysShowLabel = true,
+                selected = selectedRoute == screen.route, //currentDestination?.hierarchy?.any { it.route == screen.route } == true,
+                onClick = {
+                    selectedRoute = screen.route
+                    navController.navigate(screen.route) {
+                        // Pop up to the start destination of the graph to
+                        // avoid building up a large stack of destinations
+                        // on the back stack as users select items
+                        navController.graph.startDestinationRoute?.let { route ->
+                            popUpTo(route) {
+                                saveState = true
+                            }
+                        }
+
+
+                        // Avoid multiple copies of the same destination when
+                        // reselecting the same item
+                        launchSingleTop = true
+                        // Restore state when reselecting a previously selected item
+                        restoreState = true
+                    }
+                }
+            )
+        }
+    }
+}
+
 @Preview(showBackground = true)
 @Composable
 fun DefaultPreview() {
-    MyScreenContent()
+    SwiggyTheme {
+        HomeScreen(rememberLazyListState(), PaddingValues(10.dp))
+    }
 }
