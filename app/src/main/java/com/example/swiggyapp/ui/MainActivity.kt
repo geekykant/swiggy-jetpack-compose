@@ -13,8 +13,13 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.composed
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -38,6 +43,7 @@ import com.example.swiggyapp.ui.theme.Typography
 import com.google.accompanist.coil.rememberCoilPainter
 import items
 import kotlinx.coroutines.delay
+import java.util.*
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -555,14 +561,61 @@ fun StickyTopAppBar(scrolledElevation: Dp = 0.dp, modifier: Modifier) {
 
 @Composable
 fun BoxItemList(content: List<QuickTile>, modifier: Modifier = Modifier) {
+    val horizontalScrollState = rememberLazyListState()
     LazyRow(
         modifier = modifier
             .wrapContentHeight()
             .fillMaxWidth(),
-        contentPadding = PaddingValues(start = 10.dp)
+        contentPadding = PaddingValues(start = 10.dp),
+        state = horizontalScrollState
     ) {
         items(items = content.toList()) {
             BoxItem(it.title, it.tagLine, it.imageUrl)
+        }
+    }
+
+    /*
+    Horizontal Slider implemented the hard way to track scroll on lazyrow.
+     */
+    val roundShape = RoundedCornerShape(5.dp)
+    Box(
+        modifier = Modifier
+            .padding(top = 5.dp, bottom = 10.dp)
+            .fillMaxWidth(),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            "",
+            modifier = Modifier
+                .height(3.5.dp)
+                .simpleHorizontalScrollbar(horizontalScrollState)
+                .background(Color(0x1A000000), roundShape)
+                .fillMaxWidth(0.2f),
+        )
+    }
+}
+
+@Composable
+fun Modifier.simpleHorizontalScrollbar(
+    state: LazyListState,
+    height: Dp = 3.5.dp
+): Modifier = composed {
+    drawWithContent {
+        drawContent()
+        val firstVisibleElementIndex = state.layoutInfo.visibleItemsInfo.firstOrNull()?.index
+
+        // Draw scrollbar if scrolling or if the animation is still running and lazy column has content
+        if (firstVisibleElementIndex != null) {
+            val elementWidth = this.size.width / state.layoutInfo.totalItemsCount
+            val scrollbarOffsetX = firstVisibleElementIndex * elementWidth
+            val scrollbarWidth = state.layoutInfo.visibleItemsInfo.size * elementWidth
+
+            drawRoundRect(
+                color = Color.Red,
+                topLeft = Offset(scrollbarOffsetX, 0f),
+                size = Size(scrollbarWidth, height.toPx()),
+                cornerRadius = CornerRadius(15.dp.toPx(), 15.dp.toPx())
+            )
         }
     }
 }
@@ -696,7 +749,12 @@ fun BottomNavigationBar(navController: NavController) {
                         )
                     }
                 },
-                label = { Text(text = screen.title) },
+                label = {
+                    Text(
+                        text = screen.title.uppercase(Locale.getDefault()),
+                        fontSize = 9.sp
+                    )
+                },
                 selectedContentColor = MaterialTheme.colors.primaryVariant,
                 unselectedContentColor = Color.Black.copy(0.65f),
                 alwaysShowLabel = true,
@@ -712,8 +770,6 @@ fun BottomNavigationBar(navController: NavController) {
                                 saveState = true
                             }
                         }
-
-
                         // Avoid multiple copies of the same destination when
                         // reselecting the same item
                         launchSingleTop = true
