@@ -50,7 +50,13 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             SwiggyTheme {
-                MainContent()
+                val navController = rememberNavController()
+                Scaffold(
+                    topBar = { },
+                    bottomBar = { BottomNavigationBar(navController) }
+                ) { outerPaddingValues ->
+                    Navigation(navController, outerPaddingValues)
+                }
             }
         }
     }
@@ -58,44 +64,42 @@ class MainActivity : ComponentActivity() {
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun MainContent() {
+private fun MainContent(
+    outerPaddingValues: PaddingValues
+) {
     val scrollState = rememberLazyListState()
     var topBarElevation by remember { mutableStateOf(0.dp) }
-    val navController = rememberNavController()
 
     Scaffold(
         topBar = {
             val modifier: Modifier
-            when (scrollState.firstVisibleItemIndex) {
-                0 -> {
-                    topBarElevation = 0.dp
-                    modifier = Modifier
-                        .fillMaxWidth()
-                }
-                else -> {
-                    topBarElevation = 12.dp
-                    modifier = Modifier
-                        .fillMaxWidth()
-                }
+            if (scrollState.firstVisibleItemIndex != 0 || scrollState.isScrollInProgress) {
+                topBarElevation = 12.dp
+                modifier = Modifier
+                    .fillMaxWidth()
+            } else {
+                topBarElevation = 0.dp
+                modifier = Modifier
+                    .fillMaxWidth()
             }
             StickyTopAppBar(topBarElevation, modifier)
-        },
-        bottomBar = { BottomNavigationBar(navController) }
-    ) { paddingValues ->
-        Navigation(navController, scrollState, paddingValues)
+        }
+    ) { innerPaddingValues ->
+        HomeScreen(scrollState, outerPaddingValues, innerPaddingValues)
     }
 }
 
 @Composable
 fun HomeScreen(
     scrollState: LazyListState,
-    paddingValues: PaddingValues
+    outerPaddingValues: PaddingValues,
+    innerPaddingValues: PaddingValues
 ) {
     val widgetBottomPadding = 10.dp
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .padding(bottom = paddingValues.calculateBottomPadding()),
+            .padding(bottom = outerPaddingValues.calculateBottomPadding()),
         state = scrollState
     ) {
         // Top messages section
@@ -145,10 +149,7 @@ fun HomeScreen(
                 R.drawable.ic_offers_filled,
                 showSeeAllIcon = true
             )
-            DoubleSectionRestaurants(
-                spotlightRestaurants = prepareRestaurants(),
-                lazyListScope = this@LazyColumn
-            )
+            DoubleSectionRestaurants(spotlightRestaurants = prepareRestaurants())
         }
 
     }
@@ -187,7 +188,6 @@ fun SingleImageComposable(imageUrl: String, modifier: Modifier = Modifier) {
 @Composable
 fun DoubleSectionRestaurants(
     spotlightRestaurants: List<Restaurant>,
-    lazyListScope: LazyListScope,
     modifier: Modifier = Modifier
 ) {
     /* Spotlight Restaurants are in 6 columns x 2 rows
@@ -199,7 +199,6 @@ fun DoubleSectionRestaurants(
             0,
             12.coerceAtMost(nearestEven(spotlightRestaurants.size))
         )
-    val windowSize = spotlightRestaurantsSublist.size / 2
 
     LazyHorizontalGrid(
         cells = GridCells.Fixed(2)
@@ -556,7 +555,17 @@ fun StickyTopAppBar(scrolledElevation: Dp = 0.dp, modifier: Modifier) {
         },
         backgroundColor = MaterialTheme.colors.surface,
         elevation = scrolledElevation,
-    )
+        modifier = Modifier
+            .drawWithContent {
+                drawContent()
+                drawLine(
+                    color = Color(0x1A000000),
+                    start = Offset(0f, this.size.height),
+                    end = Offset(this.size.width, this.size.height),
+                    strokeWidth = 3f,
+                    alpha = if(scrolledElevation == 0.dp) 1f else 0f
+                )
+            })
 }
 
 @Composable
@@ -701,12 +710,11 @@ fun AnnouncementHeading(message: String, modifier: Modifier = Modifier) {
 @Composable
 fun Navigation(
     navController: NavHostController,
-    scrollState: LazyListState,
-    paddingValues: PaddingValues
+    outerPaddingValues: PaddingValues
 ) {
     NavHost(navController, startDestination = ScreenItem.Home.route) {
         composable(ScreenItem.Home.route) {
-            HomeScreen(scrollState, paddingValues)
+            MainContent(outerPaddingValues)
         }
         composable(ScreenItem.Search.route) {
             NoScreen()
@@ -786,6 +794,6 @@ fun BottomNavigationBar(navController: NavController) {
 @Composable
 fun DefaultPreview() {
     SwiggyTheme {
-        HomeScreen(rememberLazyListState(), PaddingValues(10.dp))
+        MainContent(PaddingValues(10.dp))
     }
 }
