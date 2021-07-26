@@ -260,7 +260,7 @@ fun SectionHeading(
     showSeeAllText: Boolean = true,
     seeAllText: String = "See All",
     seeAllTextColor: Color = Color.Black,
-    seeAllOnClick: () -> Unit
+    seeAllOnClick: () -> Unit = { }
 ) {
     Column(
         modifier = Modifier
