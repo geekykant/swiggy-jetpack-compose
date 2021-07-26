@@ -8,7 +8,6 @@ import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
-import com.example.swiggyapp.ui.home.Home
 
 @Composable
 fun SwiggyApp() {
@@ -16,7 +15,7 @@ fun SwiggyApp() {
     var isOnline by remember { mutableStateOf(checkIfOnline(context)) }
 
     if (isOnline){
-        Home()
+//        Home()
     }else{
         OfflineDialog { isOnline = checkIfOnline(context)}
     }
