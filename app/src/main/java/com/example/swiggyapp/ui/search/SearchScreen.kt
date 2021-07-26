@@ -4,6 +4,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Close
@@ -12,6 +13,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -78,7 +80,7 @@ fun SearchScreen(
                 searchCuisinesList.forEach {
                     CuisineItemComposable(
                         cuisine = it,
-                        modifier = modifier.fillParentMaxWidth(0.20f)
+                        modifier = Modifier.fillParentMaxWidth(0.20f)
                     )
                 }
             }
@@ -105,6 +107,7 @@ fun CuisineItemComposable(cuisine: Cuisine, modifier: Modifier = Modifier) {
             ),
             contentDescription = null,
             modifier = Modifier
+                .shadow(1.dp, RoundedCornerShape(percent = 50))
                 .fillMaxWidth(),
             contentScale = ContentScale.Inside,
         )
@@ -211,6 +214,10 @@ fun SearchBar(modifier: Modifier = Modifier) {
                     modifier = Modifier.clickable { searchText.value = "" }
                 )
         },
+        colors = TextFieldDefaults.textFieldColors(
+            focusedIndicatorColor =  MaterialTheme.colors.onSurface.copy(alpha = TextFieldDefaults.UnfocusedIndicatorLineOpacity)
+        ),
+        maxLines = 1
     )
 }
 
