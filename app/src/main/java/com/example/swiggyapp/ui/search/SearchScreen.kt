@@ -98,12 +98,14 @@ fun SearchScreen(
                     )
                 }
             }
+            Spacer(modifier = modifier.height(10.dp))
             Divider(
                 modifier = modifier
                     .height(10.dp),
                 color = Color(0xD000000)
             )
         }
+
     }
 }
 
@@ -152,8 +154,8 @@ fun SearchBar(
 fun CuisineItemComposable(
     cuisine: Cuisine,
     modifier: Modifier = Modifier,
-    fontSize: TextUnit = 12.sp,
-    bottomTextPadding: PaddingValues = PaddingValues(4.dp)
+    fontSize: TextUnit = 13.sp,
+    bottomTextPadding: PaddingValues = PaddingValues(top = 5.dp)
 ) {
     Column(
         modifier = modifier.padding(2.dp),

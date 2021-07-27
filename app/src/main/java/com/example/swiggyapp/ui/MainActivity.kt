@@ -52,10 +52,10 @@ fun Navigation(
             SearchScreen(outerPaddingValues)
         }
         composable(ScreenItem.Cart.route) {
-            CartScreen()
+            CartScreen(outerPaddingValues)
         }
         composable(ScreenItem.Account.route) {
-            AccountScreen()
+            AccountScreen(outerPaddingValues)
         }
     }
 }
@@ -72,7 +72,7 @@ fun BottomNavigationBar(navController: NavController) {
     var selectedRoute by remember { mutableStateOf(ScreenItem.Home.route) }
     BottomNavigation(
         backgroundColor = Color.White,
-        contentColor = MaterialTheme.colors.primaryVariant,
+        contentColor = MaterialTheme.colors.primary,
         elevation = 8.dp
     ) {
         items.forEach { screen ->
@@ -95,7 +95,7 @@ fun BottomNavigationBar(navController: NavController) {
                         fontSize = 9.sp
                     )
                 },
-                selectedContentColor = MaterialTheme.colors.primaryVariant,
+                selectedContentColor = MaterialTheme.colors.primary,
                 unselectedContentColor = Color.Black.copy(0.65f),
                 alwaysShowLabel = true,
                 selected = selectedRoute == screen.route, //currentDestination?.hierarchy?.any { it.route == screen.route } == true,

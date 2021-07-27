@@ -506,13 +506,13 @@ fun FlatDealOfferSnackComposable(
 fun BasicOfferSnackComposable(message: String, invert: Boolean, modifier: Modifier) {
     val roundShape = RoundedCornerShape(5.dp)
     var textColor = Color.White
-    var backgroundColor = MaterialTheme.colors.primaryVariant
+    var backgroundColor = MaterialTheme.colors.primary
     var borderColor = Color(0x0)
     var fontWeight = FontWeight.Bold
 
     if (invert) {
         backgroundColor = Color.White
-        textColor = MaterialTheme.colors.primaryVariant
+        textColor = MaterialTheme.colors.primary
         fontWeight = FontWeight.ExtraBold
         borderColor = Color(0x1A000000)
     }
@@ -727,7 +727,7 @@ fun AnnouncementHeading(message: String, modifier: Modifier = Modifier) {
                 .height(60.dp)
                 .align(Alignment.CenterVertically)
                 .clip(RoundedCornerShape(topEnd = 30.dp, bottomEnd = 30.dp))
-                .background(MaterialTheme.colors.primaryVariant)
+                .background(MaterialTheme.colors.primary)
         ) { }
         Text(
             text = message,
