@@ -3,6 +3,7 @@ package com.example.swiggyapp.ui.home
 import LazyHorizontalGrid
 import androidx.compose.animation.*
 import androidx.compose.foundation.*
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -23,19 +24,21 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import com.example.swiggyapp.R
 import com.example.swiggyapp.data.*
+import com.example.swiggyapp.ui.search.CuisineItemComposable
+import com.example.swiggyapp.ui.theme.SwiggyTheme
 import com.example.swiggyapp.ui.theme.Typography
 import com.google.accompanist.coil.rememberCoilPainter
 import items
 import kotlinx.coroutines.delay
 import java.util.*
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun MainContent(
     outerPaddingValues: PaddingValues
@@ -57,6 +60,7 @@ fun MainContent(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun HomeScreen(
     scrollState: LazyListState,
@@ -95,6 +99,32 @@ fun HomeScreen(
                 imageUrl = "https://res.cloudinary.com/paavam/image/upload/fl_lossy,f_auto,q_auto,w_550,h_310,c_fill//edilicious_eszbcy.png",
                 modifier = Modifier.padding(bottom = widgetBottomPadding)
             )
+        }
+
+        item {
+            SectionHeading(
+                title = "Popular Curations",
+                showSeeAllText = false
+            )
+            LazyHorizontalGrid(
+                cells = GridCells.Fixed(2),
+                modifier = Modifier
+                    .padding(vertical = 10.dp)
+                    .padding(bottom = widgetBottomPadding),
+                contentPadding = PaddingValues(start = 10.dp),
+            ) {
+                items(items = preparePopularCurations()) {
+                    CuisineItemComposable(
+                        it,
+                        modifier = Modifier
+                            .clickable { }
+                            .padding(horizontal = 8.dp, vertical = 10.dp)
+                            .fillParentMaxWidth(0.25f),
+                        fontSize = 14.sp,
+                        bottomTextPadding = PaddingValues(top=10.dp)
+                    )
+                }
+            }
         }
 
         item {
@@ -179,17 +209,14 @@ fun DoubleSectionRestaurants(
        We need to check and see they are in the limits for the sublist windowing.
     */
     fun nearestEven(size: Int): Int = if (size % 2 == 0) size else size.dec()
-    val spotlightRestaurantsSublist =
-        spotlightRestaurants.subList(
-            0,
-            12.coerceAtMost(nearestEven(spotlightRestaurants.size))
-        )
+    val showUpToCount: Int = 12.coerceAtMost(nearestEven(spotlightRestaurants.size))
+    val spotlightRestaurantsSublist = spotlightRestaurants.subList(0, showUpToCount)
 
     LazyHorizontalGrid(
         cells = GridCells.Fixed(2)
     ) {
         items(items = spotlightRestaurantsSublist) {
-            RestaurantItem(r = it, modifier = Modifier.fillParentMaxWidth(0.8f))
+            RestaurantItem(r = it, modifier = modifier.fillParentMaxWidth(0.8f))
         }
     }
 }
@@ -298,12 +325,12 @@ fun SectionHeading(
                 if (showSeeAllText) {
                     Text(
                         text = seeAllText.uppercase(Locale.getDefault()),
-                        style = if(showSeeAllIcon) Typography.h3 else Typography.body1,
-                        fontWeight = if(showSeeAllIcon) FontWeight.Bold else FontWeight.Normal,
+                        style = if (showSeeAllIcon) Typography.h3 else Typography.body1,
+                        fontWeight = if (showSeeAllIcon) FontWeight.Bold else FontWeight.Normal,
                         modifier = Modifier
-                            .clickable { seeAllOnClick() }
+                            .noRippleClickable { seeAllOnClick() }
                             .padding(5.dp, 0.dp)
-                            .align(if(showSeeAllIcon) Alignment.CenterVertically else Alignment.Bottom),
+                            .align(if (showSeeAllIcon) Alignment.CenterVertically else Alignment.Bottom),
                         color = seeAllTextColor,
                     )
                 }
@@ -327,6 +354,13 @@ fun SectionHeading(
                 style = MaterialTheme.typography.h3
             )
         }
+    }
+}
+
+inline fun Modifier.noRippleClickable(crossinline onClick: () -> Unit): Modifier = composed {
+    clickable(indication = null,
+        interactionSource = remember { MutableInteractionSource() }) {
+        onClick()
     }
 }
 
@@ -602,27 +636,28 @@ fun QuickTilesList(content: List<QuickTile>, modifier: Modifier = Modifier) {
     }
 }
 
-@Composable
 fun Modifier.simpleHorizontalScrollbar(
     state: LazyListState,
     height: Dp = 3.5.dp
 ): Modifier = composed {
-    drawWithContent {
-        drawContent()
-        val firstVisibleElementIndex = state.layoutInfo.visibleItemsInfo.firstOrNull()?.index
+    composed {
+        drawWithContent {
+            drawContent()
+            val firstVisibleElementIndex = state.layoutInfo.visibleItemsInfo.firstOrNull()?.index
 
-        // Draw scrollbar if scrolling or if the animation is still running and lazy column has content
-        if (firstVisibleElementIndex != null) {
-            val elementWidth = this.size.width / state.layoutInfo.totalItemsCount
-            val scrollbarOffsetX = firstVisibleElementIndex * elementWidth
-            val scrollbarWidth = state.layoutInfo.visibleItemsInfo.size * elementWidth
+            // Draw scrollbar if scrolling or if the animation is still running and lazy column has content
+            if (firstVisibleElementIndex != null) {
+                val elementWidth = this.size.width / state.layoutInfo.totalItemsCount
+                val scrollbarOffsetX = firstVisibleElementIndex * elementWidth
+                val scrollbarWidth = state.layoutInfo.visibleItemsInfo.size * elementWidth
 
-            drawRoundRect(
-                color = Color.Red,
-                topLeft = Offset(scrollbarOffsetX, 0f),
-                size = Size(scrollbarWidth, height.toPx()),
-                cornerRadius = CornerRadius(15.dp.toPx(), 15.dp.toPx())
-            )
+                drawRoundRect(
+                    color = Color.Red,
+                    topLeft = Offset(scrollbarOffsetX, 0f),
+                    size = Size(scrollbarWidth, height.toPx()),
+                    cornerRadius = CornerRadius(15.dp.toPx(), 15.dp.toPx())
+                )
+            }
         }
     }
 }
@@ -704,3 +739,12 @@ fun AnnouncementHeading(message: String, modifier: Modifier = Modifier) {
         )
     }
 }
+
+@Preview("HomeScreen", showBackground = true)
+@Composable
+fun HomePreview() {
+    SwiggyTheme {
+        MainContent(outerPaddingValues = PaddingValues(10.dp))
+    }
+}
+
