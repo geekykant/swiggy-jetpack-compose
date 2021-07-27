@@ -16,21 +16,26 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.example.swiggyapp.R
+import com.example.swiggyapp.ui.ScreenItem
 import com.example.swiggyapp.ui.theme.SwiggyTheme
 import com.example.swiggyapp.ui.theme.Typography
 import java.util.*
 
 @Composable
 fun CartScreen(
+    navController: NavController,
     outerPaddingValues: PaddingValues
 ) {
-    NoItemsInCart(outerPaddingValues)
+    NoItemsInCart(navController, outerPaddingValues)
 }
 
 @Composable
 fun NoItemsInCart(
-    outerPaddingValues: PaddingValues
+    navController: NavController,
+    outerPaddingValues: PaddingValues,
 ) {
     Column(
         modifier = Modifier
@@ -62,12 +67,16 @@ fun NoItemsInCart(
         )
 
         OutlinedButton(
-            onClick = { /* Open home page */ },
+            onClick = {
+                /* Open home page */
+                navController.navigate(ScreenItem.Home.route)
+
+            },
             colors = ButtonDefaults.outlinedButtonColors(
                 contentColor = MaterialTheme.colors.primary
             ),
             contentPadding = PaddingValues(horizontal = 10.dp),
-            border= BorderStroke(ButtonDefaults.OutlinedBorderSize, MaterialTheme.colors.primary),
+            border = BorderStroke(ButtonDefaults.OutlinedBorderSize, MaterialTheme.colors.primary),
         ) {
             Text(
                 "Browse Restaurants".uppercase(Locale.getDefault()),
@@ -85,6 +94,6 @@ fun NoItemsInCart(
 @Composable
 fun CartScreenPreview() {
     SwiggyTheme {
-        CartScreen(outerPaddingValues = PaddingValues(10.dp))
+        CartScreen(rememberNavController(), outerPaddingValues = PaddingValues(10.dp))
     }
 }

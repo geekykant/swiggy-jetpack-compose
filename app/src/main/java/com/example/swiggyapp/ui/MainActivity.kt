@@ -5,15 +5,19 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.navigation.NavDestination.Companion.hierarchy
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.swiggyapp.ui.account.AccountScreen
 import com.example.swiggyapp.ui.cart.CartScreen
@@ -52,7 +56,7 @@ fun Navigation(
             SearchScreen(outerPaddingValues)
         }
         composable(ScreenItem.Cart.route) {
-            CartScreen(outerPaddingValues)
+            CartScreen(navController, outerPaddingValues)
         }
         composable(ScreenItem.Account.route) {
             AccountScreen(outerPaddingValues)
@@ -69,17 +73,20 @@ fun BottomNavigationBar(navController: NavController) {
         ScreenItem.Account
     )
 
-    var selectedRoute by remember { mutableStateOf(ScreenItem.Home.route) }
     BottomNavigation(
         backgroundColor = Color.White,
         contentColor = MaterialTheme.colors.primary,
         elevation = 8.dp
     ) {
+        val navBackStackEntry by navController.currentBackStackEntryAsState()
+        val currentDestination = navBackStackEntry?.destination
+
         items.forEach { screen ->
+            val isSelectedRoute = currentDestination?.hierarchy?.any { it.route == screen.route }
             BottomNavigationItem(
                 icon = {
-                    when (screen.route) {
-                        selectedRoute -> Icon(
+                    when (isSelectedRoute) {
+                        true -> Icon(
                             painterResource(id = screen.icon_pressed),
                             contentDescription = screen.title
                         )
@@ -98,17 +105,14 @@ fun BottomNavigationBar(navController: NavController) {
                 selectedContentColor = MaterialTheme.colors.primary,
                 unselectedContentColor = Color.Black.copy(0.65f),
                 alwaysShowLabel = true,
-                selected = selectedRoute == screen.route, //currentDestination?.hierarchy?.any { it.route == screen.route } == true,
+                selected = isSelectedRoute == true,
                 onClick = {
-                    selectedRoute = screen.route
                     navController.navigate(screen.route) {
                         // Pop up to the start destination of the graph to
                         // avoid building up a large stack of destinations
                         // on the back stack as users select items
-                        navController.graph.startDestinationRoute?.let { route ->
-                            popUpTo(route) {
-                                saveState = true
-                            }
+                        popUpTo(navController.graph.findStartDestination().id) {
+                            saveState = true
                         }
                         // Avoid multiple copies of the same destination when
                         // reselecting the same item

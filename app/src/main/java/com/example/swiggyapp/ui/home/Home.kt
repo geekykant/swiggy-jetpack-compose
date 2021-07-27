@@ -597,7 +597,8 @@ fun StickyTopAppBar(scrolledElevation: Dp, modifier: Modifier = Modifier) {
                     strokeWidth = 3f,
                     alpha = if (scrolledElevation == 0.dp) 1f else 0f
                 )
-            })
+            }
+    )
 }
 
 @Composable
