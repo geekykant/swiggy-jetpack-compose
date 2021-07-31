@@ -1,6 +1,7 @@
 package com.example.swiggyapp.ui.home
 
 import LazyHorizontalGrid
+import android.content.Intent
 import androidx.compose.animation.*
 import androidx.compose.foundation.*
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -20,6 +21,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -31,6 +33,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import com.example.swiggyapp.R
 import com.example.swiggyapp.data.*
+import com.example.swiggyapp.ui.restaurant.RestaurantActivity
 import com.example.swiggyapp.ui.search.CuisineItemComposable
 import com.example.swiggyapp.ui.theme.SwiggyTheme
 import com.example.swiggyapp.ui.theme.Typography
@@ -44,16 +47,12 @@ fun MainContent(
     outerPaddingValues: PaddingValues
 ) {
     val scrollState = rememberLazyListState()
-    var topBarElevation by remember { mutableStateOf(0.dp) }
+    var isScrollStateChanged by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
-            topBarElevation = if (scrollState.firstVisibleItemScrollOffset != 0) {
-                12.dp
-            } else {
-                0.dp
-            }
-            StickyTopAppBar(topBarElevation)
+            isScrollStateChanged = scrollState.firstVisibleItemScrollOffset != 0
+            StickyTopAppBar(isScrollStateChanged)
         }
     ) { innerPaddingValues ->
         HomeScreen(scrollState, outerPaddingValues, innerPaddingValues)
@@ -63,7 +62,7 @@ fun MainContent(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun HomeScreen(
-    scrollState: LazyListState,
+    scrollState: LazyListState, // Higher level is invoked, and reflected throughout
     outerPaddingValues: PaddingValues,
     innerPaddingValues: PaddingValues
 ) {
@@ -121,7 +120,7 @@ fun HomeScreen(
                             .padding(horizontal = 8.dp, vertical = 10.dp)
                             .fillParentMaxWidth(0.25f),
                         fontSize = 14.sp,
-                        bottomTextPadding = PaddingValues(top=10.dp)
+                        bottomTextPadding = PaddingValues(top = 10.dp)
                     )
                 }
             }
@@ -140,7 +139,13 @@ fun HomeScreen(
         }
 
         items(items = prepareRestaurants()) {
-            RestaurantItem(it, Modifier.fillMaxWidth())
+            RestaurantItem(
+                it,
+                Modifier.fillMaxWidth(),
+                onRestaurantClick = {
+
+                }
+            )
         }
 
         item {
@@ -212,11 +217,19 @@ fun DoubleSectionRestaurants(
     val showUpToCount: Int = 12.coerceAtMost(nearestEven(spotlightRestaurants.size))
     val spotlightRestaurantsSublist = spotlightRestaurants.subList(0, showUpToCount)
 
+    val context = LocalContext.current
+
     LazyHorizontalGrid(
         cells = GridCells.Fixed(2)
     ) {
         items(items = spotlightRestaurantsSublist) {
-            RestaurantItem(r = it, modifier = modifier.fillParentMaxWidth(0.8f))
+            RestaurantItem(
+                r = it,
+                modifier = modifier.fillParentMaxWidth(0.8f),
+                onRestaurantClick = {
+                    context.startActivity(Intent(context, RestaurantActivity::class.java))
+                }
+            )
         }
     }
 }
@@ -357,18 +370,24 @@ fun SectionHeading(
     }
 }
 
-inline fun Modifier.noRippleClickable(crossinline onClick: () -> Unit): Modifier = composed {
-    clickable(indication = null,
-        interactionSource = remember { MutableInteractionSource() }) {
-        onClick()
+inline fun Modifier.noRippleClickable(crossinline onClick: () -> Unit): Modifier =
+    composed {
+        clickable(indication = null,
+            interactionSource = remember { MutableInteractionSource() }) {
+            onClick()
+        }
     }
-}
 
 @Composable
-fun RestaurantItem(r: Restaurant, modifier: Modifier = Modifier) {
+fun RestaurantItem(
+    r: Restaurant,
+    modifier: Modifier = Modifier,
+    onRestaurantClick: (r: Restaurant) -> Unit
+) {
     val height = 120.dp
     Row(
         modifier = modifier
+            .clickable { onRestaurantClick(r) }
             .fillMaxWidth()
             .padding(horizontal = 15.dp, vertical = 15.dp)
             .heightIn(0.dp, height)
@@ -533,7 +552,7 @@ fun BasicOfferSnackComposable(message: String, invert: Boolean, modifier: Modifi
 }
 
 @Composable
-fun StickyTopAppBar(scrolledElevation: Dp, modifier: Modifier = Modifier) {
+fun StickyTopAppBar(isScrollStateChanged: Boolean, modifier: Modifier = Modifier) {
     TopAppBar(
         title = {
             Row(
@@ -586,7 +605,7 @@ fun StickyTopAppBar(scrolledElevation: Dp, modifier: Modifier = Modifier) {
             }
         },
         backgroundColor = MaterialTheme.colors.surface,
-        elevation = scrolledElevation,
+        elevation = if (isScrollStateChanged) 12.dp else 0.dp,
         modifier = Modifier
             .drawWithContent {
                 drawContent()
@@ -595,7 +614,7 @@ fun StickyTopAppBar(scrolledElevation: Dp, modifier: Modifier = Modifier) {
                     start = Offset(0f, this.size.height),
                     end = Offset(this.size.width, this.size.height),
                     strokeWidth = 3f,
-                    alpha = if (scrolledElevation == 0.dp) 1f else 0f
+                    alpha = if (isScrollStateChanged) 0f else 1f
                 )
             }
     )
