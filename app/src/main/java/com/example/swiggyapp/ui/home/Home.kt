@@ -263,13 +263,13 @@ fun TopHelloBar(contentList: List<HelloBar>, modifier: Modifier = Modifier) {
                 .clip(roundShape),
             contentScale = ContentScale.Inside,
         )
-        AnimateUpDown(contentList[i].message)
+        AnimateUpDown(contentList[i].message, 2)
     }
 }
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
-private fun AnimateUpDown(message: String, modifier: Modifier = Modifier) {
+fun AnimateUpDown(message: String, maxLines: Int, modifier: Modifier = Modifier) {
     AnimatedContent(targetState = message,
         transitionSpec = {
             if (targetState > initialState) {
@@ -286,7 +286,7 @@ private fun AnimateUpDown(message: String, modifier: Modifier = Modifier) {
             modifier = modifier
                 .padding(horizontal = 5.dp, vertical = 3.dp)
                 .height(30.dp),
-            maxLines = 2
+            maxLines = maxLines
         )
     }
 }
