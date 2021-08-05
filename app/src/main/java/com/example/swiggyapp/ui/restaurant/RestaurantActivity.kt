@@ -8,12 +8,15 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
@@ -33,6 +36,7 @@ import com.example.swiggyapp.ui.home.noRippleClickable
 import com.example.swiggyapp.ui.theme.Prox
 import com.example.swiggyapp.ui.theme.SwiggyTheme
 import com.example.swiggyapp.ui.theme.Typography
+import com.google.accompanist.coil.rememberCoilPainter
 import kotlinx.coroutines.delay
 import java.util.*
 
@@ -149,7 +153,7 @@ fun RestaurantContent(
                 border = BorderStroke(0.5.dp, Color(0x66009688)),
                 elevation = 2.dp,
                 modifier = Modifier
-                    .padding(horizontal = 15.dp, vertical= 15.dp)
+                    .padding(horizontal = 15.dp, vertical = 15.dp)
                     .fillMaxWidth()
             ) {
                 Row(
@@ -192,10 +196,88 @@ fun RestaurantContent(
             DashedDivider()
         }
 
-        item {
-            GrayDivider()
+        item { GrayDivider() }
+        val foodList = prepareRestaurantFoods()
+        items(items = foodList) {
+            FoodItemComposable(foodItem = it)
         }
+        item { GrayDivider() }
 
+    }
+}
+
+@Composable
+fun FoodItemComposable(
+    foodItem: FoodItem,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier
+            .padding(horizontal = 15.dp, vertical = 15.dp)
+            .fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Column(
+            verticalArrangement = Arrangement.SpaceAround,
+            modifier = Modifier.fillMaxWidth(0.75f),
+        ) {
+            Row(
+                modifier = Modifier.padding(end = 8.dp)
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_foodtype),
+                    contentDescription = null,
+                    tint = when (foodItem.foodType) {
+                        FoodType.VEG -> Color(0xFF008000)
+                        FoodType.NON_VEG -> Color(0xFF008000)
+                    },
+                    modifier = Modifier.padding(end = 3.dp)
+                )
+
+                foodItem.starText?.let {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_rating),
+                        contentDescription = null,
+                        tint = Color(0xFFFFC300 )
+                    )
+                    Text(
+                        text = it,
+                        modifier = Modifier.padding(horizontal = 3.dp),
+                        color = Color(0xFFFFC300 )
+                    )
+                }
+            }
+
+            Text(
+                text = foodItem.name,
+                style = Typography.h2,
+            )
+
+            Text(
+                text = "₹${foodItem.price}"
+            )
+            foodItem.foodContents?.let {
+                Text(
+                    text = it,
+                    maxLines = 4,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
+        }
+        Image(
+            painter = rememberCoilPainter(
+                foodItem.imageUrl,
+                fadeInDurationMs = 100,
+                previewPlaceholder = R.drawable.ic_restaurant1,
+            ),
+            contentDescription = null,
+            modifier = Modifier
+                .clip(RoundedCornerShape(3.dp))
+                .fillMaxWidth(1f),
+            contentScale = ContentScale.FillWidth,
+        )
+        Divider()
     }
 }
 
@@ -232,6 +314,7 @@ fun GrayDivider(
 @Composable
 fun RestaurantPageTopAppBar(
     isScrolling: Boolean,
+    isShopClosed: Boolean = false,
     modifier: Modifier = Modifier
 ) {
     TopAppBar(
@@ -243,6 +326,7 @@ fun RestaurantPageTopAppBar(
                 Column(
                     modifier = Modifier
                         .weight(1f)
+                        .alpha(if (isScrolling) 1f else 0f)
                 ) {
                     Text(
                         text = "Alakapuri".uppercase(Locale.getDefault()),
@@ -250,11 +334,11 @@ fun RestaurantPageTopAppBar(
                         fontSize = 14.sp
                     )
                     Text(
-                        "52 mins",
+                        text = if (isShopClosed) "Closed for delivery" else "52 mins",
                         fontSize = 12.sp,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
-                        color = Color(0xD9000000)
+                        color = if (isShopClosed) Color.Red else Color(0xD9000000)
                     )
                 }
                 IconButton(
