@@ -75,7 +75,8 @@ class RestaurantActivity : ComponentActivity() {
 fun RestaurantContent(
     scrollState: LazyListState, // Higher level is invoked, and reflected throughout
     outerPadding: PaddingValues,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    isClosed: Boolean = false
 ) {
     //implement it
     LazyColumn(
@@ -171,7 +172,11 @@ fun RestaurantContent(
                         .padding(5.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text("39 mins", style = Typography.h2)
+                    Text(
+                        text = if(isClosed) "Closed" else "39 mins",
+                        style = Typography.h2,
+                        color = if(isClosed) Color.Red else Color.Black
+                    )
                     Text("Delivery Time")
                 }
                 Column(
@@ -237,6 +242,39 @@ fun RestaurantContent(
         }
 
         item { GrayDivider() }
+        item {
+            Row(
+                modifier = Modifier
+                    .padding(horizontal = 15.dp, vertical = 10.dp)
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    var foodTypePreference by remember { mutableStateOf(false) }
+                    Switch(
+                        checked = foodTypePreference,
+                        onCheckedChange = {
+                            foodTypePreference = !foodTypePreference
+                        }
+                    )
+                    Text(
+                        "VEG ONLY".uppercase(Locale.getDefault()),
+                        style = Typography.h3,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(horizontal = 5.dp)
+                    )
+                }
+                Image(
+                    painter = painterResource(id = R.drawable.ic_best_safety),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .width(85.dp)
+                )
+            }
+        }
+
         val foodList = prepareRestaurantFoods()
         items(items = foodList) {
             FoodItemComposable(foodItem = it)
@@ -247,66 +285,6 @@ fun RestaurantContent(
             FooterLicenseInfo(
                 modifier = Modifier
                     .background(Color(0xD000000))
-            )
-        }
-    }
-}
-
-@Composable
-fun FooterLicenseInfo(
-    modifier: Modifier = Modifier
-) {
-    Column(
-        modifier = modifier
-            .padding(bottom = 130.dp)
-            .padding(horizontal = 15.dp, vertical = 10.dp)
-    ) {
-        val washedGray = Color(0x4D000000)
-
-        Row(
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(
-                painter = painterResource(id = R.drawable.ic_fssai_logo),
-                contentDescription = null,
-                modifier = modifier.width(50.dp),
-                tint = washedGray
-            )
-            Text(
-                "License No. 11316007000189",
-                style = Typography.h2,
-                modifier = Modifier.padding(horizontal = 10.dp),
-                color = washedGray
-            )
-        }
-
-        Divider(
-            thickness = 1.dp,
-            modifier = Modifier
-                .padding(vertical = 15.dp)
-                .fillMaxWidth()
-        )
-
-        Text(
-            "Pizza Hut",
-            style = Typography.h4,
-            color = washedGray
-        )
-        Text("(Outlet:Lulu Mall)")
-        Row(
-            modifier = Modifier.padding(vertical = 10.dp)
-        ) {
-            Icon(
-                painterResource(id = R.drawable.ic_location),
-                contentDescription = null,
-                modifier = Modifier
-                    .width(12.dp),
-                tint = washedGray
-            )
-            Text(
-                "Pizza hut, Lulu Shopping Mall, 3rd Floor, Edapally, Cochin - 24",
-                color = washedGray,
-                modifier = Modifier.padding(horizontal = 5.dp)
             )
         }
     }
@@ -414,7 +392,7 @@ fun AddToCartComposable(
     val fontWeight = FontWeight.ExtraBold
     val borderColor = Color(0x1A000000)
 
-    var itemCounter by remember { mutableStateOf(1) }
+    var itemCounter by remember { mutableStateOf(0) }
 
     if (itemCounter > 0) {
         Row(
@@ -491,6 +469,67 @@ fun DashedDivider(
                 )
             }
     )
+}
+
+
+@Composable
+fun FooterLicenseInfo(
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier
+            .padding(bottom = 130.dp)
+            .padding(horizontal = 15.dp, vertical = 10.dp)
+    ) {
+        val washedGray = Color(0x4D000000)
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_fssai_logo),
+                contentDescription = null,
+                modifier = modifier.width(50.dp),
+                tint = washedGray
+            )
+            Text(
+                "License No. 11316007000189",
+                style = Typography.h2,
+                modifier = Modifier.padding(horizontal = 10.dp),
+                color = washedGray
+            )
+        }
+
+        Divider(
+            thickness = 1.dp,
+            modifier = Modifier
+                .padding(vertical = 15.dp)
+                .fillMaxWidth()
+        )
+
+        Text(
+            "Pizza Hut",
+            style = Typography.h4,
+            color = washedGray
+        )
+        Text("(Outlet:Lulu Mall)")
+        Row(
+            modifier = Modifier.padding(vertical = 10.dp)
+        ) {
+            Icon(
+                painterResource(id = R.drawable.ic_location),
+                contentDescription = null,
+                modifier = Modifier
+                    .width(12.dp),
+                tint = washedGray
+            )
+            Text(
+                "Pizza hut, Lulu Shopping Mall, 3rd Floor, Edapally, Cochin - 24",
+                color = washedGray,
+                modifier = Modifier.padding(horizontal = 5.dp)
+            )
+        }
+    }
 }
 
 @Composable
