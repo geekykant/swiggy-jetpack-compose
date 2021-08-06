@@ -522,7 +522,12 @@ fun FlatDealOfferSnackComposable(
 }
 
 @Composable
-fun BasicOfferSnackComposable(message: String, invert: Boolean, modifier: Modifier) {
+fun BasicOfferSnackComposable(
+    message: String,
+    invert: Boolean,
+    onClick: () -> Unit = {},
+    modifier: Modifier
+) {
     val roundShape = RoundedCornerShape(5.dp)
     var textColor = Color.White
     var backgroundColor = MaterialTheme.colors.primary
@@ -541,6 +546,7 @@ fun BasicOfferSnackComposable(message: String, invert: Boolean, modifier: Modifi
         maxLines = 1,
         style = Typography.h1,
         modifier = modifier
+            .clickable { onClick() }
             .shadow(8.dp, roundShape)
             .background(backgroundColor, roundShape)
             .border(1.dp, borderColor, shape = roundShape)

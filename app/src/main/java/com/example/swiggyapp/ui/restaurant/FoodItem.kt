@@ -25,7 +25,7 @@ fun prepareRestaurantFoods() = listOf(
     FoodItem(
         "Aloo Patty Sub ( 15 cm, 6 Inch )",
         FoodType.VEG,
-        "Bestseller",
+        null,
         196f,
         "The traditional aloo patty seasoned with special herbs and spices with your choice of crisp fresh veggies, on freshly baked bread. New bread featured - Flatbread.",
         "https://res.cloudinary.com/swiggy/image/upload/fl_lossy,f_auto,q_auto,w_208,h_208,c_fit/ge1oc1o4i1agi8pawbvt"
@@ -33,7 +33,7 @@ fun prepareRestaurantFoods() = listOf(
     FoodItem(
         "Tandoori Chicken Tikka Sub ( 15 cm, 6 Inch )",
         FoodType.NON_VEG,
-        "Bestseller",
+        null,
         224f,
         "Tandoori flavored chicken tikka",
         "https://res.cloudinary.com/swiggy/image/upload/fl_lossy,f_auto,q_auto,w_208,h_208,c_fit/ixdq8qrujoxmcnvai65x"
