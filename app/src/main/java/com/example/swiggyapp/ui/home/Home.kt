@@ -284,8 +284,8 @@ fun AnimateUpDown(message: String, maxLines: Int, modifier: Modifier = Modifier)
         Text(
             text = message,
             modifier = modifier
-                .padding(horizontal = 5.dp, vertical = 3.dp)
-                .height(30.dp),
+                .padding(horizontal = 5.dp)
+                .sizeIn(maxHeight = 30.dp),
             maxLines = maxLines
         )
     }
@@ -312,7 +312,7 @@ fun SectionHeading(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Row {
-                if (iconResId != null) {
+                iconResId?.let {
                     Image(
                         painter = painterResource(iconResId),
                         contentDescription = null,
@@ -326,7 +326,7 @@ fun SectionHeading(
                     fontWeight = FontWeight.ExtraBold,
                     style = MaterialTheme.typography.h1,
                     modifier = Modifier
-                        .padding(5.dp, 0.dp)
+                        .padding(0.dp)
                         .alignByBaseline()
                 )
             }
@@ -490,7 +490,7 @@ fun RestaurantItem(
                                 tint = Color(0xFFFA5520)
                             )
                             Text(
-                                text = offer.offerMessage,
+                                text = offer.offerMessage(),
                                 modifier = Modifier.align(Alignment.CenterVertically)
                             )
                         }

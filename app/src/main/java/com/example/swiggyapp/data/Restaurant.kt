@@ -14,7 +14,9 @@ data class Restaurant(
     val allOffers: List<Offer>?,
     val offerSnack: OfferSnack?,
     val isBestSafety: Boolean = false
-)
+){
+    fun getLocationTagline() = "$location | $distance kms"
+}
 
 fun prepareRestaurants(): List<Restaurant> {
     var prepList = listOf(
@@ -27,7 +29,7 @@ fun prepareRestaurants(): List<Restaurant> {
             53,
             400,
             "https://res.cloudinary.com/swiggy/image/upload/fl_lossy,f_auto,q_auto,w_200,h_220,c_fill/jmkzdtpvr6njj3wvokrj",
-            listOf(Offer(R.drawable.ic_offers, "40% off upto ₹80")),
+            listOf(Offer(R.drawable.ic_offers_filled, 40, 80, "40METOO", 129)),
             OfferSnack("40% OFF", OfferSnackType.BASIC)
         ), Restaurant(
             "McDonald's",
@@ -49,7 +51,7 @@ fun prepareRestaurants(): List<Restaurant> {
             53,
             200,
             "https://res.cloudinary.com/swiggy/image/upload/fl_lossy,f_auto,q_auto,w_200,h_220,c_fill/shxshuxficcjcwyixw0s",
-            listOf(Offer(R.drawable.ic_offers, "20% off upto ₹180")),
+            listOf(Offer(R.drawable.ic_offers_filled, 20, 180,"20OFFERPLOX", 600)),
             OfferSnack("20% OFF", OfferSnackType.INVERT_BASIC)
         )
     )

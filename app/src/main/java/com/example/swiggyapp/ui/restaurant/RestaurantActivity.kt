@@ -3,12 +3,11 @@ package com.example.swiggyapp.ui.restaurant
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.lazy.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -17,10 +16,7 @@ import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawWithContent
-import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.draw.*
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathEffect
@@ -35,8 +31,9 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.swiggyapp.R
-import com.example.swiggyapp.ui.home.AnimateUpDown
-import com.example.swiggyapp.ui.home.noRippleClickable
+import com.example.swiggyapp.data.HelloBar
+import com.example.swiggyapp.data.Offer
+import com.example.swiggyapp.ui.home.*
 import com.example.swiggyapp.ui.theme.Prox
 import com.example.swiggyapp.ui.theme.SwiggyTheme
 import com.example.swiggyapp.ui.theme.Typography
@@ -76,8 +73,11 @@ fun RestaurantContent(
     scrollState: LazyListState, // Higher level is invoked, and reflected throughout
     outerPadding: PaddingValues,
     modifier: Modifier = Modifier,
-    isClosed: Boolean = false
+    viewModel: RestaurantViewModel = RestaurantViewModel()
 ) {
+    val restaurantFoods = viewModel.restaurantFoods.collectAsState()
+    val expandedSectionIds = viewModel.expandedFoodSectionIdsList.collectAsState()
+
     //implement it
     LazyColumn(
         modifier = modifier,
@@ -88,196 +88,36 @@ fun RestaurantContent(
         )
     ) {
         item {
-            Column(
-                modifier.padding(horizontal = 15.dp, vertical = 10.dp)
-            ) {
-                Text(
-                    text = "Pizza Hut",
-                    style = Typography.h1
-                )
-                Text(
-                    text = "Pizzas, Fast Food",
-                    style = Typography.h3
-                )
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = "Lulu Mall | 3.6 kms",
-                        style = Typography.h3
-                    )
-                    Icon(
-                        Icons.Filled.ArrowDropDown,
-                        contentDescription = null,
-                        modifier = Modifier
-                            .padding(horizontal = 2.dp)
-                            .width(20.dp),
-                        tint = MaterialTheme.colors.primary
-                    )
-                }
-            }
-        }
-
-        item {
+            RestaurantBasicDetails()
+            TopHelloBar(listOf(HelloBar("It's raining. To compensate your delivery partner, additional ₹12 delivery fee will apply")))
             DashedDivider(modifier = Modifier.padding(vertical = 5.dp))
-            Row(
-                modifier = Modifier
-                    .padding(horizontal = 15.dp, vertical = 0.dp)
-                    .fillMaxWidth(),
-            ) {
-                Column(
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(5.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.Center
-                    ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_rating),
-                            contentDescription = null,
-                            modifier = Modifier
-                                .width(18.dp)
-                                .padding(end = 4.dp)
-                        )
-                        Text(
-                            "4.0",
-                            style = Typography.h2
-                        )
-                        Icon(
-                            Icons.Filled.KeyboardArrowRight,
-                            contentDescription = null,
-                            modifier = Modifier
-                                .width(22.dp)
-                                .padding(horizontal = 0.dp)
-                        )
-                    }
-                    val movingList =
-                        listOf("Tate 74%", "Portion 70%", "500+ ratings", "Packing 7500")
-
-                    var i by remember { mutableStateOf(0) }
-                    LaunchedEffect(true) {
-                        while (true) {
-                            delay(3000) // set here your delay between animations
-                            i = ((i + 1) % movingList.size)
-                        }
-                    }
-                    AnimateUpDown(movingList[i], 1)
-                }
-                Column(
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(5.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(
-                        text = if(isClosed) "Closed" else "39 mins",
-                        style = Typography.h2,
-                        color = if(isClosed) Color.Red else Color.Black
-                    )
-                    Text("Delivery Time")
-                }
-                Column(
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(5.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text("₹350", style = Typography.h2)
-                    Text("Cost for 2")
-                }
-            }
-
-            Card(
-                backgroundColor = Color(0xFFE0F7FA),
-                shape = RoundedCornerShape(12.dp),
-                border = BorderStroke(0.5.dp, Color(0x66009688)),
-                elevation = 2.dp,
-                modifier = Modifier
-                    .padding(horizontal = 15.dp, vertical = 0.dp)
-                    .fillMaxWidth()
-            ) {
-                Row(
-                    modifier = Modifier
-                        .padding(horizontal = 4.dp, vertical = 12.dp)
-                        .fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Image(
-                        painterResource(id = R.drawable.ic_safety),
-                        null,
-                        modifier = Modifier
-                            .size(32.dp)
-                            .weight(0.1f),
-                        contentScale = ContentScale.Inside
-                    )
-                    Text(
-                        "This restaurant follows Best Safety Standards",
-                        style = TextStyle(
-                            fontWeight = FontWeight.Normal,
-                            fontSize = 15.sp
-                        ),
-                        modifier = Modifier
-                            .weight(0.8f)
-                            .padding(horizontal = 1.dp),
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                    Image(
-                        painterResource(id = R.drawable.ic_next_arrow),
-                        null,
-                        modifier = Modifier
-                            .size(13.dp)
-                            .weight(0.1f),
-                        contentScale = ContentScale.Inside
-                    )
-                }
-            }
-
-            DashedDivider(modifier = Modifier.padding(vertical = 10.dp))
-
-            DashedDivider()
         }
 
-        item { GrayDivider() }
         item {
-            Row(
-                modifier = Modifier
-                    .padding(horizontal = 15.dp, vertical = 10.dp)
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    var foodTypePreference by remember { mutableStateOf(false) }
-                    Switch(
-                        checked = foodTypePreference,
-                        onCheckedChange = {
-                            foodTypePreference = !foodTypePreference
-                        }
-                    )
-                    Text(
-                        "VEG ONLY".uppercase(Locale.getDefault()),
-                        style = Typography.h3,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(horizontal = 5.dp)
-                    )
-                }
-                Image(
-                    painter = painterResource(id = R.drawable.ic_best_safety),
-                    contentDescription = null,
-                    modifier = Modifier
-                        .width(85.dp)
+            ThreeSectionDetails()
+            BestSafetyCard()
+            DashedDivider(modifier = Modifier.padding(vertical = 10.dp))
+            RestaurantOffersRows()
+
+            GrayDivider()
+        }
+
+        item {
+            PureVegComposable()
+        }
+
+        items(items = restaurantFoods.value.mainFoodSections.orEmpty()) {
+            SectionHeading(title = it.getMainName(), showSeeAllText = false)
+
+            it.mainFoodSections.orEmpty().forEach { sub ->
+                ExpandableSectionFoods(
+                    sectionTitle = sub.getSubName(),
+                    foodList = sub.foodList,
+                    onArrowClick = { viewModel.onSectionExpanded(sub.subSectionId) },
+                    expanded = expandedSectionIds.value.contains(sub.subSectionId)
                 )
             }
-        }
-
-        val foodList = prepareRestaurantFoods()
-        items(items = foodList) {
-            FoodItemComposable(foodItem = it)
+            GrayDivider()
         }
         item { GrayDivider() }
 
@@ -291,8 +131,355 @@ fun RestaurantContent(
 }
 
 @Composable
+fun ExpandableSectionFoods(
+    sectionTitle: String,
+    foodList: List<FoodModel>,
+    onArrowClick: () -> Unit,
+    expanded: Boolean,
+    modifier: Modifier = Modifier
+) {
+    val arrowRotationDegree by animateFloatAsState(
+        animationSpec = if (expanded) tween(200) else tween(0),
+        targetValue = if (expanded) 180f else 0f
+    )
+
+    Column {
+        Row(
+            modifier = modifier
+                .drawWithContent {
+                    drawContent()
+                    drawLine(
+                        color = Color(0x14000000),
+                        start = Offset(15.dp.toPx(), this.size.height),
+                        end = Offset(
+                            if (expanded) (this.size.width * 0.15f) else (this.size.width - 15.dp.toPx()),
+                            this.size.height
+                        ),
+                        strokeWidth = 2f
+                    )
+                }
+                .noRippleClickable { onArrowClick() }
+                .padding(horizontal = 15.dp, vertical = 15.dp)
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                sectionTitle,
+                style = TextStyle(
+                    fontWeight = FontWeight.Normal,
+                    fontSize = 17.sp
+                )
+            )
+            Icon(
+                painterResource(id = R.drawable.ic_expand),
+                null,
+                modifier = Modifier.rotate(arrowRotationDegree)
+            )
+        }
+        if (expanded) {
+            foodList.forEach {
+                FoodItemComposable(foodModel = it)
+            }
+        }
+    }
+}
+
+@Composable
+fun RestaurantOffersRows(
+    modifier: Modifier = Modifier
+) {
+    val rOffersList = listOf(
+        Offer(R.drawable.ic_offers_filled, 40, 80, "40METOO", 129),
+        Offer(R.drawable.ic_offers_filled, 20, 180, "20OFFERPLOX", 600)
+    )
+
+    val horizontalScrollState = rememberLazyListState()
+    LazyRow(
+        modifier = modifier
+            .wrapContentHeight()
+            .fillMaxWidth(),
+        state = horizontalScrollState,
+        contentPadding = PaddingValues(start = 5.dp)
+    ) {
+        items(items = rOffersList) {
+            OfferItemComposable(
+                it,
+                Modifier.defaultMinSize(180.dp)
+            )
+        }
+    }
+
+    /*
+    Horizontal Slider implemented the hard way to track scroll on lazyrow.
+     */
+    val roundShape = RoundedCornerShape(5.dp)
+    Box(
+        modifier = Modifier
+            .padding(top = 10.dp, bottom = 15.dp)
+            .fillMaxWidth(),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            "",
+            modifier = Modifier
+                .height(3.5.dp)
+                .simpleHorizontalScrollbar(horizontalScrollState)
+                .background(Color(0x1A000000), roundShape)
+                .fillMaxWidth(0.15f),
+        )
+    }
+}
+
+@Composable
+fun OfferItemComposable(
+    offer: Offer,
+    modifier: Modifier = Modifier
+) {
+    val roundShape = RoundedCornerShape(5.dp)
+    Column(
+        modifier = modifier
+            .padding(5.dp)
+            .border(0.7.dp, Color(0x1A000000), shape = roundShape)
+            .padding(8.dp),
+    ) {
+        Row(
+            modifier = modifier.padding(vertical = 2.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Image(
+                painter = painterResource(id = offer.icon),
+                contentDescription = null,
+                modifier = Modifier.size(16.dp, 16.dp)
+            )
+            Text(
+                text = offer.offerMessage(),
+                maxLines = 1,
+                style = TextStyle(
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 15.sp,
+                    letterSpacing = (-0.5).sp,
+                ),
+                modifier = Modifier.padding(horizontal = 5.dp)
+            )
+        }
+        Text(
+            text = offer.shortCodeInfo(),
+            maxLines = 1,
+            style = TextStyle(
+                fontSize = 12.sp,
+                letterSpacing = (-0.5).sp,
+            ),
+            modifier = Modifier.padding(vertical = 2.dp)
+        )
+    }
+}
+
+@Composable
+fun RestaurantBasicDetails(
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier.padding(horizontal = 15.dp, vertical = 5.dp)
+    ) {
+        Text(
+            text = "Pizza Hut",
+            style = Typography.h1
+        )
+        Text(
+            text = "Pizzas, Fast Food",
+            style = Typography.h3
+        )
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "Lulu Mall | 3.6 kms",
+                style = Typography.h3
+            )
+            Icon(
+                Icons.Filled.ArrowDropDown,
+                contentDescription = null,
+                modifier = Modifier
+                    .padding(horizontal = 2.dp)
+                    .width(20.dp),
+                tint = MaterialTheme.colors.primary
+            )
+        }
+    }
+}
+
+@Composable
+fun BestSafetyCard() {
+    Card(
+        backgroundColor = Color(0xFFE0F7FA),
+        shape = RoundedCornerShape(12.dp),
+        border = BorderStroke(0.5.dp, Color(0x66009688)),
+        elevation = 2.dp,
+        modifier = Modifier
+            .padding(horizontal = 15.dp, vertical = 5.dp)
+            .fillMaxWidth()
+    ) {
+        Row(
+            modifier = Modifier
+                .padding(horizontal = 4.dp, vertical = 12.dp)
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Image(
+                painterResource(id = R.drawable.ic_safety),
+                null,
+                modifier = Modifier
+                    .size(32.dp)
+                    .weight(0.1f),
+                contentScale = ContentScale.Inside
+            )
+            Text(
+                "This restaurant follows Best Safety Standards",
+                style = TextStyle(
+                    fontWeight = FontWeight.Normal,
+                    fontSize = 15.sp
+                ),
+                modifier = Modifier
+                    .weight(0.8f)
+                    .padding(horizontal = 1.dp),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+            Image(
+                painterResource(id = R.drawable.ic_next_arrow),
+                null,
+                modifier = Modifier
+                    .size(13.dp)
+                    .weight(0.1f),
+                contentScale = ContentScale.Inside
+            )
+        }
+    }
+}
+
+@Composable
+fun ThreeSectionDetails() {
+    val isClosed = false
+    Row(
+        modifier = Modifier
+            .padding(horizontal = 15.dp, vertical = 5.dp)
+            .fillMaxWidth(),
+    ) {
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .padding(5.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_rating),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .width(18.dp)
+                        .padding(end = 4.dp)
+                )
+                Text(
+                    "4.0",
+                    style = Typography.h2
+                )
+                Icon(
+                    Icons.Filled.KeyboardArrowRight,
+                    contentDescription = null,
+                    modifier = Modifier
+                        .width(22.dp)
+                        .padding(horizontal = 0.dp)
+                )
+            }
+            val movingList =
+                listOf("Taste 74%", "Portion 70%", "500+ ratings", "Packing 7500")
+
+            var i by remember { mutableStateOf(0) }
+            LaunchedEffect(true) {
+                while (true) {
+                    delay(3000) // set here your delay between animations
+                    i = ((i + 1) % movingList.size)
+                }
+            }
+            AnimateUpDown(movingList[i], 1)
+        }
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .padding(5.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = if (isClosed) "Closed" else "39 mins",
+                style = Typography.h2,
+                color = if (isClosed) Color.Red else Color.Black
+            )
+            Text("Delivery Time")
+        }
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .padding(5.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text("₹350", style = Typography.h2)
+            Text("Cost for 2")
+        }
+    }
+}
+
+@Composable
+fun PureVegComposable() {
+    val isPureVeg = true
+    Row(
+        modifier = Modifier
+            .padding(horizontal = 15.dp, vertical = 10.dp)
+            .fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            when (isPureVeg) {
+                true -> {
+                    Image(
+                        painter = painterResource(id = R.drawable.ic_pureveg),
+                        contentDescription = null
+                    )
+                }
+                else -> {
+                    var foodTypePreference by remember { mutableStateOf(false) }
+                    Switch(
+                        checked = foodTypePreference,
+                        onCheckedChange = {
+                            foodTypePreference = !foodTypePreference
+                        }
+                    )
+                }
+            }
+            Text(
+                text = if (isPureVeg) "PURE VEG" else "VEG ONLY",
+                style = Typography.h3,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(horizontal = 5.dp)
+            )
+        }
+        Image(
+            painter = painterResource(id = R.drawable.ic_best_safety),
+            contentDescription = null,
+            modifier = Modifier
+                .width(85.dp)
+        )
+    }
+}
+
+@Composable
 fun FoodItemComposable(
-    foodItem: FoodItem,
+    foodModel: FoodModel,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -310,14 +497,14 @@ fun FoodItemComposable(
                 Icon(
                     painter = painterResource(id = R.drawable.ic_foodtype),
                     contentDescription = null,
-                    tint = when (foodItem.foodType) {
+                    tint = when (foodModel.foodType) {
                         FoodType.VEG -> Color(0xFF008000)
                         FoodType.NON_VEG -> Color(0xFF008000)
                     },
                     modifier = Modifier.padding(end = 5.dp)
                 )
 
-                foodItem.starText?.let {
+                foodModel.starText?.let {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_rating),
                         contentDescription = null,
@@ -332,15 +519,16 @@ fun FoodItemComposable(
             }
             Spacer(modifier = Modifier.height(3.dp))
             Text(
-                text = foodItem.name,
+                text = foodModel.name,
                 style = Typography.h2,
+                fontWeight = FontWeight.SemiBold
             )
             Spacer(modifier = Modifier.height(3.dp))
             Text(
-                text = "₹${foodItem.price}"
+                text = "₹${foodModel.price}"
             )
             Spacer(modifier = Modifier.height(3.dp))
-            foodItem.foodContents?.let {
+            foodModel.foodContents?.let {
                 Text(
                     text = it,
                     maxLines = 2,
@@ -356,7 +544,7 @@ fun FoodItemComposable(
         ) {
             Image(
                 painter = rememberCoilPainter(
-                    foodItem.imageUrl,
+                    foodModel.imageUrl,
                     fadeInDurationMs = 100,
                     previewPlaceholder = R.drawable.ic_restaurant1,
                 ),
@@ -653,17 +841,11 @@ fun BottomQuickMenu(modifier: Modifier = Modifier) {
     }
 }
 
-//@Preview("top bar preview", showBackground = true)
-//@Composable
-//fun TopBarPreview() {
-//    RestaurantPageTopAppBar(false)
-//}
-//
-//@Preview("bottom preview", showBackground = true)
-//@Composable
-//fun BottomPreview() {
-//    BottomQuickMenu()
-//}
+@Preview(showBackground = true)
+@Composable
+fun FoodItemPreview() {
+    FoodItemComposable(foodModel = prepareRestaurantFoods()[0])
+}
 
 @Preview("restaurant content", showBackground = true)
 @Composable
