@@ -106,17 +106,42 @@ fun RestaurantContent(
             PureVegComposable()
         }
 
-        items(items = restaurantFoods.value.mainFoodSections.orEmpty()) {
-            SectionHeading(title = it.getMainName(), showSeeAllText = false)
+        item {
+            restaurantFoods.value.recommendedFoods?.let {
+                SectionFoodsComposable(
+                    sectionTitle = it.getSubName(),
+                    foodList = it.foodList,
+                    onArrowClick = { viewModel.onSectionExpanded(it.subSectionId) },
+                    expanded = expandedSectionIds.value.contains(it.subSectionId),
+                )
+                GrayDivider()
+            }
+        }
 
-            it.mainFoodSections.orEmpty().forEach { sub ->
-                ExpandableSectionFoods(
-                    sectionTitle = sub.getSubName(),
-                    foodList = sub.foodList,
-                    onArrowClick = { viewModel.onSectionExpanded(sub.subSectionId) },
-                    expanded = expandedSectionIds.value.contains(sub.subSectionId)
+        items(items = restaurantFoods.value.mainFoodSections.orEmpty()) { mainSubSection ->
+            if (mainSubSection.subSectionsFoods.isNullOrEmpty()) {
+                SectionHeading(
+                    title = mainSubSection.getMainName(),
+                    showSeeAllText = false,
+                    paddingValues = PaddingValues(15.dp, 15.dp)
+                )
+                mainSubSection.mainFoodSections.orEmpty().forEach { sub ->
+                    ExpandableSectionFoods(
+                        sectionTitle = sub.getSubName(),
+                        foodList = sub.foodList,
+                        onArrowClick = { viewModel.onSectionExpanded(sub.subSectionId) },
+                        expanded = expandedSectionIds.value.contains(sub.subSectionId)
+                    )
+                }
+            } else if (mainSubSection.mainFoodSections.isNullOrEmpty()) {
+                SectionFoodsComposable(
+                    sectionTitle = mainSubSection.mainSectionName,
+                    foodList = mainSubSection.subSectionsFoods,
+                    onArrowClick = { viewModel.onSectionExpanded(mainSubSection.mainSectionId) },
+                    expanded = expandedSectionIds.value.contains(mainSubSection.mainSectionId),
                 )
             }
+
             GrayDivider()
         }
         item { GrayDivider() }
@@ -126,6 +151,46 @@ fun RestaurantContent(
                 modifier = Modifier
                     .background(Color(0xD000000))
             )
+        }
+    }
+}
+
+@Composable
+fun SectionFoodsComposable(
+    sectionTitle: String,
+    foodList: List<FoodModel>?,
+    onArrowClick: () -> Unit,
+    expanded: Boolean,
+    modifier: Modifier = Modifier
+) {
+    val arrowRotationDegree by animateFloatAsState(
+        animationSpec = if (expanded) tween(200) else tween(0),
+        targetValue = if (expanded) 180f else 0f
+    )
+    Column {
+        Box(
+            modifier = modifier
+                .noRippleClickable { onArrowClick() }
+                .padding(horizontal = 15.dp, vertical = 15.dp)
+                .fillMaxWidth()
+        ) {
+            SectionHeading(
+                title = sectionTitle,
+                showSeeAllText = false,
+                paddingValues = PaddingValues(0.dp, 8.dp)
+            )
+            Icon(
+                painterResource(id = R.drawable.ic_expand),
+                null,
+                modifier = Modifier
+                    .align(Alignment.CenterEnd)
+                    .rotate(arrowRotationDegree)
+            )
+        }
+        if (expanded) {
+            foodList.orEmpty().forEach { food ->
+                FoodItemComposable(foodModel = food)
+            }
         }
     }
 }

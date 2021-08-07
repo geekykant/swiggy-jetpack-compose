@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-class RestaurantViewModel(): ViewModel() {
+class RestaurantViewModel() : ViewModel() {
     private val _restaurantFoods = MutableStateFlow(RestaurantFoodModel(null, null))
     val restaurantFoods: MutableStateFlow<RestaurantFoodModel> get() = _restaurantFoods
 
@@ -38,15 +38,21 @@ class RestaurantViewModel(): ViewModel() {
     }
 
     private fun getRestaurantFoodData() {
-        viewModelScope.launch(Dispatchers.Default){
+        viewModelScope.launch(Dispatchers.Default) {
             val subFoodList = prepareAllRestaurantFoods()
+            //by default expand drop-downs
+//            _expandedFoodSectionIdsList.emit(subFoodList.mainFoodSections.orEmpty().flatMap { it.mainFoodSections!! }.subList(0,1).map { it.subSectionId }.toList())
+            subFoodList.recommendedFoods?.let {
+                _expandedFoodSectionIdsList.emit(listOf(it.subSectionId))
+            }
             _restaurantFoods.emit(subFoodList)
         }
     }
 
-    fun onSectionExpanded(sectionId: Int){
-        _expandedFoodSectionIdsList.value = _expandedFoodSectionIdsList.value.toMutableList().also { list ->
-            if(list.contains(sectionId)) list.remove(sectionId) else list.add(sectionId)
-        }
+    fun onSectionExpanded(sectionId: Int) {
+        _expandedFoodSectionIdsList.value =
+            _expandedFoodSectionIdsList.value.toMutableList().also { list ->
+                if (list.contains(sectionId)) list.remove(sectionId) else list.add(sectionId)
+            }
     }
 }

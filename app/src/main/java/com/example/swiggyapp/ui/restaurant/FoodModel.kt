@@ -49,7 +49,7 @@ fun prepareRestaurantFoods() = listOf(
 )
 
 data class RestaurantFoodModel(
-    val recommendedFoods: MainSectionFoods?,
+    val recommendedFoods: SubSectionsFoods?,
     val mainFoodSections: List<MainSectionFoods>?
 )
 
@@ -81,12 +81,10 @@ data class SubSectionsFoods(
 }
 
 fun prepareAllRestaurantFoods() = RestaurantFoodModel(
-    recommendedFoods = MainSectionFoods(
+    recommendedFoods = SubSectionsFoods(
         31,
         "Recommended",
-        null,
-        isExpandable = true,
-        subSectionsFoods = prepareRestaurantFoods().subList(0, 2)
+        prepareRestaurantFoods().subList(0, 2)
     ),
     mainFoodSections = listOf(
         MainSectionFoods(

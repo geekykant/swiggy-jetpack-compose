@@ -300,11 +300,12 @@ fun SectionHeading(
     showSeeAllText: Boolean = true,
     seeAllText: String = "See All",
     seeAllTextColor: Color = Color.Black,
-    seeAllOnClick: () -> Unit = { }
+    seeAllOnClick: () -> Unit = { },
+    paddingValues: PaddingValues = PaddingValues(15.dp, 8.dp)
 ) {
     Column(
         modifier = Modifier
-            .padding(15.dp, 8.dp)
+            .padding(paddingValues)
             .fillMaxWidth(),
     ) {
         Row(
