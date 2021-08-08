@@ -2,7 +2,7 @@ package com.example.swiggyapp.data
 
 import com.example.swiggyapp.R
 
-class HomeRepository {
+object HomeRepository {
     fun preparePopularCurations() = listOf(
         Cuisine(
             "Pizzas",

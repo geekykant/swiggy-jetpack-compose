@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class RestaurantViewModel(
-    private val restaurantRepository: RestaurantRepository
+    private val restaurantRepository: RestaurantRepository = RestaurantRepository
 ) : ViewModel() {
     private val _state = MutableStateFlow(RestaurantViewState())
     val state: StateFlow<RestaurantViewState> get() = _state

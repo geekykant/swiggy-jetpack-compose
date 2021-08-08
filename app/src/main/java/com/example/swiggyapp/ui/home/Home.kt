@@ -11,13 +11,10 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.composed
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -26,7 +23,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
@@ -37,6 +33,7 @@ import com.example.swiggyapp.ui.search.CuisineItemComposable
 import com.example.swiggyapp.ui.theme.SwiggyTheme
 import com.example.swiggyapp.ui.theme.Typography
 import com.example.swiggyapp.ui.utils.noRippleClickable
+import com.example.swiggyapp.ui.utils.simpleHorizontalScrollbar
 import com.google.accompanist.coil.rememberCoilPainter
 import items
 import kotlinx.coroutines.delay
@@ -66,7 +63,7 @@ fun HomeScreen(
     outerPaddingValues: PaddingValues,
     innerPaddingValues: PaddingValues
 ) {
-    val viewModel = HomeViewModel(homeRepository = HomeRepository())
+    val viewModel = HomeViewModel(homeRepository = HomeRepository)
     val viewState by viewModel.state.collectAsState()
 
     val widgetBottomPadding = 10.dp
@@ -141,12 +138,14 @@ fun HomeScreen(
             )
         }
 
+
         items(items = viewState.nearbyRestaurants) {
+            val context = LocalContext.current
             RestaurantItem(
                 it,
                 Modifier.fillMaxWidth(),
                 onRestaurantClick = {
-
+                    context.startActivity(Intent(context, RestaurantActivity::class.java))
                 }
             )
         }
@@ -655,32 +654,6 @@ fun QuickTilesList(content: List<QuickTile>, modifier: Modifier = Modifier) {
                 .background(Color(0x1A000000), roundShape)
                 .fillMaxWidth(0.15f),
         )
-    }
-}
-
-fun Modifier.simpleHorizontalScrollbar(
-    state: LazyListState,
-    height: Dp = 3.5.dp
-): Modifier = composed {
-    composed {
-        drawWithContent {
-            drawContent()
-            val firstVisibleElementIndex = state.layoutInfo.visibleItemsInfo.firstOrNull()?.index
-
-            // Draw scrollbar if scrolling or if the animation is still running and lazy column has content
-            if (firstVisibleElementIndex != null) {
-                val elementWidth = this.size.width / state.layoutInfo.totalItemsCount
-                val scrollbarOffsetX = firstVisibleElementIndex * elementWidth
-                val scrollbarWidth = state.layoutInfo.visibleItemsInfo.size * elementWidth
-
-                drawRoundRect(
-                    color = Color.Red,
-                    topLeft = Offset(scrollbarOffsetX, 0f),
-                    size = Size(scrollbarWidth, height.toPx()),
-                    cornerRadius = CornerRadius(15.dp.toPx(), 15.dp.toPx())
-                )
-            }
-        }
     }
 }
 

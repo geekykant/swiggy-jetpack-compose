@@ -11,7 +11,8 @@ data class Restaurant(
     val imageUrl: String,
     val allOffers: List<Offer>?,
     val offerSnack: OfferSnack?,
-    val isBestSafety: Boolean = false
+    val isBestSafety: Boolean = false,
+    val isShopClosed: Boolean = false
 ){
     fun getLocationTagline() = "$location | $distance kms"
 }

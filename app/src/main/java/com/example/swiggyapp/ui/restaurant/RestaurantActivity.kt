@@ -19,6 +19,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.*
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.ColorMatrix
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -35,11 +37,11 @@ import com.example.swiggyapp.data.*
 import com.example.swiggyapp.ui.home.AnimateUpDown
 import com.example.swiggyapp.ui.home.SectionHeading
 import com.example.swiggyapp.ui.home.TopHelloBar
-import com.example.swiggyapp.ui.home.simpleHorizontalScrollbar
 import com.example.swiggyapp.ui.theme.Prox
 import com.example.swiggyapp.ui.theme.SwiggyTheme
 import com.example.swiggyapp.ui.theme.Typography
 import com.example.swiggyapp.ui.utils.noRippleClickable
+import com.example.swiggyapp.ui.utils.simpleHorizontalScrollbar
 import com.google.accompanist.coil.rememberCoilPainter
 import kotlinx.coroutines.delay
 import java.util.*
@@ -77,7 +79,7 @@ fun RestaurantContent(
     outerPadding: PaddingValues,
     modifier: Modifier = Modifier
 ) {
-    val viewModel = RestaurantViewModel(restaurantRepository = RestaurantRepository())
+    val viewModel = RestaurantViewModel(restaurantRepository = RestaurantRepository)
     val viewState = viewModel.state.collectAsState()
 
     //implement it
@@ -135,7 +137,7 @@ fun RestaurantContent(
 
 @Composable
 fun FoodAsSectionsComposable(
-    viewModel: RestaurantViewModel = RestaurantViewModel(RestaurantRepository())
+    viewModel: RestaurantViewModel = RestaurantViewModel(RestaurantRepository)
 ) {
     val state = viewModel.state.collectAsState()
     val expandedState = state.value.expandedSectionIds.collectAsState()
@@ -145,12 +147,15 @@ fun FoodAsSectionsComposable(
         it?.forEach { section ->
             when (section) {
                 is SubSectionsFoods -> {
-                    SectionFoodsComposable(
-                        sectionTitle = section.getSubName(),
-                        foodList = section.foodList,
-                        onArrowClick = { viewModel.onSectionExpanded(section.subSectionId) },
-                        expanded = expandedState.value.contains(section.subSectionId),
-                    )
+                    state.value.restaurant?.let { r ->
+                        SectionFoodsComposable(
+                            sectionTitle = section.getSubName(),
+                            foodList = section.foodList,
+                            onArrowClick = { viewModel.onSectionExpanded(section.subSectionId) },
+                            expanded = expandedState.value.contains(section.subSectionId),
+                            isShopClosed = r.isShopClosed
+                        )
+                    }
                 }
 
                 is MainSectionFoods -> {
@@ -160,12 +165,15 @@ fun FoodAsSectionsComposable(
                         paddingValues = PaddingValues(15.dp, 15.dp)
                     )
                     section.subFoodSections.orEmpty().forEach { sub ->
-                        ExpandableSectionFoods(
-                            sectionTitle = sub.getSubName(),
-                            foodList = sub.foodList,
-                            onArrowClick = { viewModel.onSectionExpanded(sub.subSectionId) },
-                            expanded = expandedState.value.contains(sub.subSectionId)
-                        )
+                        state.value.restaurant?.let { r ->
+                            ExpandableSectionFoods(
+                                sectionTitle = sub.getSubName(),
+                                foodList = sub.foodList,
+                                onArrowClick = { viewModel.onSectionExpanded(sub.subSectionId) },
+                                expanded = expandedState.value.contains(sub.subSectionId),
+                                isShopClosed = r.isShopClosed
+                            )
+                        }
                     }
                 }
             }
@@ -181,6 +189,7 @@ fun SectionFoodsComposable(
     foodList: List<Food>?,
     onArrowClick: () -> Unit,
     expanded: Boolean,
+    isShopClosed: Boolean,
     modifier: Modifier = Modifier
 ) {
     val arrowRotationDegree by animateFloatAsState(
@@ -209,7 +218,10 @@ fun SectionFoodsComposable(
         }
         if (expanded) {
             foodList.orEmpty().forEach { food ->
-                FoodItemComposable(food = food)
+                FoodItemComposable(
+                    food = food,
+                    isShopClosed = isShopClosed
+                )
             }
         }
     }
@@ -221,6 +233,7 @@ fun ExpandableSectionFoods(
     foodList: List<Food>,
     onArrowClick: () -> Unit,
     expanded: Boolean,
+    isShopClosed: Boolean,
     modifier: Modifier = Modifier
 ) {
     val arrowRotationDegree by animateFloatAsState(
@@ -264,7 +277,10 @@ fun ExpandableSectionFoods(
         }
         if (expanded) {
             foodList.forEach {
-                FoodItemComposable(food = it)
+                FoodItemComposable(
+                    food = it,
+                    isShopClosed = isShopClosed
+                )
             }
         }
     }
@@ -442,7 +458,6 @@ fun BestSafetyCard() {
 
 @Composable
 fun ThreeSectionDetails(r: Restaurant) {
-    val isClosed = false
     Row(
         modifier = Modifier
             .padding(horizontal = 15.dp, vertical = 5.dp)
@@ -496,9 +511,9 @@ fun ThreeSectionDetails(r: Restaurant) {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = if (isClosed) "Closed" else "${r.distanceTimeMinutes} mins",
+                text = if (r.isShopClosed) "Closed" else "${r.distanceTimeMinutes} mins",
                 style = Typography.h2,
-                color = if (isClosed) Color.Red else Color.Black
+                color = if (r.isShopClosed) Color.Red else Color.Black
             )
             Text("Delivery Time")
         }
@@ -562,6 +577,7 @@ fun PureVegComposable() {
 @Composable
 fun FoodItemComposable(
     food: Food,
+    isShopClosed: Boolean,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -628,7 +644,7 @@ fun FoodItemComposable(
                 painter = rememberCoilPainter(
                     food.imageUrl,
                     fadeInDurationMs = 100,
-                    previewPlaceholder = R.drawable.ic_restaurant1,
+                    previewPlaceholder = R.drawable.ic_restaurant1
                 ),
                 contentDescription = null,
                 modifier = Modifier
@@ -636,12 +652,24 @@ fun FoodItemComposable(
                     .clip(RoundedCornerShape(5.dp))
                     .fillMaxWidth(),
                 contentScale = ContentScale.Crop,
+                colorFilter = if (isShopClosed) ColorFilter.colorMatrix(
+                    ColorMatrix(
+                        floatArrayOf(
+                            0.33f, 0.33f, 0.33f, 0f, 0f,
+                            0.33f, 0.33f, 0.33f, 0f, 0f,
+                            0.33f, 0.33f, 0.33f, 0f, 0f,
+                            0f, 0f, 0f, 1f, 0f
+                        )
+                    )
+                ) else null
             )
+
             AddToCartComposable(
                 message = "ADD",
                 modifier = Modifier
                     .fillMaxWidth(0.75f)
                     .align(Alignment.BottomCenter)
+                    .alpha(if (isShopClosed) 0f else 1f)
             )
         }
     }
@@ -817,7 +845,6 @@ fun GrayDivider(
 @Composable
 fun RestaurantPageTopAppBar(
     isScrolling: Boolean,
-    isShopClosed: Boolean = false,
     modifier: Modifier = Modifier
 ) {
     TopAppBar(
@@ -831,18 +858,27 @@ fun RestaurantPageTopAppBar(
                         .weight(1f)
                         .alpha(if (isScrolling) 1f else 0f)
                 ) {
-                    Text(
-                        text = "Alakapuri".uppercase(Locale.getDefault()),
-                        fontWeight = FontWeight.SemiBold,
-                        fontSize = 14.sp
-                    )
-                    Text(
-                        text = if (isShopClosed) "Closed for delivery" else "52 mins",
-                        fontSize = 12.sp,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        color = if (isShopClosed) Color.Red else Color(0xD9000000)
-                    )
+                    val viewModel =
+                        RestaurantViewModel(restaurantRepository = RestaurantRepository)
+                    val viewState = viewModel.state.collectAsState()
+
+                    val restaurant = viewState.value.restaurant
+
+                    restaurant?.let {
+                        Text(
+                            text = it.name.uppercase(Locale.getDefault()),
+                            fontWeight = FontWeight.SemiBold,
+                            fontSize = 14.sp
+                        )
+                        Text(
+                            text = if (it.isShopClosed) "Closed for delivery" else "${it.distanceTimeMinutes} mins",
+                            fontSize = 12.sp,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            color = if (it.isShopClosed) Color.Red else Color(0xD9000000)
+                        )
+                    }
+
                 }
                 IconButton(
                     onClick = {},
@@ -926,7 +962,10 @@ fun BottomQuickMenu(modifier: Modifier = Modifier) {
 @Preview(showBackground = true)
 @Composable
 fun FoodItemPreview() {
-    FoodItemComposable(food = HomeRepository().prepareRestaurantFoods()[0])
+    FoodItemComposable(
+        food = HomeRepository.prepareRestaurantFoods()[0],
+        isShopClosed = true
+    )
 }
 
 @Preview("restaurant content", showBackground = true)

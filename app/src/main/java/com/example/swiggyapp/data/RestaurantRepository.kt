@@ -5,7 +5,7 @@ import com.example.swiggyapp.ui.restaurant.MainSectionFoods
 import com.example.swiggyapp.ui.restaurant.RestaurantFoodModel
 import com.example.swiggyapp.ui.restaurant.SubSectionsFoods
 
-class RestaurantRepository {
+object RestaurantRepository {
     fun prepareARestaurant() = Restaurant(
         "Aryaas",
         "South Indian, Chineese, Arabian, North India",
@@ -27,29 +27,29 @@ class RestaurantRepository {
             SubSectionsFoods(
                 31,
                 "Recommended",
-                HomeRepository().prepareRestaurantFoods().subList(0, 2)
+                HomeRepository.prepareRestaurantFoods().subList(0, 2)
             ),
             MainSectionFoods(
                 mainSectionId = 11,
                 mainSectionName = "South India",
                 subFoodSections = listOf(
-                    SubSectionsFoods(12, "Dosas", HomeRepository().prepareRestaurantFoods()),
-                    SubSectionsFoods(13, "Uttapams", HomeRepository().prepareRestaurantFoods()),
+                    SubSectionsFoods(12, "Dosas", HomeRepository.prepareRestaurantFoods()),
+                    SubSectionsFoods(13, "Uttapams", HomeRepository.prepareRestaurantFoods()),
                     SubSectionsFoods(
                         14,
                         "Kerala Curries",
-                        HomeRepository().prepareRestaurantFoods()
+                        HomeRepository.prepareRestaurantFoods()
                     ),
-                    SubSectionsFoods(15, "Appam", HomeRepository().prepareRestaurantFoods()),
+                    SubSectionsFoods(15, "Appam", HomeRepository.prepareRestaurantFoods()),
                 )
             ),
             MainSectionFoods(
                 mainSectionId = 21,
                 mainSectionName = "Quick Bites / Kerala Snacks",
                 subFoodSections = listOf(
-                    SubSectionsFoods(22, "Munchies", HomeRepository().prepareRestaurantFoods()),
-                    SubSectionsFoods(23, "Chaats", HomeRepository().prepareRestaurantFoods()),
-                    SubSectionsFoods(24, "Pav Bhaji", HomeRepository().prepareRestaurantFoods()),
+                    SubSectionsFoods(22, "Munchies", HomeRepository.prepareRestaurantFoods()),
+                    SubSectionsFoods(23, "Chaats", HomeRepository.prepareRestaurantFoods()),
+                    SubSectionsFoods(24, "Pav Bhaji", HomeRepository.prepareRestaurantFoods()),
                 )
             )
         )
