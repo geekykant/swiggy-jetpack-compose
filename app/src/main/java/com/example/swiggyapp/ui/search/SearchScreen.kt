@@ -32,9 +32,9 @@ import com.example.swiggyapp.R
 import com.example.swiggyapp.data.Cuisine
 import com.example.swiggyapp.data.prepareSearchCuisines
 import com.example.swiggyapp.ui.home.SectionHeading
-import com.example.swiggyapp.ui.home.noRippleClickable
 import com.example.swiggyapp.ui.theme.Prox
 import com.example.swiggyapp.ui.theme.SwiggyTheme
+import com.example.swiggyapp.ui.utils.noRippleClickable
 import com.google.accompanist.coil.rememberCoilPainter
 
 @Composable

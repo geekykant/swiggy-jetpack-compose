@@ -26,6 +26,7 @@ import com.example.swiggyapp.ui.search.SearchScreen
 import com.example.swiggyapp.ui.theme.SwiggyTheme
 import java.util.*
 
+//@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,17 +49,17 @@ fun Navigation(
     navController: NavHostController,
     outerPaddingValues: PaddingValues
 ) {
-    NavHost(navController, startDestination = ScreenItem.Home.route) {
-        composable(ScreenItem.Home.route) {
+    NavHost(navController, startDestination = BottomNavItem.Home.route) {
+        composable(BottomNavItem.Home.route) {
             MainContent(outerPaddingValues)
         }
-        composable(ScreenItem.Search.route) {
+        composable(BottomNavItem.Search.route) {
             SearchScreen(outerPaddingValues)
         }
-        composable(ScreenItem.Cart.route) {
+        composable(BottomNavItem.Cart.route) {
             CartScreen(navController, outerPaddingValues)
         }
-        composable(ScreenItem.Account.route) {
+        composable(BottomNavItem.Account.route) {
             AccountScreen(outerPaddingValues)
         }
     }
@@ -67,10 +68,10 @@ fun Navigation(
 @Composable
 fun BottomNavigationBar(navController: NavController) {
     val items = listOf(
-        ScreenItem.Home,
-        ScreenItem.Search,
-        ScreenItem.Cart,
-        ScreenItem.Account
+        BottomNavItem.Home,
+        BottomNavItem.Search,
+        BottomNavItem.Cart,
+        BottomNavItem.Account
     )
 
     BottomNavigation(

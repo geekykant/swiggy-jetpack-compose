@@ -31,12 +31,15 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.swiggyapp.R
-import com.example.swiggyapp.data.HelloBar
-import com.example.swiggyapp.data.Offer
-import com.example.swiggyapp.ui.home.*
+import com.example.swiggyapp.data.*
+import com.example.swiggyapp.ui.home.AnimateUpDown
+import com.example.swiggyapp.ui.home.SectionHeading
+import com.example.swiggyapp.ui.home.TopHelloBar
+import com.example.swiggyapp.ui.home.simpleHorizontalScrollbar
 import com.example.swiggyapp.ui.theme.Prox
 import com.example.swiggyapp.ui.theme.SwiggyTheme
 import com.example.swiggyapp.ui.theme.Typography
+import com.example.swiggyapp.ui.utils.noRippleClickable
 import com.google.accompanist.coil.rememberCoilPainter
 import kotlinx.coroutines.delay
 import java.util.*
@@ -74,6 +77,8 @@ fun RestaurantContent(
     outerPadding: PaddingValues,
     modifier: Modifier = Modifier
 ) {
+    val viewModel = RestaurantViewModel(restaurantRepository = RestaurantRepository())
+    val viewState = viewModel.state.collectAsState()
 
     //implement it
     LazyColumn(
@@ -85,17 +90,20 @@ fun RestaurantContent(
         )
     ) {
         item {
-            RestaurantBasicDetails()
+            viewState.value.restaurant?.let { RestaurantBasicDetails(restaurant = it) }
             TopHelloBar(listOf(HelloBar("It's raining. To compensate your delivery partner, additional ₹12 delivery fee will apply")))
             DashedDivider(modifier = Modifier.padding(vertical = 5.dp))
         }
 
         item {
-            ThreeSectionDetails()
+            viewState.value.restaurant?.let { ThreeSectionDetails(it) }
             BestSafetyCard()
             DashedDivider(modifier = Modifier.padding(vertical = 10.dp))
-            RestaurantOffersRows()
-
+            viewState.value.restaurant?.allOffers?.let {
+                RestaurantOffersRows(
+                    rOffersList = it
+                )
+            }
             GrayDivider()
         }
 
@@ -105,6 +113,13 @@ fun RestaurantContent(
 
         item {
             FoodAsSectionsComposable()
+
+//                viewState.value.restaurantFoods,
+//                viewState.value.expandedSectionIds,
+//                onSectionExpanded = { id ->
+//                    viewModel.onSectionExpanded(id)
+//                }
+//            )
         }
 
         item { GrayDivider() }
@@ -120,20 +135,21 @@ fun RestaurantContent(
 
 @Composable
 fun FoodAsSectionsComposable(
-    viewModel: RestaurantViewModel = RestaurantViewModel()
+    viewModel: RestaurantViewModel = RestaurantViewModel(RestaurantRepository())
 ) {
-    val restaurantFoods = viewModel.restaurantFoods.collectAsState()
-    val expandedSectionIds = viewModel.expandedFoodSectionIdsList.collectAsState()
+    val state = viewModel.state.collectAsState()
+    val expandedState = state.value.expandedSectionIds.collectAsState()
+    val restaurantFoods = state.value.restaurantFoods
 
-    restaurantFoods.value.mainFoodSections.let {
-        it.forEach { section ->
+    restaurantFoods?.mainFoodSections.let {
+        it?.forEach { section ->
             when (section) {
                 is SubSectionsFoods -> {
                     SectionFoodsComposable(
                         sectionTitle = section.getSubName(),
                         foodList = section.foodList,
                         onArrowClick = { viewModel.onSectionExpanded(section.subSectionId) },
-                        expanded = expandedSectionIds.value.contains(section.subSectionId),
+                        expanded = expandedState.value.contains(section.subSectionId),
                     )
                 }
 
@@ -148,11 +164,10 @@ fun FoodAsSectionsComposable(
                             sectionTitle = sub.getSubName(),
                             foodList = sub.foodList,
                             onArrowClick = { viewModel.onSectionExpanded(sub.subSectionId) },
-                            expanded = expandedSectionIds.value.contains(sub.subSectionId)
+                            expanded = expandedState.value.contains(sub.subSectionId)
                         )
                     }
                 }
-
             }
             GrayDivider()
         }
@@ -163,7 +178,7 @@ fun FoodAsSectionsComposable(
 @Composable
 fun SectionFoodsComposable(
     sectionTitle: String,
-    foodList: List<FoodModel>?,
+    foodList: List<Food>?,
     onArrowClick: () -> Unit,
     expanded: Boolean,
     modifier: Modifier = Modifier
@@ -194,7 +209,7 @@ fun SectionFoodsComposable(
         }
         if (expanded) {
             foodList.orEmpty().forEach { food ->
-                FoodItemComposable(foodModel = food)
+                FoodItemComposable(food = food)
             }
         }
     }
@@ -203,7 +218,7 @@ fun SectionFoodsComposable(
 @Composable
 fun ExpandableSectionFoods(
     sectionTitle: String,
-    foodList: List<FoodModel>,
+    foodList: List<Food>,
     onArrowClick: () -> Unit,
     expanded: Boolean,
     modifier: Modifier = Modifier
@@ -249,7 +264,7 @@ fun ExpandableSectionFoods(
         }
         if (expanded) {
             foodList.forEach {
-                FoodItemComposable(foodModel = it)
+                FoodItemComposable(food = it)
             }
         }
     }
@@ -257,13 +272,9 @@ fun ExpandableSectionFoods(
 
 @Composable
 fun RestaurantOffersRows(
+    rOffersList: List<Offer>,
     modifier: Modifier = Modifier
 ) {
-    val rOffersList = listOf(
-        Offer(R.drawable.ic_offers_filled, 40, 80, "40METOO", 129),
-        Offer(R.drawable.ic_offers_filled, 20, 180, "20OFFERPLOX", 600)
-    )
-
     val horizontalScrollState = rememberLazyListState()
     LazyRow(
         modifier = modifier
@@ -347,24 +358,25 @@ fun OfferItemComposable(
 
 @Composable
 fun RestaurantBasicDetails(
-    modifier: Modifier = Modifier,
+    restaurant: Restaurant,
+    modifier: Modifier = Modifier
 ) {
     Column(
         modifier.padding(horizontal = 15.dp, vertical = 5.dp)
     ) {
         Text(
-            text = "Pizza Hut",
+            text = restaurant.name,
             style = Typography.h1
         )
         Text(
-            text = "Pizzas, Fast Food",
+            text = restaurant.dishTagline,
             style = Typography.h3
         )
         Row(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "Lulu Mall | 3.6 kms",
+                text = restaurant.getLocationTagline(),
                 style = Typography.h3
             )
             Icon(
@@ -429,7 +441,7 @@ fun BestSafetyCard() {
 }
 
 @Composable
-fun ThreeSectionDetails() {
+fun ThreeSectionDetails(r: Restaurant) {
     val isClosed = false
     Row(
         modifier = Modifier
@@ -454,7 +466,7 @@ fun ThreeSectionDetails() {
                         .padding(end = 4.dp)
                 )
                 Text(
-                    "4.0",
+                    r.rating.toString(),
                     style = Typography.h2
                 )
                 Icon(
@@ -484,7 +496,7 @@ fun ThreeSectionDetails() {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = if (isClosed) "Closed" else "39 mins",
+                text = if (isClosed) "Closed" else "${r.distanceTimeMinutes} mins",
                 style = Typography.h2,
                 color = if (isClosed) Color.Red else Color.Black
             )
@@ -496,7 +508,7 @@ fun ThreeSectionDetails() {
                 .padding(5.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text("₹350", style = Typography.h2)
+            Text("₹${r.averagePricingForTwo}", style = Typography.h2)
             Text("Cost for 2")
         }
     }
@@ -549,7 +561,7 @@ fun PureVegComposable() {
 
 @Composable
 fun FoodItemComposable(
-    foodModel: FoodModel,
+    food: Food,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -567,14 +579,14 @@ fun FoodItemComposable(
                 Icon(
                     painter = painterResource(id = R.drawable.ic_foodtype),
                     contentDescription = null,
-                    tint = when (foodModel.foodType) {
+                    tint = when (food.foodType) {
                         FoodType.VEG -> Color(0xFF008000)
                         FoodType.NON_VEG -> Color(0xFF008000)
                     },
                     modifier = Modifier.padding(end = 5.dp)
                 )
 
-                foodModel.starText?.let {
+                food.starText?.let {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_rating),
                         contentDescription = null,
@@ -589,16 +601,16 @@ fun FoodItemComposable(
             }
             Spacer(modifier = Modifier.height(3.dp))
             Text(
-                text = foodModel.name,
+                text = food.name,
                 style = Typography.h2,
                 fontWeight = FontWeight.SemiBold
             )
             Spacer(modifier = Modifier.height(3.dp))
             Text(
-                text = "₹${foodModel.price}"
+                text = "₹${food.price}"
             )
             Spacer(modifier = Modifier.height(3.dp))
-            foodModel.foodContents?.let {
+            food.foodContents?.let {
                 Text(
                     text = it,
                     maxLines = 2,
@@ -614,7 +626,7 @@ fun FoodItemComposable(
         ) {
             Image(
                 painter = rememberCoilPainter(
-                    foodModel.imageUrl,
+                    food.imageUrl,
                     fadeInDurationMs = 100,
                     previewPlaceholder = R.drawable.ic_restaurant1,
                 ),
@@ -914,7 +926,7 @@ fun BottomQuickMenu(modifier: Modifier = Modifier) {
 @Preview(showBackground = true)
 @Composable
 fun FoodItemPreview() {
-    FoodItemComposable(foodModel = prepareRestaurantFoods()[0])
+    FoodItemComposable(food = HomeRepository().prepareRestaurantFoods()[0])
 }
 
 @Preview("restaurant content", showBackground = true)

@@ -4,7 +4,6 @@ import LazyHorizontalGrid
 import android.content.Intent
 import androidx.compose.animation.*
 import androidx.compose.foundation.*
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -37,6 +36,7 @@ import com.example.swiggyapp.ui.restaurant.RestaurantActivity
 import com.example.swiggyapp.ui.search.CuisineItemComposable
 import com.example.swiggyapp.ui.theme.SwiggyTheme
 import com.example.swiggyapp.ui.theme.Typography
+import com.example.swiggyapp.ui.utils.noRippleClickable
 import com.google.accompanist.coil.rememberCoilPainter
 import items
 import kotlinx.coroutines.delay
@@ -66,6 +66,9 @@ fun HomeScreen(
     outerPaddingValues: PaddingValues,
     innerPaddingValues: PaddingValues
 ) {
+    val viewModel = HomeViewModel(homeRepository = HomeRepository())
+    val viewState by viewModel.state.collectAsState()
+
     val widgetBottomPadding = 10.dp
     LazyColumn(
         modifier = Modifier
@@ -75,7 +78,7 @@ fun HomeScreen(
     ) {
         // Top announcements section
         item {
-            TopHelloBar(prepareHelloBarContent())
+            viewState.helloBarMessages?.let { TopHelloBar(it) }
             AnnouncementHeading(
                 message = "As per state mandates, we will be operational till 8:00 PM",
                 modifier = Modifier.padding(bottom = widgetBottomPadding),
@@ -89,7 +92,7 @@ fun HomeScreen(
                     .fillMaxWidth()
                     .padding(bottom = widgetBottomPadding)
             ) {
-                QuickTilesList(prepareTilesContent())
+                QuickTilesList(viewState.quickTiles)
             }
         }
 
@@ -112,7 +115,7 @@ fun HomeScreen(
                     .padding(bottom = widgetBottomPadding),
                 contentPadding = PaddingValues(start = 10.dp),
             ) {
-                items(items = preparePopularCurations()) {
+                items(items = viewState.popularCurations) {
                     CuisineItemComposable(
                         it,
                         modifier = Modifier
@@ -138,7 +141,7 @@ fun HomeScreen(
             )
         }
 
-        items(items = prepareRestaurants()) {
+        items(items = viewState.nearbyRestaurants) {
             RestaurantItem(
                 it,
                 Modifier.fillMaxWidth(),
@@ -158,7 +161,7 @@ fun HomeScreen(
 
                 }
             )
-            DoubleSectionRestaurants(spotlightRestaurants = prepareRestaurants())
+            DoubleSectionRestaurants(spotlightRestaurants = viewState.nearbyRestaurants)
         }
 
         item {
@@ -173,7 +176,7 @@ fun FooterStaticImage(
     imageUrl: String = "https://res.cloudinary.com/swiggy/image/upload/fl_lossy,f_auto,q_auto/footer_graphic_vxojqs",
 ) {
     Image(
-        rememberCoilPainter(imageUrl, previewPlaceholder = R.drawable.ic_restaurant1),
+        rememberCoilPainter(imageUrl),
         contentDescription = null,
         modifier = modifier
             .fillMaxWidth()
@@ -370,14 +373,6 @@ fun SectionHeading(
         }
     }
 }
-
-inline fun Modifier.noRippleClickable(crossinline onClick: () -> Unit): Modifier =
-    composed {
-        clickable(indication = null,
-            interactionSource = remember { MutableInteractionSource() }) {
-            onClick()
-        }
-    }
 
 @Composable
 fun RestaurantItem(

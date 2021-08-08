@@ -2,54 +2,45 @@ package com.example.swiggyapp.ui.restaurant
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.swiggyapp.data.Restaurant
+import com.example.swiggyapp.data.RestaurantRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-class RestaurantViewModel() : ViewModel() {
-    private val _restaurantFoods = MutableStateFlow(RestaurantFoodModel(emptyList()))
-    val restaurantFoods: MutableStateFlow<RestaurantFoodModel> get() = _restaurantFoods
+class RestaurantViewModel(
+    private val restaurantRepository: RestaurantRepository
+) : ViewModel() {
+    private val _state = MutableStateFlow(RestaurantViewState())
+    val state: StateFlow<RestaurantViewState> get() = _state
 
-    private val _expandedFoodSectionIdsList = MutableStateFlow(listOf<Int>())
-    val expandedFoodSectionIdsList: StateFlow<List<Int>> get() = _expandedFoodSectionIdsList
+    private val _expandedSectionIds = MutableStateFlow(listOf<Int>())
+    private val refreshing = MutableStateFlow(false)
 
     init {
-        getRestaurantDetails()
-        getRestaurantFoodData()
-    }
-
-    private fun getRestaurantDetails() {
         viewModelScope.launch(Dispatchers.Default) {
-            //fetch restaurant details
-//            val restaurant = Restaurant(
-//                "Aryaas",
-//                "South Indian, Chineese, Arabian, North India",
-//                "Kakkanad",
-//                "7.2 kms",
-//                4.2f,
-//                53,
-//                400,
-//                "https://res.cloudinary.com/swiggy/image/upload/fl_lossy,f_auto,q_auto,w_200,h_220,c_fill/jmkzdtpvr6njj3wvokrj",
-//                listOf(Offer(R.drawable.ic_offers_filled, 40, 80, "40METOO", 129)),
-//                OfferSnack("40% OFF", OfferSnackType.BASIC)
-//            )
-        }
-    }
-
-    private fun getRestaurantFoodData() {
-        viewModelScope.launch(Dispatchers.Default) {
-            val subFoodList = prepareAllRestaurantFoods()
-            //by default expand drop-downs
-//            _expandedFoodSectionIdsList.emit(subFoodList.mainFoodSections.orEmpty().flatMap { it.mainFoodSections!! }.subList(0,1).map { it.subSectionId }.toList())
-            _restaurantFoods.emit(subFoodList)
+            _state.value = RestaurantViewState(
+                restaurant = restaurantRepository.prepareARestaurant(),
+                restaurantFoods = restaurantRepository.prepareAllRestaurantFoods(),
+                expandedSectionIds = _expandedSectionIds,
+                refreshing = refreshing.value,
+                errorMessage = null
+            )
         }
     }
 
     fun onSectionExpanded(sectionId: Int) {
-        _expandedFoodSectionIdsList.value =
-            _expandedFoodSectionIdsList.value.toMutableList().also { list ->
-                if (list.contains(sectionId)) list.remove(sectionId) else list.add(sectionId)
-            }
+        _expandedSectionIds.value = _expandedSectionIds.value.toMutableList().also { list ->
+            if (list.contains(sectionId)) list.remove(sectionId) else list.add(sectionId)
+        }
     }
 }
+
+data class RestaurantViewState(
+    val restaurant: Restaurant? = null,
+    val restaurantFoods: RestaurantFoodModel? = null,
+    var expandedSectionIds: MutableStateFlow<List<Int>> = MutableStateFlow(emptyList()),
+    val refreshing: Boolean = false,
+    val errorMessage: String? = null
+)
