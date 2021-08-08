@@ -72,11 +72,8 @@ class RestaurantActivity : ComponentActivity() {
 fun RestaurantContent(
     scrollState: LazyListState, // Higher level is invoked, and reflected throughout
     outerPadding: PaddingValues,
-    modifier: Modifier = Modifier,
-    viewModel: RestaurantViewModel = RestaurantViewModel()
+    modifier: Modifier = Modifier
 ) {
-    val restaurantFoods = viewModel.restaurantFoods.collectAsState()
-    val expandedSectionIds = viewModel.expandedFoodSectionIdsList.collectAsState()
 
     //implement it
     LazyColumn(
@@ -107,43 +104,9 @@ fun RestaurantContent(
         }
 
         item {
-            restaurantFoods.value.recommendedFoods?.let {
-                SectionFoodsComposable(
-                    sectionTitle = it.getSubName(),
-                    foodList = it.foodList,
-                    onArrowClick = { viewModel.onSectionExpanded(it.subSectionId) },
-                    expanded = expandedSectionIds.value.contains(it.subSectionId),
-                )
-                GrayDivider()
-            }
+            FoodAsSectionsComposable()
         }
 
-        items(items = restaurantFoods.value.mainFoodSections.orEmpty()) { mainSubSection ->
-            if (mainSubSection.subSectionsFoods.isNullOrEmpty()) {
-                SectionHeading(
-                    title = mainSubSection.getMainName(),
-                    showSeeAllText = false,
-                    paddingValues = PaddingValues(15.dp, 15.dp)
-                )
-                mainSubSection.mainFoodSections.orEmpty().forEach { sub ->
-                    ExpandableSectionFoods(
-                        sectionTitle = sub.getSubName(),
-                        foodList = sub.foodList,
-                        onArrowClick = { viewModel.onSectionExpanded(sub.subSectionId) },
-                        expanded = expandedSectionIds.value.contains(sub.subSectionId)
-                    )
-                }
-            } else if (mainSubSection.mainFoodSections.isNullOrEmpty()) {
-                SectionFoodsComposable(
-                    sectionTitle = mainSubSection.mainSectionName,
-                    foodList = mainSubSection.subSectionsFoods,
-                    onArrowClick = { viewModel.onSectionExpanded(mainSubSection.mainSectionId) },
-                    expanded = expandedSectionIds.value.contains(mainSubSection.mainSectionId),
-                )
-            }
-
-            GrayDivider()
-        }
         item { GrayDivider() }
 
         item {
@@ -152,6 +115,48 @@ fun RestaurantContent(
                     .background(Color(0xD000000))
             )
         }
+    }
+}
+
+@Composable
+fun FoodAsSectionsComposable(
+    viewModel: RestaurantViewModel = RestaurantViewModel()
+) {
+    val restaurantFoods = viewModel.restaurantFoods.collectAsState()
+    val expandedSectionIds = viewModel.expandedFoodSectionIdsList.collectAsState()
+
+    restaurantFoods.value.mainFoodSections.let {
+        it.forEach { section ->
+            when (section) {
+                is SubSectionsFoods -> {
+                    SectionFoodsComposable(
+                        sectionTitle = section.getSubName(),
+                        foodList = section.foodList,
+                        onArrowClick = { viewModel.onSectionExpanded(section.subSectionId) },
+                        expanded = expandedSectionIds.value.contains(section.subSectionId),
+                    )
+                }
+
+                is MainSectionFoods -> {
+                    SectionHeading(
+                        title = section.getMainName(),
+                        showSeeAllText = false,
+                        paddingValues = PaddingValues(15.dp, 15.dp)
+                    )
+                    section.subFoodSections.orEmpty().forEach { sub ->
+                        ExpandableSectionFoods(
+                            sectionTitle = sub.getSubName(),
+                            foodList = sub.foodList,
+                            onArrowClick = { viewModel.onSectionExpanded(sub.subSectionId) },
+                            expanded = expandedSectionIds.value.contains(sub.subSectionId)
+                        )
+                    }
+                }
+
+            }
+            GrayDivider()
+        }
+        GrayDivider()
     }
 }
 

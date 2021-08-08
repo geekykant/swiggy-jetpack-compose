@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class RestaurantViewModel() : ViewModel() {
-    private val _restaurantFoods = MutableStateFlow(RestaurantFoodModel(null, null))
+    private val _restaurantFoods = MutableStateFlow(RestaurantFoodModel(emptyList()))
     val restaurantFoods: MutableStateFlow<RestaurantFoodModel> get() = _restaurantFoods
 
     private val _expandedFoodSectionIdsList = MutableStateFlow(listOf<Int>())
@@ -42,9 +42,6 @@ class RestaurantViewModel() : ViewModel() {
             val subFoodList = prepareAllRestaurantFoods()
             //by default expand drop-downs
 //            _expandedFoodSectionIdsList.emit(subFoodList.mainFoodSections.orEmpty().flatMap { it.mainFoodSections!! }.subList(0,1).map { it.subSectionId }.toList())
-            subFoodList.recommendedFoods?.let {
-                _expandedFoodSectionIdsList.emit(listOf(it.subSectionId))
-            }
             _restaurantFoods.emit(subFoodList)
         }
     }

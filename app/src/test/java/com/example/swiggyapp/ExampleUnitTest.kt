@@ -1,6 +1,9 @@
 package com.example.swiggyapp
 
 //import androidx.compose.ui.Modifier
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import org.junit.Test
 import kotlin.math.min
 
@@ -41,6 +44,16 @@ class ExampleUnitTest {
             size
         } else {
             size.dec()
+        }
+    }
+
+    @Test
+    fun main() = runBlocking {
+        repeat(100_000) { // launch a lot of coroutines
+            launch {
+                delay(5000L)
+                print(".")
+            }
         }
     }
 }
