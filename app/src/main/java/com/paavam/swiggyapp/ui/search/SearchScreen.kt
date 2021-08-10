@@ -28,14 +28,15 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.google.accompanist.coil.rememberCoilPainter
 import com.paavam.swiggyapp.R
 import com.paavam.swiggyapp.data.Cuisine
 import com.paavam.swiggyapp.data.prepareSearchCuisines
 import com.paavam.swiggyapp.ui.home.SectionHeading
 import com.paavam.swiggyapp.ui.theme.Prox
 import com.paavam.swiggyapp.ui.theme.SwiggyTheme
+import com.paavam.swiggyapp.ui.utils.UiUtils
 import com.paavam.swiggyapp.ui.utils.noRippleClickable
-import com.google.accompanist.coil.rememberCoilPainter
 
 @Composable
 fun SearchScreen(
@@ -165,7 +166,7 @@ fun CuisineItemComposable(
             painter = rememberCoilPainter(
                 cuisine.imageUrl,
                 fadeInDurationMs = 100,
-                previewPlaceholder = R.drawable.ic_cuisine,
+                previewPlaceholder =  UiUtils.fetchRandomPlaceholder(),
             ),
             contentDescription = null,
             modifier = Modifier

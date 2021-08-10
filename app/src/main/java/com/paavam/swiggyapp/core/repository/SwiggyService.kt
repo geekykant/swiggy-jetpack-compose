@@ -5,14 +5,12 @@ import com.paavam.swiggyapp.data.HelloBar
 import com.paavam.swiggyapp.data.QuickTile
 import com.paavam.swiggyapp.data.Restaurant
 import com.paavam.swiggyapp.ui.restaurant.RestaurantFoodModel
-
-//import com.paavam.swiggyapp.ui.restaurant.RestaurantFoodModel
+import javax.inject.Inject
 
 /**
  * Retrofit interface to server URLs
  */
-object SwiggyService{
-
+class SwiggyService @Inject constructor() {
     //    @GET("/")
     suspend fun fetchThisRestaurant(): ResponseResult<Restaurant> =
         ResponseResult.success(PreviewData.prepareARestaurant())

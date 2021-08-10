@@ -32,7 +32,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.rememberNavController
 import com.google.accompanist.coil.rememberCoilPainter
 import com.paavam.swiggyapp.R
@@ -44,6 +44,7 @@ import com.paavam.swiggyapp.ui.home.TopHelloBar
 import com.paavam.swiggyapp.ui.theme.Prox
 import com.paavam.swiggyapp.ui.theme.SwiggyTheme
 import com.paavam.swiggyapp.ui.theme.Typography
+import com.paavam.swiggyapp.ui.utils.UiUtils
 import com.paavam.swiggyapp.ui.utils.noRippleClickable
 import com.paavam.swiggyapp.ui.utils.simpleHorizontalScrollbar
 import kotlinx.coroutines.delay
@@ -52,8 +53,10 @@ import java.util.*
 class RestaurantActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContent {
             SwiggyTheme {
+                val viewModel = hiltViewModel<RestaurantViewModel>()
                 val scrollState = rememberLazyListState()
                 var isScrollStateChanged by remember { mutableStateOf(false) }
 
@@ -63,6 +66,7 @@ class RestaurantActivity : ComponentActivity() {
                     topBar = {
                         isScrollStateChanged = scrollState.firstVisibleItemScrollOffset != 0
                         RestaurantPageTopAppBar(
+                            viewModel,
                             isScrollStateChanged,
                             onBackClick = {
                                 //TODO: Fix Back button
@@ -74,6 +78,7 @@ class RestaurantActivity : ComponentActivity() {
                     floatingActionButtonPosition = FabPosition.Center
                 ) { outerPadding ->
                     RestaurantContent(
+                        viewModel,
                         scrollState,
                         outerPadding,
                         Modifier.fillMaxSize()
@@ -86,11 +91,11 @@ class RestaurantActivity : ComponentActivity() {
 
 @Composable
 fun RestaurantContent(
+    viewModel: RestaurantViewModel,
     scrollState: LazyListState, // Higher level is invoked, and reflected throughout
     outerPadding: PaddingValues,
     modifier: Modifier = Modifier
 ) {
-    val viewModel = viewModel() as RestaurantViewModel
     val viewState = viewModel.state.collectAsState()
 
     //implement it
@@ -125,14 +130,7 @@ fun RestaurantContent(
         }
 
         item {
-            FoodAsSectionsComposable()
-
-//                viewState.value.restaurantFoods,
-//                viewState.value.expandedSectionIds,
-//                onSectionExpanded = { id ->
-//                    viewModel.onSectionExpanded(id)
-//                }
-//            )
+            FoodAsSectionsComposable(viewModel = viewModel)
         }
 
         item { GrayDivider() }
@@ -148,7 +146,7 @@ fun RestaurantContent(
 
 @Composable
 fun FoodAsSectionsComposable(
-    viewModel: RestaurantViewModel = viewModel() as RestaurantViewModel
+    viewModel: RestaurantViewModel
 ) {
     val state = viewModel.state.collectAsState()
     val expandedState = state.value.expandedSectionIds.collectAsState()
@@ -656,7 +654,7 @@ fun FoodItemComposable(
                 painter = rememberCoilPainter(
                     food.imageUrl,
                     fadeInDurationMs = 100,
-                    previewPlaceholder = R.drawable.ic_restaurant1
+                    previewPlaceholder = UiUtils.fetchRandomPlaceholder()
                 ),
                 contentDescription = null,
                 modifier = Modifier
@@ -856,6 +854,7 @@ fun GrayDivider(
 
 @Composable
 fun RestaurantPageTopAppBar(
+    viewModel: RestaurantViewModel,
     isScrolling: Boolean,
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier
@@ -871,9 +870,7 @@ fun RestaurantPageTopAppBar(
                         .weight(1f)
                         .alpha(if (isScrolling) 1f else 0f)
                 ) {
-                    val viewModel = viewModel() as RestaurantViewModel
                     val viewState = viewModel.state.collectAsState()
-
                     val restaurant = viewState.value.restaurant
 
                     restaurant?.let {
@@ -916,7 +913,7 @@ fun RestaurantPageTopAppBar(
                 )
             },
         navigationIcon = {
-            IconButton(onClick = {  }) {
+            IconButton(onClick = { }) {
                 Icon(painterResource(id = R.drawable.ic_left_arrow), null)
             }
         },
@@ -980,10 +977,10 @@ fun FoodItemPreview() {
     )
 }
 
-@Preview("restaurant content", showBackground = true)
-@Composable
-fun RestaurantPreview() {
-    RestaurantContent(
-        rememberLazyListState(), PaddingValues(10.dp), Modifier.fillMaxSize()
-    )
-}
+//@Preview("restaurant content", showBackground = true)
+//@Composable
+//fun RestaurantPreview() {
+//    RestaurantContent(
+//        RestaurantViewModel(RestaurantsRepository()), rememberLazyListState(), PaddingValues(10.dp), Modifier.fillMaxSize()
+//    )
+//}

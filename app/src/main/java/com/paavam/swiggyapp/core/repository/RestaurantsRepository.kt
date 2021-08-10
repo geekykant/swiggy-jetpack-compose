@@ -2,16 +2,17 @@ package com.paavam.swiggyapp.core.repository
 
 import com.paavam.swiggyapp.data.Restaurant
 import com.paavam.swiggyapp.ui.restaurant.RestaurantFoodModel
-import javax.inject.Singleton
+import javax.inject.Inject
 
 /**
  * Repository for Restaurant Screen.
  */
-@Singleton
-interface RestaurantsRepository {
+class RestaurantsRepository @Inject constructor(
+    private val swiggyService: SwiggyService
+) {
     suspend fun fetchThisRestaurant(): ResponseResult<Restaurant> =
-        SwiggyService.fetchThisRestaurant()
+        swiggyService.fetchThisRestaurant()
 
     suspend fun fetchThisRestaurantFoods(): ResponseResult<RestaurantFoodModel> =
-        SwiggyService.fetchThisRestaurantFoods()
+        swiggyService.fetchThisRestaurantFoods()
 }

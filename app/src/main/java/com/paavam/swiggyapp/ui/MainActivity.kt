@@ -24,23 +24,29 @@ import com.paavam.swiggyapp.ui.cart.CartScreen
 import com.paavam.swiggyapp.ui.home.MainContent
 import com.paavam.swiggyapp.ui.search.SearchScreen
 import com.paavam.swiggyapp.ui.theme.SwiggyTheme
+import dagger.hilt.android.AndroidEntryPoint
 import java.util.*
 
-//@AndroidEntryPoint
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             SwiggyTheme {
-                val navController = rememberNavController()
-                Scaffold(
-                    topBar = { },
-                    bottomBar = { BottomNavigationBar(navController) }
-                ) { outerPaddingValues ->
-                    Navigation(navController, outerPaddingValues)
-                }
+                SwiggyMain()
             }
         }
+    }
+}
+
+@Composable
+private fun SwiggyMain() {
+    val navController = rememberNavController()
+    Scaffold(
+        topBar = { },
+        bottomBar = { BottomNavigationBar(navController) }
+    ) { outerPaddingValues ->
+        Navigation(navController, outerPaddingValues)
     }
 }
 
@@ -49,17 +55,17 @@ fun Navigation(
     navController: NavHostController,
     outerPaddingValues: PaddingValues
 ) {
-    NavHost(navController, startDestination = BottomNavItem.Home.route) {
-        composable(BottomNavItem.Home.route) {
+    NavHost(navController, startDestination = NavScreen.Home.route) {
+        composable(NavScreen.Home.route) {
             MainContent(outerPaddingValues)
         }
-        composable(BottomNavItem.Search.route) {
+        composable(NavScreen.Search.route) {
             SearchScreen(outerPaddingValues)
         }
-        composable(BottomNavItem.Cart.route) {
+        composable(NavScreen.Cart.route) {
             CartScreen(navController, outerPaddingValues)
         }
-        composable(BottomNavItem.Account.route) {
+        composable(NavScreen.Account.route) {
             AccountScreen(outerPaddingValues)
         }
     }
@@ -68,10 +74,10 @@ fun Navigation(
 @Composable
 fun BottomNavigationBar(navController: NavController) {
     val items = listOf(
-        BottomNavItem.Home,
-        BottomNavItem.Search,
-        BottomNavItem.Cart,
-        BottomNavItem.Account
+        NavScreen.Home,
+        NavScreen.Search,
+        NavScreen.Cart,
+        NavScreen.Account
     )
 
     BottomNavigation(

@@ -2,11 +2,11 @@ package com.paavam.swiggyapp.ui.restaurant
 
 import com.paavam.swiggyapp.data.Food
 
-data class RestaurantFoodModel(
+class RestaurantFoodModel(
     val mainFoodSections: List<Any?>
 )
 
-internal data class MainSectionFoods(
+data class MainSectionFoods(
     val mainSectionId: Int,
     val mainSectionName: String,
     val subFoodSections: List<SubSectionsFoods>?
@@ -17,10 +17,9 @@ internal data class MainSectionFoods(
         }
         return mainSectionName
     }
-
 }
 
-internal data class SubSectionsFoods(
+data class SubSectionsFoods(
     val subSectionId: Int,
     val subSectionName: String,
     val foodList: List<Food>

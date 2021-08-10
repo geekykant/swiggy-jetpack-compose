@@ -5,11 +5,16 @@ import androidx.lifecycle.viewModelScope
 import com.paavam.swiggyapp.core.repository.ResponseResult
 import com.paavam.swiggyapp.core.repository.RestaurantsRepository
 import com.paavam.swiggyapp.data.Restaurant
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class RestaurantViewModel : RestaurantsRepository, ViewModel() {
+@HiltViewModel
+class RestaurantViewModel @Inject constructor(
+    private val restaurantsRepository: RestaurantsRepository
+) : ViewModel() {
     private val _state = MutableStateFlow(RestaurantViewState())
     val state: StateFlow<RestaurantViewState> get() = _state
 
@@ -19,11 +24,12 @@ class RestaurantViewModel : RestaurantsRepository, ViewModel() {
     init {
         viewModelScope.launch {
             val restaurant =
-                when (val restaurantResult = fetchThisRestaurant()) {
+                when (val restaurantResult = restaurantsRepository.fetchThisRestaurant()) {
                     is ResponseResult.Success -> restaurantResult.data
                     is ResponseResult.Error -> null /* Throw error message */
                 }
-            val restaurantFoods = when (val restaurantFoodsResult = fetchThisRestaurantFoods()) {
+            val restaurantFoods = when (val restaurantFoodsResult =
+                restaurantsRepository.fetchThisRestaurantFoods()) {
                 is ResponseResult.Success -> restaurantFoodsResult.data
                 is ResponseResult.Error -> null /* Throw error message */
             }

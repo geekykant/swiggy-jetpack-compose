@@ -8,15 +8,20 @@ import com.paavam.swiggyapp.data.Cuisine
 import com.paavam.swiggyapp.data.HelloBar
 import com.paavam.swiggyapp.data.QuickTile
 import com.paavam.swiggyapp.data.Restaurant
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class HomeViewModel: HomeRepository, ViewModel() {
+@HiltViewModel
+class HomeViewModel @Inject constructor(
+    private val homeRepository: HomeRepository
+) : ViewModel() {
     private val _state = MutableStateFlow(HomeViewState())
     val state: StateFlow<HomeViewState> get() = _state
 
-    private val refreshing = MutableStateFlow(false)
+    private val _refreshing = MutableStateFlow(false)
 
     init {
         prepareHomeData()
@@ -24,22 +29,22 @@ class HomeViewModel: HomeRepository, ViewModel() {
 
     private fun prepareHomeData() {
         viewModelScope.launch {
-            val quickTiles = when (val quickTiles = fetchTilesContent()) {
+            val quickTiles = when (val quickTiles = homeRepository.fetchTilesContent()) {
                 is ResponseResult.Success -> quickTiles.data
                 is ResponseResult.Error -> emptyList() /* Throw error message */
             }
             val helloBarMessages =
-                when (val helloBarMessages = fetchHelloBarContent()) {
+                when (val helloBarMessages = homeRepository.fetchHelloBarContent()) {
                     is ResponseResult.Success -> helloBarMessages.data
                     is ResponseResult.Error -> emptyList() /* Throw error message */
                 }
             val nearbyRestaurants =
-                when (val nearbyRestaurants = fetchRestaurantsList()) {
+                when (val nearbyRestaurants = homeRepository.fetchRestaurantsList()) {
                     is ResponseResult.Success -> nearbyRestaurants.data
                     is ResponseResult.Error -> emptyList() /* Throw error message */
                 }
             val popularCurations =
-                when (val popularCurations = fetchPopularCuisines()) {
+                when (val popularCurations = homeRepository.fetchPopularCuisines()) {
                     is ResponseResult.Success -> popularCurations.data
                     is ResponseResult.Error -> emptyList() /* Throw error message */
                 }
@@ -49,7 +54,7 @@ class HomeViewModel: HomeRepository, ViewModel() {
                 helloBarMessages = helloBarMessages,
                 nearbyRestaurants = nearbyRestaurants,
                 popularCurations = popularCurations,
-                refreshing = refreshing.value,
+                refreshing = _refreshing.value,
                 errorMessage = null
             )
         }
@@ -58,10 +63,10 @@ class HomeViewModel: HomeRepository, ViewModel() {
     fun refresh(force: Boolean = true) {
         viewModelScope.launch {
             runCatching {
-                refreshing.value = true
+                _refreshing.value = true
                 prepareHomeData()
             }
-            refreshing.value = false
+            _refreshing.value = false
         }
     }
 }

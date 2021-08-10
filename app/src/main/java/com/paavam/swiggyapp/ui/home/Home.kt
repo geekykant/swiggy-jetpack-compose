@@ -26,7 +26,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.accompanist.coil.rememberCoilPainter
 import com.paavam.swiggyapp.R
 import com.paavam.swiggyapp.data.HelloBar
@@ -37,6 +37,7 @@ import com.paavam.swiggyapp.ui.restaurant.RestaurantActivity
 import com.paavam.swiggyapp.ui.search.CuisineItemComposable
 import com.paavam.swiggyapp.ui.theme.SwiggyTheme
 import com.paavam.swiggyapp.ui.theme.Typography
+import com.paavam.swiggyapp.ui.utils.UiUtils
 import com.paavam.swiggyapp.ui.utils.noRippleClickable
 import com.paavam.swiggyapp.ui.utils.simpleHorizontalScrollbar
 import items
@@ -67,7 +68,7 @@ fun HomeScreen(
     outerPaddingValues: PaddingValues,
     innerPaddingValues: PaddingValues
 ) {
-    val viewModel = viewModel() as HomeViewModel
+    val viewModel = hiltViewModel<HomeViewModel>()
     val viewState by viewModel.state.collectAsState()
 
     val widgetBottomPadding = 10.dp
@@ -198,7 +199,7 @@ fun SingleImageComposable(imageUrl: String, modifier: Modifier = Modifier) {
             rememberCoilPainter(
                 imageUrl,
                 fadeInDurationMs = 300,
-                previewPlaceholder = R.drawable.ic_restaurant1
+                previewPlaceholder = UiUtils.fetchRandomPlaceholder(),
             ),
             contentDescription = null,
             modifier = Modifier
@@ -401,7 +402,7 @@ fun RestaurantItem(
                 rememberCoilPainter(
                     r.imageUrl,
                     fadeInDurationMs = 300,
-                    previewPlaceholder = R.drawable.ic_restaurant1
+                    previewPlaceholder = UiUtils.fetchRandomPlaceholder()
                 ),
                 contentDescription = null,
                 modifier = Modifier
@@ -692,7 +693,7 @@ fun QuickTileComposable(heading: String, tagline: String, imageUrl: String) {
                 painter = rememberCoilPainter(
                     imageUrl,
                     fadeInDurationMs = 300,
-                    previewPlaceholder = R.drawable.ic_deliveryman
+                    previewPlaceholder = UiUtils.fetchRandomPlaceholder()
                 ),
                 contentDescription = null,
                 modifier = Modifier

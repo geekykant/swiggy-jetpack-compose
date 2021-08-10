@@ -19,7 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.paavam.swiggyapp.R
-import com.paavam.swiggyapp.ui.BottomNavItem
+import com.paavam.swiggyapp.ui.NavScreen
 import com.paavam.swiggyapp.ui.theme.SwiggyTheme
 import com.paavam.swiggyapp.ui.theme.Typography
 import java.util.*
@@ -69,7 +69,7 @@ fun NoItemsInCart(
         OutlinedButton(
             onClick = {
                 /* Open home page */
-                navController.navigate(BottomNavItem.Home.route)
+                navController.navigate(NavScreen.Home.route)
 
             },
             colors = ButtonDefaults.outlinedButtonColors(
