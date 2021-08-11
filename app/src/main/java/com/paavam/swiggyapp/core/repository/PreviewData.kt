@@ -8,6 +8,7 @@ import com.paavam.swiggyapp.ui.restaurant.SubSectionsFoods
 
 object PreviewData {
     fun prepareARestaurant() = Restaurant(
+        1L,
         "Aryaas",
         "South Indian, Chineese, Arabian, North India",
         "Kakkanad",
@@ -93,6 +94,7 @@ object PreviewData {
 
     fun prepareRestaurantFoods() = listOf(
         Food(
+            101L,
             "Veggie Delite Sub ( 15 cm, 6 Inch )",
             FoodType.VEG,
             "Bestseller",
@@ -101,6 +103,7 @@ object PreviewData {
             "https://res.cloudinary.com/swiggy/image/upload/fl_lossy,f_auto,q_auto,w_208,h_208,c_fit/awlvilhyeecsyubydsn5"
         ),
         Food(
+            102L,
             "Aloo Patty Sub ( 15 cm, 6 Inch )",
             FoodType.VEG,
             null,
@@ -109,6 +112,7 @@ object PreviewData {
             "https://res.cloudinary.com/swiggy/image/upload/fl_lossy,f_auto,q_auto,w_208,h_208,c_fit/ge1oc1o4i1agi8pawbvt"
         ),
         Food(
+            103L,
             "Tandoori Chicken Tikka Sub ( 15 cm, 6 Inch )",
             FoodType.NON_VEG,
             null,
@@ -117,6 +121,7 @@ object PreviewData {
             "https://res.cloudinary.com/swiggy/image/upload/fl_lossy,f_auto,q_auto,w_208,h_208,c_fit/ixdq8qrujoxmcnvai65x"
         ),
         Food(
+            104L,
             "Cheesy Aloo Patty Sub (15 cm, 6 Inch)+ Cheesy aloo patty Sub (15 cm, 6 Inch)",
             FoodType.NON_VEG,
             "Bestseller",
@@ -163,6 +168,7 @@ object PreviewData {
     fun prepareRestaurants(): List<Restaurant> {
         var prepList = listOf(
             Restaurant(
+                1L,
                 "Aryaas",
                 "South Indian, Chineese, Arabian, North India",
                 "Kakkanad",
@@ -174,6 +180,7 @@ object PreviewData {
                 listOf(Offer(R.drawable.ic_offers_filled, 40, 80, "40METOO", 129)),
                 OfferSnack("40% OFF", OfferSnackType.BASIC)
             ), Restaurant(
+                2L,
                 "McDonald's",
                 "American, Continental, Fast Food, Desserts",
                 "Edapally",
@@ -185,6 +192,7 @@ object PreviewData {
                 null,
                 null
             ), Restaurant(
+                3L,
                 "Hotel Matoshri",
                 "Chinese, Fast Food",
                 "Kaveri Hospital, Shingoli",

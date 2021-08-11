@@ -1,6 +1,7 @@
 package com.paavam.swiggyapp.data
 
 data class Restaurant(
+    val restaurantId: Long,
     val name: String,
     val dishTagline: String,
     val location: String,
