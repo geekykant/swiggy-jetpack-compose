@@ -1,0 +1,16 @@
+package com.paavam.data.database.tables
+
+import org.jetbrains.exposed.dao.id.LongIdTable
+
+object Foods : LongIdTable("foods", columnName = "food_id") {
+    val name = text("name")
+    val foodType = enumeration("food_type", FoodType::class)
+    val starText = text("star_text")
+    val price = float("price")
+    val foodContents = text("food_contents")
+    val imageUrl = text("image_url")
+}
+
+enum class FoodType {
+    VEG, NON_VEG
+}
