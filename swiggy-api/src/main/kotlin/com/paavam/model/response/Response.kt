@@ -9,5 +9,5 @@ interface Response {
 }
 
 enum class State {
-    SUCCESS, FAILED, UNAUTHORIZED
+    SUCCESS, FAILED, NOT_FOUND, UNAUTHORIZED
 }

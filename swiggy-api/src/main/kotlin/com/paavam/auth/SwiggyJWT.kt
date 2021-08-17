@@ -12,20 +12,20 @@ class SwiggyJWT private constructor(secretKey: String) {
         .withAudience(AUDIENCE)
         .build()
 
-    fun sign(userId: String): String = JWT
+    fun sign(mobileNo: String): String = JWT
         .create()
         .withIssuer(ISSUER)
         .withAudience(AUDIENCE)
-        .withClaim(CLAIM, userId)
+        .withClaim(CLAIM, mobileNo)
         .sign(algorithm)
 
     companion object {
         lateinit var instance: SwiggyJWT
             private set
 
-        fun initialize(secretKey: String){
-            synchronized(this){
-                if(!this::instance.isInitialized){
+        fun initialize(secretKey: String) {
+            synchronized(this) {
+                if (!this::instance.isInitialized) {
                     instance = SwiggyJWT(secretKey)
                 }
             }
@@ -33,6 +33,6 @@ class SwiggyJWT private constructor(secretKey: String) {
 
         private const val ISSUER = "Swiggy-JWT-Issuer"
         private const val AUDIENCE = "https://api.paavam.com/swiggy"
-        const val CLAIM = "userId"
+        const val CLAIM = "mobileNo"
     }
 }

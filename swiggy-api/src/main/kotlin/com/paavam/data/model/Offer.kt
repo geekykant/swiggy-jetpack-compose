@@ -5,11 +5,15 @@ import com.paavam.data.entity.EntityOffer
 data class Offer(
     val offer_id: String,
     val iconUrl: String?,
-    val discountPercentage: Int?,
+    val discountPercentage: Int,
     var upToLimit: Int?,
-    val offerCode: String?,
+    val offerCode: String,
     val minLimit: Int?
 ) {
+    fun isFieldsBlank(): Boolean {
+        return offerCode.isBlank()
+    }
+
     companion object {
         fun fromEntity(entity: EntityOffer): Offer = Offer(
             entity.id.value.toString(),

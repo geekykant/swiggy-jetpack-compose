@@ -21,4 +21,19 @@ class EntityRestaurant(restaurantId: EntityID<Long>) : LongEntity(restaurantId) 
     var isShopClosed by Restaurants.isShopClosed
 
     var allOffer by EntityOffer via RestaurantWithOffers
+
+//    fun toEntity(restaurant: Restaurant): EntityRestaurant = EntityRestaurant(
+//        id
+//    ).apply {
+//        name = restaurant.name
+//        dishTagline = restaurant.dishTagline
+//        location = restaurant.location
+//        distance = restaurant.distance
+//        rating = restaurant.rating
+//        distanceTimeMinutes = restaurant.distanceTimeMinutes
+//        averagePricingForTwo = restaurant.averagePricingForTwo
+//        imageUrl = restaurant.imageUrl
+//        isBestSafety = restaurant.isBestSafety
+//        isShopClosed = restaurant.isShopClosed
+//    }
 }

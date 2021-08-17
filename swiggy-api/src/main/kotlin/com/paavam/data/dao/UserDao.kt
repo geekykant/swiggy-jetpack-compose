@@ -8,10 +8,10 @@ import org.jetbrains.exposed.sql.transactions.transaction
 import javax.inject.Inject
 
 class UserDao @Inject constructor() {
-    fun addUser(mobileNo: String, password: String): User = transaction {
+    fun addUser(user: User): User = transaction {
         EntityUser.new {
-            this.mobileNo = mobileNo
-            this.password = password
+            this.mobileNo = user.mobileNo
+            this.password = user.password
         }
     }.let { User.fromEntity(it) }
 

@@ -5,12 +5,8 @@ import org.jetbrains.exposed.dao.id.LongIdTable
 object Foods : LongIdTable("foods", columnName = "food_id") {
     val name = text("name")
     val foodType = enumeration("food_type", FoodType::class)
-    val starText = text("star_text")
+    val starText = text("star_text").nullable()
     val price = float("price")
-    val foodContents = text("food_contents")
-    val imageUrl = text("image_url")
-}
-
-enum class FoodType {
-    VEG, NON_VEG
+    val foodContents = text("food_contents").nullable()
+    val imageUrl = text("image_url").nullable()
 }

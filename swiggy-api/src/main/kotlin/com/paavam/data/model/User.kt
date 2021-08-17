@@ -3,12 +3,12 @@ package com.paavam.data.model
 import com.paavam.data.entity.EntityUser
 
 data class User(
-    val user_id: String,
+    val user_id: String? = null,
     val mobileNo: String,
-    val password: String
+    val password: String,
 ) {
     companion object {
-        fun fromEntity(entity: EntityUser) =
+        fun fromEntity(entity: EntityUser): User =
             User(entity.id.value.toString(), entity.mobileNo, entity.password)
     }
 }

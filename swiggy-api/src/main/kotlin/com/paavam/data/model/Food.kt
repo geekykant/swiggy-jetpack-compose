@@ -7,11 +7,15 @@ data class Food(
     val food_id: String,
     val name: String,
     val foodType: FoodType,
-    val starText: String,
+    val starText: String?,
     val price: Float,
-    val foodContents: String,
-    val imageUrl: String
+    val foodContents: String?,
+    val imageUrl: String?
 ) {
+    fun hasEmptyFields(): Boolean {
+        return name.isBlank()
+    }
+
     companion object {
         fun fromEntity(entity: EntityFood): Food =
             Food(
