@@ -9,3 +9,5 @@ class RestaurantNotFoundException(override val message: String) : Exception(mess
 class FoodNotFoundException(override val message: String) : Exception(message)
 
 class OfferNotFoundException(override val message: String) : Exception(message)
+
+class OfferRestaurantMissingLinkException(override val message: String) : Exception(message)

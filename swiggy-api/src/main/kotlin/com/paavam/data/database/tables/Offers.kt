@@ -9,7 +9,3 @@ object Offers : LongIdTable("offers", columnName = "offer_id") {
     val offerCode = text("offer_code")
     val minLimit = integer("min_limit").nullable()
 }
-
-enum class OfferSnackType {
-    FLAT_DEAL, BASIC, INVERT_BASIC
-}

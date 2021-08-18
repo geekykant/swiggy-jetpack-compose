@@ -1,12 +1,12 @@
 package com.paavam.data.model
 
-import com.paavam.data.database.tables.FoodType
+import com.paavam.data.database.tables.enums.FoodTypes
 import com.paavam.data.entity.EntityFood
 
 data class Food(
     val food_id: String,
     val name: String,
-    val foodType: FoodType,
+    val foodType: FoodTypes,
     val starText: String?,
     val price: Float,
     val foodContents: String?,
@@ -27,5 +27,7 @@ data class Food(
                 entity.foodContents,
                 entity.imageUrl
             )
+
+        fun checkEntityIDType(foodId: String): Boolean = foodId.toLongOrNull() != null
     }
 }

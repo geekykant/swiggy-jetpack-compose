@@ -23,5 +23,7 @@ data class Offer(
             entity.offerCode,
             entity.minLimit
         )
+
+        fun checkEntityIDType(offerId: String): Boolean = offerId.toLongOrNull() != null
     }
 }

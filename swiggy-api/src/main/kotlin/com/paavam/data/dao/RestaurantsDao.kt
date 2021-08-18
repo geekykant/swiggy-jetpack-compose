@@ -18,6 +18,7 @@ class RestaurantsDao @Inject constructor() {
             this.imageUrl = restaurant.imageUrl
             this.isBestSafety = restaurant.isBestSafety
             this.isShopClosed = restaurant.isShopClosed
+            this.offerSnackType = restaurant.offerSnackType
         }.id.toString()
     }
 
@@ -37,6 +38,7 @@ class RestaurantsDao @Inject constructor() {
             this.imageUrl = restaurant.imageUrl
             this.isBestSafety = restaurant.isBestSafety
             this.isShopClosed = restaurant.isShopClosed
+            this.offerSnackType = restaurant.offerSnackType
         }.id.toString()
     }
 

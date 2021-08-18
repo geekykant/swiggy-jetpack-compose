@@ -1,5 +1,6 @@
 package com.paavam.data.model
 
+import com.paavam.data.database.tables.enums.OfferSnackTypes
 import com.paavam.data.entity.EntityRestaurant
 
 data class Restaurant(
@@ -13,7 +14,8 @@ data class Restaurant(
     val averagePricingForTwo: Int,
     val imageUrl: String?,
     val isBestSafety: Boolean,
-    val isShopClosed: Boolean
+    val isShopClosed: Boolean,
+    val offerSnackType: OfferSnackTypes
 ) {
     companion object {
         fun fromEntity(entity: EntityRestaurant): Restaurant = Restaurant(
@@ -27,26 +29,15 @@ data class Restaurant(
             entity.averagePricingForTwo,
             entity.imageUrl,
             entity.isBestSafety,
-            entity.isShopClosed
+            entity.isShopClosed,
+            entity.offerSnackType
         )
 
-//        fun toEntity(restaurant_id: String, restaurant: Restaurant): EntityRestaurant {
-//            return EntityRestaurant(EntityID(restaurant_id.toLong(), Restaurants)).also {
-//                it.name = restaurant.name
-//                it.dishTagline = restaurant.dishTagline
-//                it.location = restaurant.location
-//                it.distance = restaurant.distance
-//                it.rating = restaurant.rating
-//                it.distanceTimeMinutes = restaurant.distanceTimeMinutes
-//                it.averagePricingForTwo = restaurant.averagePricingForTwo
-//                it.imageUrl = restaurant.imageUrl
-//                it.isBestSafety = restaurant.isBestSafety
-//                it.isShopClosed = restaurant.isShopClosed
-//            }
-//    }
+        fun checkEntityIDType(restaurantId: String): Boolean = restaurantId.toLongOrNull() != null
     }
 
     fun isFieldsBlank(): Boolean {
-        return (name.isBlank() or dishTagline.isBlank() or location.isBlank())
+        return (name.isBlank() or dishTagline.isBlank() or location.isBlank()) or
+                OfferSnackTypes.values().contains(offerSnackType)
     }
 }

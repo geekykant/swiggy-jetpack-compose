@@ -10,5 +10,7 @@ data class User(
     companion object {
         fun fromEntity(entity: EntityUser): User =
             User(entity.id.value.toString(), entity.mobileNo, entity.password)
+
+        fun checkEntityIDType(userId: String): Boolean = userId.toLongOrNull() != null
     }
 }

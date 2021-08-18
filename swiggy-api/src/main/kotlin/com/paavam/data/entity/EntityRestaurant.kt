@@ -19,6 +19,7 @@ class EntityRestaurant(restaurantId: EntityID<Long>) : LongEntity(restaurantId) 
     var imageUrl by Restaurants.imageUrl
     var isBestSafety by Restaurants.isBestSafety
     var isShopClosed by Restaurants.isShopClosed
+    var offerSnackType by Restaurants.offerSnackType
 
     var allOffer by EntityOffer via RestaurantWithOffers
 

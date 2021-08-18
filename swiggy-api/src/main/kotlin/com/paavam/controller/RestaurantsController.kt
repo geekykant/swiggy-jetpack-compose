@@ -5,6 +5,7 @@ import com.paavam.data.model.Restaurant
 import com.paavam.exception.BadRequestException
 import com.paavam.exception.RestaurantNotFoundException
 import com.paavam.model.response.RestaurantResponse
+import com.paavam.model.response.RestaurantsResponse
 import javax.inject.Inject
 
 class RestaurantsController @Inject constructor(
@@ -24,9 +25,20 @@ class RestaurantsController @Inject constructor(
         }
     }
 
-//    fun getRestaurant(restaurantId: String): RestaurantResponse {
-//
-//    }
+    fun getRestaurant(restaurantId: String): RestaurantsResponse {
+        return try {
+            validateRestaurantIdOrThrowException(restaurantId)
+            checkRestaurantExistsOrThrowException(restaurantId)
+
+            val restaurant = restaurantsDao.getRestaurantById(restaurantId)
+                ?: throw BadRequestException("Failed fetching Restaurant")
+            RestaurantsResponse.success(restaurant)
+        } catch (notFoundEx: RestaurantNotFoundException) {
+            RestaurantsResponse.notFound(notFoundEx.message)
+        } catch (badEx: BadRequestException) {
+            RestaurantsResponse.failed(badEx.message)
+        }
+    }
 
     fun updateRestaurant(restaurantId: String, restaurant: Restaurant): RestaurantResponse {
         return try {
@@ -65,20 +77,22 @@ class RestaurantsController @Inject constructor(
         }
     }
 
-    private fun validateRestaurantIdOrThrowException(restaurantId: String) {
-        val message = when {
-            (restaurantId.toLongOrNull()) == null -> "Restaurant ID invalid exception"
-            else -> return
+    companion object {
+        fun validateRestaurantDetailsOrThrowException(restaurant: Restaurant) {
+            val message = when {
+                (restaurant.isFieldsBlank()) -> "Restaurant fields cannot be blank"
+                else -> return
+            }
+            throw BadRequestException(message)
         }
-        throw BadRequestException(message)
-    }
 
-    private fun validateRestaurantDetailsOrThrowException(restaurant: Restaurant) {
-        val message = when {
-            (restaurant.isFieldsBlank()) -> "Restaurant fields cannot be blank"
-            else -> return
+        fun validateRestaurantIdOrThrowException(restaurantId: String) {
+            val message = when {
+                (Restaurant.checkEntityIDType(restaurantId)) -> "Restaurant ID invalid exception"
+                else -> return
+            }
+            throw BadRequestException(message)
         }
-        throw BadRequestException(message)
     }
 
 }
