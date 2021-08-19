@@ -11,8 +11,6 @@ import javax.inject.Inject
 class RestaurantsController @Inject constructor(
     private val restaurantsDao: RestaurantsDao
 ) {
-    // private val jwt = SwiggyJWT.instance
-    //TODO: Check if admin privileges
 
     fun addNewRestaurant(restaurant: Restaurant): RestaurantResponse {
         return try {

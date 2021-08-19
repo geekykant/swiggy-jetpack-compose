@@ -2,7 +2,9 @@ package com.paavam.data.model
 
 import com.paavam.data.database.tables.enums.OfferSnackTypes
 import com.paavam.data.entity.EntityRestaurant
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class Restaurant(
     val restaurant_id: String? = null,
     val name: String,

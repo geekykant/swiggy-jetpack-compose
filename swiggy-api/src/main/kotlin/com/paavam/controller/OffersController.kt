@@ -12,8 +12,6 @@ import javax.inject.Inject
 class OffersController @Inject constructor(
     private val offersDao: OffersDao
 ) {
-    // private val jwt = SwiggyJWT.instance
-    //TODO: Check if admin privileges
 
     fun addNewOffer(offer: Offer): OfferResponse {
         return try {

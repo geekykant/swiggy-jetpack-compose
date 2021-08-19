@@ -1,7 +1,9 @@
 package com.paavam.data.model
 
 import com.paavam.data.entity.EntityOffer
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class Offer(
     val offer_id: String,
     val iconUrl: String?,

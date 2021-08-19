@@ -2,7 +2,9 @@ package com.paavam.data.model
 
 import com.paavam.data.database.tables.enums.FoodTypes
 import com.paavam.data.entity.EntityFood
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class Food(
     val food_id: String,
     val name: String,

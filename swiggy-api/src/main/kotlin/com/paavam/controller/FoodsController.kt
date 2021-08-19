@@ -10,8 +10,6 @@ import javax.inject.Inject
 class FoodsController @Inject constructor(
     private val foodsDao: FoodsDao
 ) {
-    // private val jwt = SwiggyJWT.instance
-    //TODO: Check if admin privileges
 
     fun addNewFood(food: Food): FoodResponse {
         return try {

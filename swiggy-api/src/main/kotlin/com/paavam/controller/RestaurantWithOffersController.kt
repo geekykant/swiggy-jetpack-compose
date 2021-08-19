@@ -17,8 +17,6 @@ class RestaurantWithOffersController @Inject constructor(
     private val restaurantsDao: RestaurantsDao,
     private val offersDao: OffersDao
 ) {
-    // private val jwt = SwiggyJWT.instance
-    //TODO: Check if admin privileges
 
     fun getOffersListOfRestaurant(restaurantId: String): RestaurantWithOffersResponse {
         return try {

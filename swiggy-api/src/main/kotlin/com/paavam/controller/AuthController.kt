@@ -22,8 +22,8 @@ class AuthController @Inject constructor(
         return try {
             validateCredentialsOrThrowException(user)
 
-            if (!userDao.isUsersExists(mobileNo)) {
-                throw BadRequestException("Username not available")
+            if (userDao.isUsersExists(mobileNo)) {
+                throw BadRequestException("This mobile No. is already registered")
             }
 
             val newUser = userDao.addUser(user)
