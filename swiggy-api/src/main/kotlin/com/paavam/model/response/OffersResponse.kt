@@ -4,7 +4,40 @@ import com.paavam.data.model.Offer
 import kotlinx.serialization.Serializable
 
 /**
- * Responses for single offer entity.
+ * Responses for list of offers.
+ */
+@Serializable
+data class OffersListResponse(
+    override val status: State,
+    override val message: String,
+    val offers: List<Offer>? = null
+) : Response {
+    companion object {
+        fun success(offers: List<Offer>) = OffersListResponse(
+            State.SUCCESS,
+            "Task successful",
+            offers
+        )
+
+        fun notFound(message: String) = OffersListResponse(
+            State.NOT_FOUND,
+            message
+        )
+
+        fun unauthorized(message: String) = OffersListResponse(
+            State.UNAUTHORIZED,
+            message
+        )
+
+        fun failed(message: String) = OffersListResponse(
+            State.FAILED,
+            message
+        )
+    }
+}
+
+/**
+ * Responses for single offer.
  */
 @Serializable
 data class OffersResponse(

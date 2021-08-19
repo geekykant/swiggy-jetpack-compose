@@ -10,6 +10,8 @@ import com.paavam.exception.OfferRestaurantMissingLinkException
 import com.paavam.exception.RestaurantNotFoundException
 import com.paavam.model.response.RestaurantWithOfferResponse
 import com.paavam.model.response.RestaurantWithOffersResponse
+import com.paavam.model.response.RestaurantsListResponse
+import com.paavam.model.response.RestaurantsResponse
 import javax.inject.Inject
 
 class RestaurantWithOffersController @Inject constructor(
@@ -17,6 +19,32 @@ class RestaurantWithOffersController @Inject constructor(
     private val restaurantsDao: RestaurantsDao,
     private val offersDao: OffersDao
 ) {
+
+    fun getRestaurantWithOffers(restaurantId: String): RestaurantsResponse {
+        return try {
+            validateRestaurantIdOrThrowException(restaurantId)
+            checkRestaurantIdExistsOrThrowExists(restaurantId)
+
+            val restaurant = restaurantWithOffersDao.getRestaurantWithOffers(restaurantId)
+                ?: throw BadRequestException("Error occurred!")
+            RestaurantsResponse.success(restaurant)
+        } catch (notFoundEx: RestaurantNotFoundException) {
+            RestaurantsResponse.notFound(notFoundEx.message)
+        } catch (badEx: BadRequestException) {
+            RestaurantsResponse.failed(badEx.message)
+        }
+    }
+
+    fun getAllRestaurantsWithOffers(): RestaurantsListResponse {
+        return try {
+            val restaurantsList = restaurantWithOffersDao.getAllRestaurantsWithOffers()
+            RestaurantsListResponse.success(restaurantsList)
+        } catch (notFoundEx: RestaurantNotFoundException) {
+            RestaurantsListResponse.notFound(notFoundEx.message)
+        } catch (badEx: BadRequestException) {
+            RestaurantsListResponse.failed(badEx.message)
+        }
+    }
 
     fun getOffersListOfRestaurant(restaurantId: String): RestaurantWithOffersResponse {
         return try {

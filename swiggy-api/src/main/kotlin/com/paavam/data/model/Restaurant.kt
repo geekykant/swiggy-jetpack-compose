@@ -17,7 +17,8 @@ data class Restaurant(
     val imageUrl: String?,
     val isBestSafety: Boolean,
     val isShopClosed: Boolean,
-    val offerSnackType: OfferSnackTypes
+    val offerSnackType: OfferSnackTypes = OfferSnackTypes.BASIC,
+    var offersList: List<Offer> = emptyList()
 ) {
     companion object {
         fun fromEntity(entity: EntityRestaurant): Restaurant = Restaurant(
@@ -32,10 +33,11 @@ data class Restaurant(
             entity.imageUrl,
             entity.isBestSafety,
             entity.isShopClosed,
-            entity.offerSnackType
+            entity.offerSnackType,
+            entity.allOffer.map { Offer.fromEntity(it) }.toList()
         )
 
-        fun checkEntityIDType(restaurantId: String): Boolean = restaurantId.toLongOrNull() != null
+        fun isValidEntityIDType(restaurantId: String): Boolean = restaurantId.toLongOrNull() != null
     }
 
     fun isFieldsBlank(): Boolean {

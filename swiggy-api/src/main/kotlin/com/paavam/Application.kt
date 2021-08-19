@@ -2,14 +2,17 @@ package com.paavam
 
 //import com.paavam.auth.SwiggyJWT
 import com.paavam.auth.SwiggyJWT
-import com.paavam.controller.AuthController
 import com.paavam.data.dao.UserDao
 import com.paavam.data.database.initDatabase
+import com.paavam.di.DaggerControllerComp
 import com.paavam.exception.FailureMessages
+import com.paavam.model.request.MobileNoPrincipal
 import com.paavam.model.response.FailureResponse
 import com.paavam.model.response.State
 import com.paavam.plugins.configureRouting
 import com.paavam.route.auth
+import com.paavam.route.offers
+import com.paavam.route.restaurants
 import com.paavam.utils.KeyProvider
 import io.ktor.application.*
 import io.ktor.auth.*
@@ -55,7 +58,7 @@ fun main() {
                 validate {
                     val claim = it.payload.getClaim(SwiggyJWT.CLAIM).asString()
                     if (claim.let(UserDao()::isUsersExists)) {
-                        UserIdPrincipal(claim)
+                        MobileNoPrincipal(claim)
                     } else {
                         null
                     }
@@ -86,8 +89,15 @@ fun main() {
             )
         }
 
+        val controller = DaggerControllerComp.create()
+
         routing {
-            auth(AuthController(userDao = UserDao()))
+            auth(controller.authController())
+            restaurants(
+                controller.restaurantsController(),
+                controller.restaurantWithOffersController()
+            )
+            offers(controller.offersController())
         }
 
         configureRouting()

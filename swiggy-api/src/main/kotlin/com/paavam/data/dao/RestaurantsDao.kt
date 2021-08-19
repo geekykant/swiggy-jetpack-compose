@@ -42,8 +42,8 @@ class RestaurantsDao @Inject constructor() {
         }.id.toString()
     }
 
-    fun isExist(restaurantId: String): Boolean {
-        return EntityRestaurant.findById(restaurantId.toLong()) != null
+    fun isExist(restaurantId: String): Boolean = transaction {
+        EntityRestaurant.findById(restaurantId.toLong()) != null
     }
 
     fun deleteRestaurant(restaurantId: String): Boolean = transaction {

@@ -86,7 +86,7 @@ class RestaurantsController @Inject constructor(
 
         fun validateRestaurantIdOrThrowException(restaurantId: String) {
             val message = when {
-                (Restaurant.checkEntityIDType(restaurantId)) -> "Restaurant ID invalid exception"
+                (!Restaurant.isValidEntityIDType(restaurantId)) -> "Restaurant ID invalid exception"
                 else -> return
             }
             throw BadRequestException(message)

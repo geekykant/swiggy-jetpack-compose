@@ -26,8 +26,8 @@ class OffersDao @Inject constructor() {
         }.id.toString()
     }
 
-    fun isExist(offerId: String): Boolean {
-        return EntityOffer.findById(offerId.toLong()) != null
+    fun isExist(offerId: String): Boolean = transaction {
+        EntityOffer.findById(offerId.toLong()) != null
     }
 
     fun getOfferById(offerId: String): Offer? = transaction {
@@ -41,5 +41,10 @@ class OffersDao @Inject constructor() {
             return@transaction true
         }
         return@transaction false
+    }
+
+    fun getAllOffers(): List<Offer> = transaction {
+        EntityOffer.all()
+            .map { Offer.fromEntity(it) }.toList()
     }
 }

@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class Offer(
-    val offer_id: String,
+    val offer_id: String? = null,
     val iconUrl: String?,
     val discountPercentage: Int,
     var upToLimit: Int?,
@@ -26,6 +26,6 @@ data class Offer(
             entity.minLimit
         )
 
-        fun checkEntityIDType(offerId: String): Boolean = offerId.toLongOrNull() != null
+        fun isValidEntityIDType(offerId: String): Boolean = offerId.toLongOrNull() != null
     }
 }

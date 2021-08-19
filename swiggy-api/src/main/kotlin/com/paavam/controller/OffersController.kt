@@ -6,12 +6,18 @@ import com.paavam.exception.BadRequestException
 import com.paavam.exception.OfferNotFoundException
 import com.paavam.exception.RestaurantNotFoundException
 import com.paavam.model.response.OfferResponse
+import com.paavam.model.response.OffersListResponse
 import com.paavam.model.response.OffersResponse
 import javax.inject.Inject
 
 class OffersController @Inject constructor(
     private val offersDao: OffersDao
 ) {
+
+    fun getAllOffers(): OffersListResponse {
+        val allOffers = offersDao.getAllOffers()
+        return OffersListResponse.success(allOffers)
+    }
 
     fun addNewOffer(offer: Offer): OfferResponse {
         return try {
@@ -85,7 +91,7 @@ class OffersController @Inject constructor(
     companion object {
         fun validateOfferIdOrThrowException(offerId: String) {
             val message = when {
-                (Offer.checkEntityIDType(offerId)) -> "Offer ID invalid exception"
+                (!Offer.isValidEntityIDType(offerId)) -> "Offer ID invalid exception"
                 else -> return
             }
             throw BadRequestException(message)

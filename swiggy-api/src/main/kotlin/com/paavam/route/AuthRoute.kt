@@ -1,9 +1,9 @@
 package com.paavam.route
 
 import com.paavam.controller.AuthController
+import com.paavam.data.model.User
 import com.paavam.exception.BadRequestException
 import com.paavam.exception.FailureMessages
-import com.paavam.model.request.AuthRequest
 import com.paavam.model.response.generateHttpResponse
 import io.ktor.application.*
 import io.ktor.request.*
@@ -16,7 +16,8 @@ fun Route.auth(authController: AuthController) {
 
     route("/auth") {
         post("/register") {
-            val authRequest = runCatching { call.receive<AuthRequest>() }.getOrElse {
+
+            val authRequest = runCatching { call.receive<User>() }.getOrElse {
                 throw BadRequestException(FailureMessages.MESSAGE_MISSING_CREDENTIALS)
             }
 
@@ -26,7 +27,7 @@ fun Route.auth(authController: AuthController) {
         }
 
         post("/login") {
-            val authRequest = runCatching { call.receive<AuthRequest>() }.getOrElse {
+            val authRequest = runCatching { call.receive<User>() }.getOrElse {
                 throw BadRequestException(FailureMessages.MESSAGE_MISSING_CREDENTIALS)
             }
 

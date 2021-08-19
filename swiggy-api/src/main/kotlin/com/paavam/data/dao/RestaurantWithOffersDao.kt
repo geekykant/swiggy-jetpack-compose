@@ -7,6 +7,7 @@ import com.paavam.data.entity.EntityOffer
 import com.paavam.data.entity.EntityRestaurant
 import com.paavam.data.entity.EntityRestaurantWithOffer
 import com.paavam.data.model.Offer
+import com.paavam.data.model.Restaurant
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.deleteWhere
@@ -28,6 +29,26 @@ class RestaurantWithOffersDao @Inject constructor() {
         }.id.toString()
     }
 
+    fun getAllRestaurantsWithOffers() = transaction {
+        EntityRestaurant
+            .all()
+            .map { Restaurant.fromEntity(it) }
+            .onEach {
+                it.offersList = getAllOffersOfRestaurant(it.restaurant_id!!)
+            }
+    }
+
+    fun getRestaurantWithOffers(restaurantId: String) = transaction {
+        EntityRestaurant
+            .findById(restaurantId.toLong())
+            ?.apply {
+                val restaurant = Restaurant.fromEntity(this)
+                restaurant.offersList = getAllOffersOfRestaurant(restaurantId)
+                return@transaction restaurant
+            }
+        return@transaction null
+    }
+
     fun getAllOffersOfRestaurant(restaurantId: String): List<Offer> = transaction {
         EntityRestaurantWithOffer.find {
             (RestaurantWithOffers.restaurant eq restaurantId.toLong())
@@ -47,10 +68,6 @@ class RestaurantWithOffersDao @Inject constructor() {
     }
 
     fun deleteAllOffersOfRestaurant(restaurantId: String) = transaction {
-//        EntityRestaurantWithOffer.find {
-//            (RestaurantWithOffers.restaurant eq restaurantId.toLong())
-//        }.toList().forEach { it.delete() }
-
         RestaurantWithOffers.deleteWhere {
             (RestaurantWithOffers.restaurant eq restaurantId.toLong())
         }
@@ -63,8 +80,8 @@ class RestaurantWithOffersDao @Inject constructor() {
         }.firstOrNull() != null
     }
 
-    fun isExist(offerId: String): Boolean {
-        return EntityRestaurantWithOffer.findById(offerId.toLong()) != null
+    fun isExist(offerId: String): Boolean = transaction {
+        EntityRestaurantWithOffer.findById(offerId.toLong()) != null
     }
 
 }

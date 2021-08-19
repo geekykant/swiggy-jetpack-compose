@@ -28,8 +28,8 @@ class FoodsDao @Inject constructor() {
         }.id.toString()
     }
 
-    fun isExist(foodId: String): Boolean {
-        return EntityFood.findById(foodId.toLong()) != null
+    fun isExist(foodId: String): Boolean = transaction {
+        EntityFood.findById(foodId.toLong()) != null
     }
 
     fun deleteFood(foodId: String): Boolean = transaction {

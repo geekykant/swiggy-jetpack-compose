@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class Food(
-    val food_id: String,
+    val food_id: String? = null,
     val name: String,
     val foodType: FoodTypes,
     val starText: String?,
@@ -30,6 +30,6 @@ data class Food(
                 entity.imageUrl
             )
 
-        fun checkEntityIDType(foodId: String): Boolean = foodId.toLongOrNull() != null
+        fun isValidEntityIDType(foodId: String): Boolean = foodId.toLongOrNull() != null
     }
 }
