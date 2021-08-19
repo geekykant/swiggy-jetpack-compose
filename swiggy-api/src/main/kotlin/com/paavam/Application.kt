@@ -9,8 +9,8 @@ import com.paavam.exception.FailureMessages
 import com.paavam.model.request.MobileNoPrincipal
 import com.paavam.model.response.FailureResponse
 import com.paavam.model.response.State
-import com.paavam.plugins.configureRouting
 import com.paavam.route.auth
+import com.paavam.route.basicRouting
 import com.paavam.route.offers
 import com.paavam.route.restaurants
 import com.paavam.utils.KeyProvider
@@ -92,6 +92,7 @@ fun main() {
         val controller = DaggerControllerComp.create()
 
         routing {
+            basicRouting()
             auth(controller.authController())
             restaurants(
                 controller.restaurantsController(),
@@ -99,7 +100,5 @@ fun main() {
             )
             offers(controller.offersController())
         }
-
-        configureRouting()
     }.start(wait = true)
 }

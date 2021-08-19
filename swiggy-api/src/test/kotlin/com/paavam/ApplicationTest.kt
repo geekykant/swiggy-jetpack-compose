@@ -1,5 +1,9 @@
 package com.paavam
 
+import com.paavam.controller.RestaurantWithOffersController
+import com.paavam.data.dao.OffersDao
+import com.paavam.data.dao.RestaurantWithOffersDao
+import com.paavam.data.dao.RestaurantsDao
 import com.paavam.data.database.initDatabase
 import kotlin.test.Test
 
@@ -21,28 +25,34 @@ class ApplicationTest {
             password = DATABASE_PASSWORD
         )
 
+        val test = RestaurantWithOffersController(RestaurantWithOffersDao(), RestaurantsDao(), OffersDao())
+//            .getAllRestaurantsWithOffers()
+            .getRestaurantWithOffers("1")
+        val test2 = RestaurantWithOffersController(RestaurantWithOffersDao(), RestaurantsDao(), OffersDao())
+//            .getAllRestaurantsWithOffers()
+            .getRestaurantWithOffers("2")
+
+        println(test)
+        println(test2)
+
 //        val offer1 = transaction {
-//            Offer.new {
+//            EntityOffer.new {
 //                offerCode = "OKSMAINA"
 //                discountPercentage = 30
 //            }
 //        }
 //        val offer2 = transaction {
-//            Offer.new {
+//            EntityOffer.new {
 //                offerCode = "OKSMAINA"
 //                discountPercentage = 30
 //            }
 //        }
 //
-//        val myrest = transaction {
-//            Restaurant.new {
-//                name = "Aryas"
-//                location = "Edapally"
-//            }
-//        }
-//
 //        transaction {
-//            myrest.allOffer = SizedCollection(listOf(offer1, offer2))
+//            RestaurantWithOffers.insert {
+//                it[restaurant] = 1L
+//                it[offer] = 2L
+//            }
 //        }
 
 //        val restaurant = Restaurant(
@@ -56,10 +66,11 @@ class ApplicationTest {
 //            400,
 //            "https://res.cloudinary.com/swiggy/image/upload/fl_lossy,f_auto,q_auto,w_200,h_220,c_fill/jmkzdtpvr6njj3wvokrj",
 //            isBestSafety = true,
-//            isShopClosed = false
+//            isShopClosed = false,
+//            offerSnackType = OfferSnackTypes.BASIC
 //        )
 //
 //        val test = RestaurantsDao().addNewRestaurant(restaurant)
-//        println(test.toString())
+//        println(test)
     }
 }
