@@ -1,5 +1,0 @@
-package com.paavam.data.database.tables.enums
-
-enum class OfferSnackTypes {
-    FLAT_DEAL, BASIC, INVERT_BASIC
-}

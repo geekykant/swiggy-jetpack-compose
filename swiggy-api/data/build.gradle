@@ -1,0 +1,16 @@
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // Exposed
+    def exposedVersion = '0.33.1'
+    implementation "org.jetbrains.exposed:exposed-core:$exposedVersion"
+    implementation "org.jetbrains.exposed:exposed-dao:$exposedVersion"
+    implementation "org.jetbrains.exposed:exposed-jdbc:$exposedVersion"
+    implementation "org.jetbrains.exposed:exposed-jodatime:$exposedVersion"
+
+    // PostgreSQL
+    def postgresVersion = '42.2.23.jre7'
+    implementation "org.postgresql:postgresql:$postgresVersion"
+}
