@@ -24,7 +24,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="com.paavam.swiggyapp.ui.restaurant.RestaurantActivity">
+        <activity android:name="com.paavam.swiggyapp.ui.RestaurantActivity">
             <!--            <intent-filter>-->
             <!--                <action android:name="android.intent.action.MAIN" />-->
 

@@ -1,5 +1,6 @@
 package com.paavam.swiggyapp.ui.utils
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.lazy.LazyListState
@@ -14,6 +15,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
+@SuppressLint("UnnecessaryComposedModifier")
 inline fun Modifier.noRippleClickable(crossinline onClick: () -> Unit): Modifier =
     composed {
         clickable(indication = null,
@@ -22,6 +24,7 @@ inline fun Modifier.noRippleClickable(crossinline onClick: () -> Unit): Modifier
         }
     }
 
+@SuppressLint("UnnecessaryComposedModifier")
 fun Modifier.simpleHorizontalScrollbar(
     state: LazyListState,
     height: Dp = 3.5.dp

@@ -5,5 +5,5 @@ dependencyResolutionManagement {
         mavenCentral()
     }
 }
-rootProject.name = "Swiggy"
+rootProject.name = "swiggy"
 include ':app'
