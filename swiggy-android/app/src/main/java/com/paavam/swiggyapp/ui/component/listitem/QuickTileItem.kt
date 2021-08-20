@@ -1,4 +1,4 @@
-package com.paavam.swiggyapp.ui.component
+package com.paavam.swiggyapp.ui.component.listitem
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -24,7 +24,7 @@ import com.paavam.swiggyapp.ui.utils.UiUtils
 import com.skydoves.landscapist.glide.GlideImage
 
 @Composable
-fun QuickTile(heading: String, tagline: String, imageUrl: String) {
+fun QuickTileItem(heading: String, tagline: String, imageUrl: String) {
     val roundShape = RoundedCornerShape(15.dp)
     Column(
         modifier = Modifier

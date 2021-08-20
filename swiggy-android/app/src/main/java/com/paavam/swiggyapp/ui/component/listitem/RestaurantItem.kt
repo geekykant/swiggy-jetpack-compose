@@ -1,5 +1,6 @@
 package com.paavam.swiggyapp.ui.component.listitem
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -18,7 +19,9 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.paavam.swiggyapp.PreviewData
 import com.paavam.swiggyapp.R
 import com.paavam.swiggyapp.model.OfferSnackType
 import com.paavam.swiggyapp.model.Restaurant
@@ -92,11 +95,25 @@ fun RestaurantItem(
                 .fillMaxHeight(),
             verticalArrangement = Arrangement.SpaceEvenly
         ) {
-            Text(
-                text = r.name,
-                style = Typography.h2,
-                maxLines = 1
-            )
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    text = r.name,
+                    style = Typography.h2,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+                if(r.isBestSafety){
+                    Image(
+                        painter = painterResource(id = R.drawable.ic_best_safety),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .width(85.dp)
+                    )
+                }
+            }
             Text(
                 text = r.dishTagline,
                 maxLines = 1,
@@ -152,4 +169,12 @@ fun RestaurantItem(
 
         }
     }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun PreviewRestaurantItem() {
+    RestaurantItem(r = PreviewData.prepareARestaurant(), onRestaurantClick = {
+
+    })
 }

@@ -38,6 +38,7 @@ import com.paavam.swiggyapp.ui.component.FooterStaticImage
 import com.paavam.swiggyapp.ui.component.HorizontalSliderUi
 import com.paavam.swiggyapp.ui.component.anim.AnimateUpDown
 import com.paavam.swiggyapp.ui.component.image.BannerImage
+import com.paavam.swiggyapp.ui.component.listitem.QuickTileItem
 import com.paavam.swiggyapp.ui.component.listitem.RestaurantItem
 import com.paavam.swiggyapp.ui.component.text.AnnouncementHeading
 import com.paavam.swiggyapp.ui.component.text.SectionHeading
@@ -92,13 +93,11 @@ fun HomeScreen(
 
         //Categories or Quick Tiles
         item {
-            Column(
-                modifier = Modifier
+            QuickTilesList(
+                viewState.quickTiles, Modifier
                     .fillMaxWidth()
                     .padding(bottom = widgetBottomPadding)
-            ) {
-                QuickTilesList(viewState.quickTiles)
-            }
+            )
         }
 
         item {
@@ -344,8 +343,8 @@ fun QuickTilesList(content: List<QuickTile>, modifier: Modifier = Modifier) {
         contentPadding = PaddingValues(start = 10.dp),
         state = horizontalScrollState
     ) {
-        items(items = content.toList()) {
-            QuickTile(it.title, it.tagLine, it.imageUrl)
+        items(items = content) {
+            QuickTileItem(it.title, it.tagLine, it.imageUrl)
         }
     }
 

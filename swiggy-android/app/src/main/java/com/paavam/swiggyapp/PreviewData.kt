@@ -174,6 +174,7 @@ object PreviewData {
                 400,
                 "https://res.cloudinary.com/swiggy/image/upload/fl_lossy,f_auto,q_auto,w_200,h_220,c_fill/jmkzdtpvr6njj3wvokrj",
                 listOf(Offer(R.drawable.ic_offers_filled, 40, 80, "40METOO", 129)),
+                true
             ), Restaurant(
                 2L,
                 "McDonald's",
@@ -184,7 +185,8 @@ object PreviewData {
                 39,
                 200,
                 "https://res.cloudinary.com/swiggy/image/upload/fl_lossy,f_auto,q_auto,w_200,h_220,c_fill/ndxghfzqe4qc2dacxiwd",
-                null
+                null,
+                false
             ), Restaurant(
                 3L,
                 "Hotel Matoshri",
@@ -205,6 +207,7 @@ object PreviewData {
                         OfferSnackType.INVERT_BASIC
                     )
                 ),
+                true
             )
         )
 

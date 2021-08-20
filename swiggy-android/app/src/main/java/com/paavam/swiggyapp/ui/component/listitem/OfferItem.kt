@@ -67,9 +67,8 @@ fun OfferWideItem(
 
 @Preview(showBackground = true)
 @Composable
-fun previewOfferWideItem() {
+fun PreviewOfferWideItem() {
     PreviewData.prepareARestaurant().getMaxOffer()?.let {
         OfferWideItem(offer = it)
     }
-
 }

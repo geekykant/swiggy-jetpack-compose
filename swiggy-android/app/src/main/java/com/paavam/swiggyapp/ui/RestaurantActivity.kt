@@ -1,5 +1,6 @@
 package com.paavam.swiggyapp.ui
 
+import android.app.Activity
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -20,6 +21,7 @@ import androidx.compose.ui.draw.*
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -63,6 +65,7 @@ class RestaurantActivity : ComponentActivity() {
                 var isScrollStateChanged by remember { mutableStateOf(false) }
 
                 val navController = rememberNavController()
+                val context = LocalContext.current as Activity
 
                 Scaffold(
                     topBar = {
@@ -71,8 +74,7 @@ class RestaurantActivity : ComponentActivity() {
                             viewModel,
                             isScrollStateChanged,
                             onBackClick = {
-                                //TODO: Fix Back button
-//                                navController.navigateUp()
+                                context.finish()
                             }
                         )
                     },
@@ -638,7 +640,7 @@ fun RestaurantPageTopAppBar(
 
                 }
                 IconButton(
-                    onClick = onBackClick,
+                    onClick = { },
                 ) {
                     Icon(painterResource(id = R.drawable.ic_heart), null)
                 }
@@ -661,7 +663,7 @@ fun RestaurantPageTopAppBar(
                 )
             },
         navigationIcon = {
-            IconButton(onClick = { }) {
+            IconButton(onClick = onBackClick) {
                 Icon(painterResource(id = R.drawable.ic_left_arrow), null)
             }
         },
