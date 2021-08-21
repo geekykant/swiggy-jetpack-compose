@@ -8,7 +8,7 @@ data class Food(
     val price: Float,
     val foodContents: String?,
     val imageUrl: String?,
-    val quantityInCart: Int = 0
+    var quantityInCart: Int = 0
 ) {
     fun hasFoodInCart(): Boolean = equals(quantityInCart)
 }

@@ -20,6 +20,29 @@ object PreviewData {
         )
     )
 
+    fun prepareCartFoods() = listOf(
+        Food(
+            103L,
+            "Tandoori Chicken Tikka Sub ( 15 cm, 6 Inch )",
+            FoodType.NON_VEG,
+            null,
+            224f,
+            "Tandoori flavored chicken tikka",
+            "https://res.cloudinary.com/swiggy/image/upload/fl_lossy,f_auto,q_auto,w_208,h_208,c_fit/ixdq8qrujoxmcnvai65x",
+            3
+        ),
+        Food(
+            104L,
+            "Cheesy Aloo Patty Sub (15 cm, 6 Inch)+ Cheesy aloo patty Sub (15 cm, 6 Inch)",
+            FoodType.VEG,
+            "Bestseller",
+            515f,
+            "Price shown is after 10% discount. Aloo patty + four cheese slices.",
+            "https://res.cloudinary.com/swiggy/image/upload/fl_lossy,f_auto,q_auto,w_208,h_208,c_fit/xe0slbhk3podrwqufs5f",
+            2
+        )
+    )
+
     fun prepareAllRestaurantFoods() = RestaurantFoodModel(
         mainFoodSections = listOf(
             SubSectionsFoods(

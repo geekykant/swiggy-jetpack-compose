@@ -20,8 +20,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.paavam.swiggyapp.PreviewData
 import com.paavam.swiggyapp.model.prepareSearchCuisines
-import com.paavam.swiggyapp.ui.component.CuisineItem
+import com.paavam.swiggyapp.ui.component.listitem.CuisineItem
 import com.paavam.swiggyapp.ui.component.listitem.RecentSearchItem
 import com.paavam.swiggyapp.ui.component.text.SectionHeading
 import com.paavam.swiggyapp.ui.theme.Prox
@@ -176,6 +177,6 @@ fun RecentSearchesComposable(
 @Composable
 fun TestPreview() {
     SwiggyTheme {
-        CuisineItem(com.paavam.swiggyapp.PreviewData.preparePopularCurations()[0])
+        CuisineItem(PreviewData.preparePopularCurations()[0])
     }
 }

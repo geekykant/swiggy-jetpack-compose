@@ -24,27 +24,27 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.paavam.swiggyapp.R
 import com.paavam.swiggyapp.lib.LazyHorizontalGrid
 import com.paavam.swiggyapp.lib.items
 import com.paavam.swiggyapp.model.HelloBar
 import com.paavam.swiggyapp.model.QuickTile
 import com.paavam.swiggyapp.ui.RestaurantActivity
-import com.paavam.swiggyapp.ui.component.CuisineItem
 import com.paavam.swiggyapp.ui.component.DoubleRowRestaurants
 import com.paavam.swiggyapp.ui.component.FooterStaticImage
 import com.paavam.swiggyapp.ui.component.HorizontalSliderUi
 import com.paavam.swiggyapp.ui.component.anim.AnimateUpDown
 import com.paavam.swiggyapp.ui.component.image.BannerImage
+import com.paavam.swiggyapp.ui.component.listitem.CuisineItem
 import com.paavam.swiggyapp.ui.component.listitem.QuickTileItem
 import com.paavam.swiggyapp.ui.component.listitem.RestaurantItem
 import com.paavam.swiggyapp.ui.component.text.AnnouncementHeading
 import com.paavam.swiggyapp.ui.component.text.SectionHeading
-import com.paavam.swiggyapp.ui.theme.SwiggyTheme
 import com.paavam.swiggyapp.ui.theme.Typography
 import com.paavam.swiggyapp.viewmodel.HomeViewModel
 import kotlinx.coroutines.delay
@@ -62,8 +62,8 @@ fun MainContent(
             isScrollStateChanged = scrollState.firstVisibleItemScrollOffset != 0
             StickyTopAppBar(isScrollStateChanged)
         }
-    ) { innerPaddingValues ->
-        HomeScreen(scrollState, outerPaddingValues, innerPaddingValues)
+    ) {
+        HomeScreen(scrollState, outerPaddingValues)
     }
 }
 
@@ -71,109 +71,114 @@ fun MainContent(
 @Composable
 fun HomeScreen(
     scrollState: LazyListState, // Higher level is invoked, and reflected throughout
-    outerPaddingValues: PaddingValues,
-    innerPaddingValues: PaddingValues,
+    outerPaddingValues: PaddingValues
 ) {
     val viewModel: HomeViewModel = hiltViewModel()
     val viewState by viewModel.state.collectAsState()
 
     val widgetBottomPadding = 10.dp
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(bottom = outerPaddingValues.calculateBottomPadding()),
-        state = scrollState
+
+    SwipeRefresh(
+        state = rememberSwipeRefreshState(viewState.refreshing),
+        onRefresh = { viewModel.refresh(force = true) },
     ) {
-        // Top announcements section
-        item {
-            viewState.helloBarMessages?.let { TopHelloBar(it) }
-            AnnouncementHeading(
-                message = "As per state mandates, we will be operational till 8:00 PM",
-                modifier = Modifier.padding(bottom = widgetBottomPadding),
-            )
-        }
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(bottom = outerPaddingValues.calculateBottomPadding()),
+            state = scrollState
+        ) {
+            // Top announcements section
+            item {
+                viewState.helloBarMessages?.let { TopHelloBar(it) }
+                AnnouncementHeading(
+                    message = "As per state mandates, we will be operational till 8:00 PM",
+                    modifier = Modifier.padding(bottom = widgetBottomPadding),
+                )
+            }
 
-        //Categories or Quick Tiles
-        item {
-            QuickTilesList(
-                viewState.quickTiles, Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = widgetBottomPadding)
-            )
-        }
+            //Categories or Quick Tiles
+            item {
+                QuickTilesList(
+                    viewState.quickTiles, Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = widgetBottomPadding)
+                )
+            }
 
-        item {
-            BannerImage(
-                imageUrl = "https://res.cloudinary.com/paavam/image/upload/fl_lossy,f_auto,q_auto,w_550,h_310,c_fill//edilicious_eszbcy.png",
-                modifier = Modifier.padding(bottom = widgetBottomPadding)
-            )
-        }
+            item {
+                BannerImage(
+                    imageUrl = "https://res.cloudinary.com/paavam/image/upload/fl_lossy,f_auto,q_auto,w_550,h_310,c_fill//edilicious_eszbcy.png",
+                    modifier = Modifier.padding(bottom = widgetBottomPadding)
+                )
+            }
 
-        item {
-            SectionHeading(
-                title = "Popular Curations",
-                showSeeAllText = false
-            )
-            LazyHorizontalGrid(
-                cells = GridCells.Fixed(2),
-                modifier = Modifier
-                    .padding(vertical = 10.dp)
-                    .padding(bottom = widgetBottomPadding),
-                contentPadding = PaddingValues(start = 10.dp)
-            ) {
-                items(items = viewState.popularCurations) {
-                    CuisineItem(
-                        it,
-                        modifier = Modifier
-                            .clickable { }
-                            .padding(horizontal = 8.dp, vertical = 10.dp)
-                            .fillParentMaxWidth(0.25f),
-                        fontSize = 14.sp,
-                        bottomTextPadding = PaddingValues(top = 10.dp)
-                    )
+            item {
+                SectionHeading(
+                    title = "Popular Curations",
+                    showSeeAllText = false
+                )
+                LazyHorizontalGrid(
+                    cells = GridCells.Fixed(2),
+                    modifier = Modifier
+                        .padding(vertical = 10.dp)
+                        .padding(bottom = widgetBottomPadding),
+                    contentPadding = PaddingValues(start = 10.dp)
+                ) {
+                    items(items = viewState.popularCurations) {
+                        CuisineItem(
+                            it,
+                            modifier = Modifier
+                                .clickable { }
+                                .padding(horizontal = 8.dp, vertical = 10.dp)
+                                .fillParentMaxWidth(0.25f),
+                            fontSize = 14.sp,
+                            bottomTextPadding = PaddingValues(top = 10.dp)
+                        )
+                    }
                 }
             }
-        }
 
-        item {
-            SectionHeading(
-                "All Restaurants Nearby",
-                "Discover unique tastes near you",
-                R.drawable.ic_shopicon,
-                showSeeAllIcon = true,
-                seeAllOnClick = {
+            item {
+                SectionHeading(
+                    "All Restaurants Nearby",
+                    "Discover unique tastes near you",
+                    R.drawable.ic_shopicon,
+                    showSeeAllIcon = true,
+                    seeAllOnClick = {
 
-                }
-            )
-        }
+                    }
+                )
+            }
 
 
-        items(items = viewState.nearbyRestaurants) {
-            val context = LocalContext.current
-            RestaurantItem(
-                it,
-                Modifier.fillMaxWidth(),
-                onRestaurantClick = {
-                    context.startActivity(Intent(context, RestaurantActivity::class.java))
-                }
-            )
-        }
+            items(items = viewState.nearbyRestaurants) {
+                val context = LocalContext.current
+                RestaurantItem(
+                    it,
+                    Modifier.fillMaxWidth(),
+                    onRestaurantClick = {
+                        context.startActivity(Intent(context, RestaurantActivity::class.java))
+                    }
+                )
+            }
 
-        item {
-            SectionHeading(
-                "Top Offers",
-                "Big Savings On Your Loved Eateries",
-                R.drawable.ic_offers_filled,
-                showSeeAllIcon = true,
-                seeAllOnClick = {
+            item {
+                SectionHeading(
+                    "Top Offers",
+                    "Big Savings On Your Loved Eateries",
+                    R.drawable.ic_offers_filled,
+                    showSeeAllIcon = true,
+                    seeAllOnClick = {
 
-                }
-            )
-            DoubleRowRestaurants(spotlightRestaurants = viewState.nearbyRestaurants)
-        }
+                    }
+                )
+                DoubleRowRestaurants(spotlightRestaurants = viewState.nearbyRestaurants)
+            }
 
-        item {
-            FooterStaticImage()
+            item {
+                FooterStaticImage()
+            }
         }
     }
 }
@@ -297,15 +302,3 @@ fun QuickTilesList(content: List<QuickTile>, modifier: Modifier = Modifier) {
 
     HorizontalSliderUi(horizontalScrollState, Modifier.padding(top = 10.dp, bottom = 15.dp))
 }
-
-@Preview("HomeScreen", showBackground = true)
-@Composable
-fun HomePreview() {
-    SwiggyTheme {
-//        MainContent(outerPaddingValues = PaddingValues(10.dp))
-//        HomeScreen(
-//            rememberLazyListState(), PaddingValues(), PaddingValues()
-//        )
-    }
-}
-

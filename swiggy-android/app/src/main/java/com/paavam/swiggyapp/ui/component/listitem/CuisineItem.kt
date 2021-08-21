@@ -1,4 +1,4 @@
-package com.paavam.swiggyapp.ui.component
+package com.paavam.swiggyapp.ui.component.listitem
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape

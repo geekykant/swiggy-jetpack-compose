@@ -3,7 +3,10 @@ package com.paavam.swiggyapp.ui
 import android.app.Activity
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.*
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -14,7 +17,9 @@ import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.*
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -22,7 +27,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -43,6 +47,7 @@ import com.paavam.swiggyapp.ui.screens.TopHelloBar
 import com.paavam.swiggyapp.ui.theme.Prox
 import com.paavam.swiggyapp.ui.theme.SwiggyTheme
 import com.paavam.swiggyapp.ui.theme.Typography
+import com.paavam.swiggyapp.ui.utils.addShimmer
 import com.paavam.swiggyapp.ui.utils.noRippleClickable
 import com.paavam.swiggyapp.viewmodel.RestaurantViewModel
 import kotlinx.coroutines.delay
@@ -328,11 +333,17 @@ fun RestaurantBasicDetails(
     ) {
         Text(
             text = restaurant.name,
-            style = Typography.h1
+            style = Typography.h1,
+            modifier = Modifier
+                .defaultMinSize(minWidth = 250.dp, minHeight = 10.dp)
+                .addShimmer(false)
         )
         Text(
             text = restaurant.dishTagline,
-            style = Typography.h3
+            style = Typography.h3,
+            modifier = Modifier
+                .defaultMinSize(minWidth = 100.dp, minHeight = 5.dp)
+                .addShimmer(false)
         )
         Row(
             verticalAlignment = Alignment.CenterVertically
@@ -417,7 +428,10 @@ fun ThreeSectionDetails(r: Restaurant) {
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center
+                horizontalArrangement = Arrangement.Center,
+                modifier = Modifier
+                    .defaultMinSize(minWidth = 20.dp, minHeight = 8.dp)
+                    .addShimmer(false)
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_rating),
@@ -448,7 +462,13 @@ fun ThreeSectionDetails(r: Restaurant) {
                     i = ((i + 1) % movingList.size)
                 }
             }
-            AnimateUpDown(movingList[i], 1)
+            AnimateUpDown(
+                movingList[i],
+                1,
+                Modifier
+                    .defaultMinSize(minWidth = 40.dp, minHeight = 5.dp)
+                    .addShimmer(false)
+            )
         }
         Column(
             modifier = Modifier
@@ -459,9 +479,17 @@ fun ThreeSectionDetails(r: Restaurant) {
             Text(
                 text = if (r.isShopClosed) "Closed" else "${r.distanceTimeMinutes} mins",
                 style = Typography.h2,
-                color = if (r.isShopClosed) Color.Red else Color.Black
+                color = if (r.isShopClosed) Color.Red else Color.Black,
+                modifier = Modifier
+                    .defaultMinSize(minWidth = 20.dp, minHeight = 8.dp)
+                    .addShimmer(false)
             )
-            Text("Delivery Time")
+            Text(
+                "Delivery Time",
+                modifier = Modifier
+                    .defaultMinSize(minWidth = 40.dp, minHeight = 5.dp)
+                    .addShimmer(false)
+            )
         }
         Column(
             modifier = Modifier
@@ -469,8 +497,19 @@ fun ThreeSectionDetails(r: Restaurant) {
                 .padding(5.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text("₹${r.averagePricingForTwo}", style = Typography.h2)
-            Text("Cost for 2")
+            Text(
+                "₹${r.averagePricingForTwo}",
+                style = Typography.h2,
+                modifier = Modifier
+                    .defaultMinSize(minWidth = 20.dp, minHeight = 8.dp)
+                    .addShimmer(false)
+            )
+            Text(
+                "Cost for 2",
+                modifier = Modifier
+                    .defaultMinSize(minWidth = 40.dp, minHeight = 5.dp)
+                    .addShimmer(false)
+            )
         }
     }
 }
@@ -518,76 +557,6 @@ fun PureVegComposable() {
                 .width(85.dp)
         )
     }
-}
-
-@Composable
-fun AddToCartComposable(
-    message: String,
-    modifier: Modifier = Modifier
-) {
-    val roundShape = RoundedCornerShape(5.dp)
-    val greenColor = Color(0xFF81C784)
-    val backgroundColor = Color.White
-    val fontWeight = FontWeight.ExtraBold
-    val borderColor = Color(0x1A000000)
-
-    var itemCounter by remember { mutableStateOf(0) }
-
-    if (itemCounter > 0) {
-        Row(
-            modifier = modifier
-                .clip(roundShape)
-                .shadow(8.dp, roundShape)
-                .background(backgroundColor, roundShape)
-                .border(1.dp, borderColor, shape = roundShape),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Icon(
-                painter = painterResource(id = R.drawable.ic_minus),
-                contentDescription = null,
-                modifier = Modifier
-                    .clickable { itemCounter -= 1 }
-                    .padding(horizontal = 5.dp, vertical = 5.dp),
-                tint = Color.LightGray
-            )
-            Text(
-                text = itemCounter.toString(),
-                style = Typography.h1,
-                color = greenColor,
-                fontSize = 15.sp,
-                fontWeight = fontWeight,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.weight(1f)
-            )
-            Icon(
-                painter = painterResource(id = R.drawable.ic_add),
-                contentDescription = null,
-                modifier = Modifier
-                    .clickable { itemCounter += 1 }
-                    .padding(horizontal = 5.dp, vertical = 3.dp),
-                tint = greenColor
-            )
-        }
-    } else {
-        Text(
-            text = message,
-            maxLines = 1,
-            style = Typography.h1,
-            modifier = modifier
-                .clip(roundShape)
-                .shadow(8.dp, roundShape)
-                .clickable { itemCounter += 1 }
-                .background(backgroundColor, roundShape)
-                .border(1.dp, borderColor, shape = roundShape)
-                .padding(horizontal = 10.dp, vertical = 5.dp),
-            color = greenColor,
-            fontSize = 15.sp,
-            fontWeight = fontWeight,
-            textAlign = TextAlign.Center
-        )
-    }
-
 }
 
 @Composable

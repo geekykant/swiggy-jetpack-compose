@@ -14,6 +14,9 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.google.accompanist.placeholder.PlaceholderHighlight
+import com.google.accompanist.placeholder.material.shimmer
+import com.google.accompanist.placeholder.placeholder
 
 @SuppressLint("UnnecessaryComposedModifier")
 inline fun Modifier.noRippleClickable(crossinline onClick: () -> Unit): Modifier =
@@ -49,4 +52,12 @@ fun Modifier.simpleHorizontalScrollbar(
             }
         }
     }
+}
+
+fun Modifier.addShimmer(visible: Boolean) = composed {
+    placeholder(
+        visible = visible,
+        highlight = PlaceholderHighlight.shimmer(),
+        color = Color(0x66DDDDDD)
+    )
 }

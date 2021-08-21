@@ -7,9 +7,9 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.paavam.swiggyapp.ui.screens.AccountScreen
+import com.paavam.swiggyapp.ui.screens.CartScreen
 import com.paavam.swiggyapp.ui.screens.MainContent
 import com.paavam.swiggyapp.ui.screens.SearchScreen
-import com.paavam.swiggyapp.ui.screens.cart.CartScreen
 
 @ExperimentalFoundationApi
 @Composable

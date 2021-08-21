@@ -23,7 +23,7 @@ import androidx.compose.ui.unit.dp
 import com.paavam.swiggyapp.R
 import com.paavam.swiggyapp.model.Food
 import com.paavam.swiggyapp.model.FoodType
-import com.paavam.swiggyapp.ui.AddToCartComposable
+import com.paavam.swiggyapp.ui.component.AddToCartComposable
 import com.paavam.swiggyapp.ui.theme.Typography
 import com.paavam.swiggyapp.ui.utils.UiUtils
 import com.skydoves.landscapist.glide.GlideImage
@@ -69,17 +69,17 @@ fun FoodItem(
                     )
                 }
             }
-            Spacer(modifier = androidx.compose.ui.Modifier.height(3.dp))
+            Spacer(modifier = Modifier.height(3.dp))
             Text(
                 text = food.name,
                 style = Typography.h2,
                 fontWeight = FontWeight.SemiBold
             )
-            Spacer(modifier = androidx.compose.ui.Modifier.height(3.dp))
+            Spacer(modifier = Modifier.height(3.dp))
             Text(
                 text = "₹${food.price}"
             )
-            Spacer(modifier = androidx.compose.ui.Modifier.height(3.dp))
+            Spacer(modifier = Modifier.height(3.dp))
             food.foodContents?.let {
                 Text(
                     text = it,
@@ -120,11 +120,14 @@ fun FoodItem(
             }
 
             AddToCartComposable(
-                message = "ADD",
+                cartQuantity = food.quantityInCart,
                 modifier = Modifier
                     .fillMaxWidth(0.75f)
                     .align(Alignment.BottomCenter)
-                    .alpha(if (isShopClosed) 0f else 1f)
+                    .alpha(if (isShopClosed) 0f else 1f),
+                onQuantityChange = {
+                    food.quantityInCart = it
+                }
             )
         }
     }

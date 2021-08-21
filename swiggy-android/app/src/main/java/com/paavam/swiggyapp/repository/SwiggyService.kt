@@ -1,5 +1,6 @@
 package com.paavam.swiggyapp.repository
 
+import com.paavam.swiggyapp.PreviewData
 import com.paavam.swiggyapp.model.*
 import javax.inject.Inject
 
@@ -10,20 +11,23 @@ class SwiggyService @Inject constructor() {
 
     //    @GET("/")
     suspend fun fetchThisRestaurant(): ResponseResult<Restaurant> =
-        ResponseResult.success(com.paavam.swiggyapp.PreviewData.prepareARestaurant())
+        ResponseResult.success(PreviewData.prepareARestaurant())
 
     suspend fun fetchThisRestaurantFoods(): ResponseResult<RestaurantFoodModel> =
-        ResponseResult.success(com.paavam.swiggyapp.PreviewData.prepareAllRestaurantFoods())
+        ResponseResult.success(PreviewData.prepareAllRestaurantFoods())
+
+    suspend fun fetchUsersCartFoods(): ResponseResult<List<Food>> =
+        ResponseResult.success(PreviewData.prepareCartFoods())
 
     suspend fun fetchTilesContent(): ResponseResult<List<QuickTile>> =
-        ResponseResult.success(com.paavam.swiggyapp.PreviewData.prepareTilesContent())
+        ResponseResult.success(PreviewData.prepareTilesContent())
 
     suspend fun fetchHelloBarContent(): ResponseResult<List<HelloBar>> =
-        ResponseResult.success(com.paavam.swiggyapp.PreviewData.prepareHelloBarContent())
+        ResponseResult.success(PreviewData.prepareHelloBarContent())
 
     suspend fun fetchRestaurantsList(): ResponseResult<List<Restaurant>> =
-        ResponseResult.success(com.paavam.swiggyapp.PreviewData.prepareRestaurants())
+        ResponseResult.success(PreviewData.prepareRestaurants())
 
     suspend fun preparePopularCuisines(): ResponseResult<List<Cuisine>> =
-        ResponseResult.success(com.paavam.swiggyapp.PreviewData.preparePopularCurations())
+        ResponseResult.success(PreviewData.preparePopularCurations())
 }

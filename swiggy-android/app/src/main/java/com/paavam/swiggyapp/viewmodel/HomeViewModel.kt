@@ -2,13 +2,14 @@ package com.paavam.swiggyapp.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.paavam.swiggyapp.repository.HomeRepository
-import com.paavam.swiggyapp.repository.ResponseResult
 import com.paavam.swiggyapp.model.Cuisine
 import com.paavam.swiggyapp.model.HelloBar
 import com.paavam.swiggyapp.model.QuickTile
 import com.paavam.swiggyapp.model.Restaurant
+import com.paavam.swiggyapp.repository.HomeRepository
+import com.paavam.swiggyapp.repository.ResponseResult
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -64,6 +65,7 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             runCatching {
                 refreshing.value = true
+                delay(3000)
                 prepareHomeData()
             }
             refreshing.value = false
