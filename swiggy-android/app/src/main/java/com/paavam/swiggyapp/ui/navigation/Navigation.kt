@@ -1,15 +1,17 @@
 package com.paavam.swiggyapp.ui.navigation
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.paavam.swiggyapp.ui.screens.AccountScreen
-import com.paavam.swiggyapp.ui.screens.cart.CartScreen
 import com.paavam.swiggyapp.ui.screens.MainContent
 import com.paavam.swiggyapp.ui.screens.SearchScreen
+import com.paavam.swiggyapp.ui.screens.cart.CartScreen
 
+@ExperimentalFoundationApi
 @Composable
 fun Navigation(
     navController: NavHostController,

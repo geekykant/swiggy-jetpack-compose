@@ -1,7 +1,10 @@
 package com.paavam.swiggyapp.ui.screens
 
 import android.content.Intent
-import androidx.compose.foundation.*
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -14,7 +17,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithContent
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -47,9 +49,10 @@ import com.paavam.swiggyapp.ui.theme.Typography
 import com.paavam.swiggyapp.viewmodel.HomeViewModel
 import kotlinx.coroutines.delay
 
+@ExperimentalFoundationApi
 @Composable
 fun MainContent(
-    outerPaddingValues: PaddingValues
+    outerPaddingValues: PaddingValues,
 ) {
     val scrollState = rememberLazyListState()
     var isScrollStateChanged by remember { mutableStateOf(false) }
@@ -64,7 +67,7 @@ fun MainContent(
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
+@ExperimentalFoundationApi
 @Composable
 fun HomeScreen(
     scrollState: LazyListState, // Higher level is invoked, and reflected throughout
@@ -72,7 +75,6 @@ fun HomeScreen(
     innerPaddingValues: PaddingValues,
 ) {
     val viewModel: HomeViewModel = hiltViewModel()
-//    val viewModel: HomeViewModel = viewModel()
     val viewState by viewModel.state.collectAsState()
 
     val widgetBottomPadding = 10.dp
@@ -210,61 +212,6 @@ fun TopHelloBar(contentList: List<HelloBar>, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun FlatDealOfferSnackComposable(
-    message: String,
-    modifier: Modifier,
-    roundShape: RoundedCornerShape = RoundedCornerShape(5.dp)
-) {
-    Text(
-        text = message,
-        maxLines = 1,
-        style = Typography.h1,
-        modifier = modifier
-            .shadow(8.dp, roundShape)
-            .background(Color.White, roundShape)
-            .padding(horizontal = 10.dp, vertical = 3.dp),
-        color = Color(0xFFFF5722),
-        fontSize = 18.sp
-    )
-}
-
-@Composable
-fun BasicOfferSnackComposable(
-    message: String,
-    invert: Boolean,
-    onClick: () -> Unit = {},
-    modifier: Modifier
-) {
-    val roundShape = RoundedCornerShape(5.dp)
-    var textColor = Color.White
-    var backgroundColor = MaterialTheme.colors.primary
-    var borderColor = Color(0x0)
-    var fontWeight = FontWeight.Bold
-
-    if (invert) {
-        backgroundColor = Color.White
-        textColor = MaterialTheme.colors.primary
-        fontWeight = FontWeight.ExtraBold
-        borderColor = Color(0x1A000000)
-    }
-
-    Text(
-        text = message,
-        maxLines = 1,
-        style = Typography.h1,
-        modifier = modifier
-            .clickable { onClick() }
-            .shadow(8.dp, roundShape)
-            .background(backgroundColor, roundShape)
-            .border(1.dp, borderColor, shape = roundShape)
-            .padding(horizontal = 10.dp, vertical = 3.dp),
-        color = textColor,
-        fontSize = 15.sp,
-        fontWeight = fontWeight
-    )
-}
-
-@Composable
 fun StickyTopAppBar(isScrollStateChanged: Boolean, modifier: Modifier = Modifier) {
     TopAppBar(
         title = {
@@ -356,9 +303,9 @@ fun QuickTilesList(content: List<QuickTile>, modifier: Modifier = Modifier) {
 fun HomePreview() {
     SwiggyTheme {
 //        MainContent(outerPaddingValues = PaddingValues(10.dp))
-        HomeScreen(
-            rememberLazyListState(), PaddingValues(), PaddingValues()
-        )
+//        HomeScreen(
+//            rememberLazyListState(), PaddingValues(), PaddingValues()
+//        )
     }
 }
 

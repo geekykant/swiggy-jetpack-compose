@@ -8,9 +8,9 @@ sealed class NavScreen(
     val icon_pressed: Int,
     val title: String
 ) {
-    object Home : NavScreen("Home", R.drawable.ic_location, R.drawable.ic_location, "Swiggy")
-    object Search : NavScreen("Search", R.drawable.ic_search, R.drawable.ic_search, "Search")
-    object Cart : NavScreen("Cart", R.drawable.ic_cart, R.drawable.ic_cart_filled, "Cart")
+    object Home : NavScreen("home", R.drawable.ic_location, R.drawable.ic_location, "Swiggy")
+    object Search : NavScreen("search", R.drawable.ic_search, R.drawable.ic_search, "Search")
+    object Cart : NavScreen("cart", R.drawable.ic_cart, R.drawable.ic_cart_filled, "Cart")
     object Account :
-        NavScreen("Account", R.drawable.ic_account, R.drawable.ic_account_filled, "Account")
+        NavScreen("account", R.drawable.ic_account, R.drawable.ic_account_filled, "Account")
 }

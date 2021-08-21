@@ -25,8 +25,8 @@ import com.paavam.swiggyapp.PreviewData
 import com.paavam.swiggyapp.R
 import com.paavam.swiggyapp.model.OfferSnackType
 import com.paavam.swiggyapp.model.Restaurant
-import com.paavam.swiggyapp.ui.screens.BasicOfferSnackComposable
-import com.paavam.swiggyapp.ui.screens.FlatDealOfferSnackComposable
+import com.paavam.swiggyapp.ui.component.BasicOfferSnackComposable
+import com.paavam.swiggyapp.ui.component.FlatDealOfferSnackComposable
 import com.paavam.swiggyapp.ui.theme.Typography
 import com.paavam.swiggyapp.ui.utils.UiUtils
 import com.skydoves.landscapist.glide.GlideImage

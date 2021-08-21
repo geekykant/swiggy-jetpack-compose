@@ -1,5 +1,6 @@
 package com.paavam.swiggyapp.ui.screens
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -17,6 +18,7 @@ import com.paavam.swiggyapp.ui.navigation.Navigation
 import com.paavam.swiggyapp.ui.theme.SwiggyTheme
 import java.util.*
 
+@ExperimentalFoundationApi
 @Composable
 fun SwiggyMain() {
     SwiggyTheme {
