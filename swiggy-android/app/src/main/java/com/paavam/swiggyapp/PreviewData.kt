@@ -26,7 +26,7 @@ object PreviewData {
             "Tandoori Chicken Tikka Sub ( 15 cm, 6 Inch )",
             FoodType.NON_VEG,
             null,
-            224f,
+            224,
             "Tandoori flavored chicken tikka",
             "https://res.cloudinary.com/swiggy/image/upload/fl_lossy,f_auto,q_auto,w_208,h_208,c_fit/ixdq8qrujoxmcnvai65x",
             3
@@ -36,10 +36,10 @@ object PreviewData {
             "Cheesy Aloo Patty Sub (15 cm, 6 Inch)+ Cheesy aloo patty Sub (15 cm, 6 Inch)",
             FoodType.VEG,
             "Bestseller",
-            515f,
+            515,
             "Price shown is after 10% discount. Aloo patty + four cheese slices.",
             "https://res.cloudinary.com/swiggy/image/upload/fl_lossy,f_auto,q_auto,w_208,h_208,c_fit/xe0slbhk3podrwqufs5f",
-            2
+            12
         )
     )
 
@@ -117,7 +117,7 @@ object PreviewData {
             "Veggie Delite Sub ( 15 cm, 6 Inch )",
             FoodType.VEG,
             "Bestseller",
-            172f,
+            172,
             "Delicious combination of garden fresh lettuce, tomatoes, green peppers, onions, olives and pickles. Served on freshly baked bread. 97% Fat Free.",
             "https://res.cloudinary.com/swiggy/image/upload/fl_lossy,f_auto,q_auto,w_208,h_208,c_fit/awlvilhyeecsyubydsn5"
         ),
@@ -126,7 +126,7 @@ object PreviewData {
             "Aloo Patty Sub ( 15 cm, 6 Inch )",
             FoodType.VEG,
             null,
-            196f,
+            196,
             "The traditional aloo patty seasoned with special herbs and spices with your choice of crisp fresh veggies, on freshly baked bread. New bread featured - Flatbread.",
             "https://res.cloudinary.com/swiggy/image/upload/fl_lossy,f_auto,q_auto,w_208,h_208,c_fit/ge1oc1o4i1agi8pawbvt"
         ),
@@ -135,7 +135,7 @@ object PreviewData {
             "Tandoori Chicken Tikka Sub ( 15 cm, 6 Inch )",
             FoodType.NON_VEG,
             null,
-            224f,
+            224,
             "Tandoori flavored chicken tikka",
             "https://res.cloudinary.com/swiggy/image/upload/fl_lossy,f_auto,q_auto,w_208,h_208,c_fit/ixdq8qrujoxmcnvai65x"
         ),
@@ -144,7 +144,7 @@ object PreviewData {
             "Cheesy Aloo Patty Sub (15 cm, 6 Inch)+ Cheesy aloo patty Sub (15 cm, 6 Inch)",
             FoodType.NON_VEG,
             "Bestseller",
-            515f,
+            515,
             "Price shown is after 10% discount. Aloo patty + four cheese slices.",
             "https://res.cloudinary.com/swiggy/image/upload/fl_lossy,f_auto,q_auto,w_208,h_208,c_fit/xe0slbhk3podrwqufs5f"
         )

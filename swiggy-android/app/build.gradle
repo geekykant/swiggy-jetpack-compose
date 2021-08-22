@@ -69,7 +69,9 @@ dependencies {
     implementation "javax.inject:javax.inject:1"
 
     //Accompanist
-    implementation 'com.google.accompanist:accompanist-systemuicontroller:0.16.1'
+    implementation 'com.google.accompanist:accompanist-systemuicontroller:0.17.0'
+    implementation 'com.google.accompanist:accompanist-insets-ui:0.17.0'
+    implementation 'com.google.accompanist:accompanist-insets:0.17.0'
     implementation "com.google.accompanist:accompanist-placeholder-material:0.17.0"
     implementation "com.google.accompanist:accompanist-swiperefresh:0.17.0"
 

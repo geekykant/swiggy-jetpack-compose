@@ -1,36 +1,52 @@
 package com.paavam.swiggyapp.ui.screens
 
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowRight
-import androidx.compose.material.icons.outlined.List
+import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.outlined.CheckCircle
+import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.outlined.Share
+import androidx.compose.material.icons.outlined.ThumbUp
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.google.accompanist.insets.*
 import com.paavam.swiggyapp.R
-import com.paavam.swiggyapp.model.Food
-import com.paavam.swiggyapp.model.FoodType
 import com.paavam.swiggyapp.model.Restaurant
-import com.paavam.swiggyapp.ui.component.AddToCartComposable
 import com.paavam.swiggyapp.ui.component.GrayDivider
+import com.paavam.swiggyapp.ui.component.listitem.CartFoodItem
+import com.paavam.swiggyapp.ui.component.text.DashedHoverText
 import com.paavam.swiggyapp.ui.navigation.NavScreen
 import com.paavam.swiggyapp.ui.theme.Prox
 import com.paavam.swiggyapp.ui.theme.Typography
@@ -39,6 +55,8 @@ import com.paavam.swiggyapp.viewmodel.CartViewModel
 import com.paavam.swiggyapp.viewmodel.CartViewState
 import com.skydoves.landscapist.glide.GlideImage
 import java.util.*
+import kotlin.math.min
+import kotlin.math.roundToInt
 
 @Composable
 fun CartScreen(
@@ -48,26 +66,132 @@ fun CartScreen(
     val viewModel: CartViewModel = hiltViewModel()
     val viewState = viewModel.state.value
 
-    when (viewState.cartFoodList.isEmpty()) {
-        true -> NoItemsInCart(navController, outerPaddingValues)
-        else -> ShowItemsInCart(viewState, navController, outerPaddingValues)
+    val scrollState = rememberLazyListState()
+
+    var isScrollStateChanged by remember { mutableStateOf(false) }
+    isScrollStateChanged = scrollState.firstVisibleItemIndex != 0
+
+    val position by animateFloatAsState(if (isScrollStateChanged) 0f else -45f)
+    var topAppBarSize by remember { mutableStateOf(0) }
+
+    ProvideWindowInsets {
+        Surface {
+            Box(Modifier.fillMaxSize()) {
+                CartTopAppBar(
+                    viewModel = viewModel,
+                    onBackClick = { navController.navigate(NavScreen.Home.route) },
+                    modifier = Modifier
+//                        .offset(0.dp, position.dp)
+//                        .alpha(min(1f, 1 + (position / 45f)))
+                        .graphicsLayer {
+                            alpha = min(1f, 1 + (position / 45f))
+                            translationY = (position)
+                        }
+                        .onSizeChanged { topAppBarSize = it.height }
+                        .statusBarsPadding()
+                        .navigationBarsPadding(bottom = false)
+                        .onSizeChanged { topAppBarSize = it.height }
+                )
+                when (viewState.cartFoodList.isEmpty()) {
+                    true -> NoItemsInCart(navController, outerPaddingValues)
+                    else -> ShowItemsInCart(
+                        viewState,
+                        scrollState,
+                        rememberInsetsPaddingValues(
+                            insets = LocalWindowInsets.current.systemBars,
+                            applyTop = false,
+                            additionalTop = with(LocalDensity.current) { topAppBarSize.toDp() }
+                        )
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun CartTopAppBar(
+    viewModel: CartViewModel,
+    onBackClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Surface(
+        color = Color.White,
+        elevation = 4.dp,
+        modifier = modifier
+    ) {
+        TopAppBar(
+            title = {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .weight(1f)
+                    ) {
+                        val viewState = viewModel.state.collectAsState()
+                        val restaurant = viewState.value.mainRestaurant
+
+                        restaurant?.let { r ->
+                            Text(
+                                text = r.name.uppercase(Locale.getDefault()),
+                                fontWeight = FontWeight.SemiBold,
+                                fontSize = 14.sp
+                            )
+                            viewState.value.totalAmount?.let {
+                                Text(
+                                    text = if (r.isShopClosed) "Closed for delivery"
+                                    else
+                                        "${viewState.value.cartFoodList.sumOf { it.quantityInCart }} items, To pay: ₹${viewState.value.totalAmount?.roundToInt()}",
+                                    fontSize = 12.sp,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                    color = if (r.isShopClosed) Color.Red else Color(0xD9000000)
+                                )
+                            }
+                        }
+
+                    }
+                }
+            },
+            backgroundColor = Color.Transparent,
+            modifier = modifier
+                .drawWithContent {
+                    drawContent()
+                    drawLine(
+                        color = Color(0x14000000),
+                        start = Offset(0f, this.size.height),
+                        end = Offset(this.size.width, this.size.height),
+                        strokeWidth = 3f,
+                    )
+                },
+            navigationIcon = {
+                IconButton(onClick = onBackClick) {
+                    Icon(painterResource(id = R.drawable.ic_left_arrow), null)
+                }
+            },
+            elevation = 0.dp,
+        )
     }
 }
 
 @Composable
 fun ShowItemsInCart(
     viewState: CartViewState,
-    navController: NavController,
+    scrollState: LazyListState,
     outerPaddingValues: PaddingValues,
+    modifier: Modifier = Modifier
 ) {
     LazyColumn(
-        modifier = Modifier
+//        contentPadding = outerPaddingValues,
+        modifier = modifier
             .padding(
-                top = outerPaddingValues.calculateTopPadding(),
-                bottom = outerPaddingValues.calculateBottomPadding()
+//                top = outerPaddingValues.calculateTopPadding(),
+//                bottom = outerPaddingValues.calculateBottomPadding()
             )
             .fillMaxSize(),
-        contentPadding = PaddingValues(vertical = 15.dp)
+        contentPadding = PaddingValues(top = 15.dp),
+        state = scrollState
     ) {
         item {
             viewState.mainRestaurant?.let {
@@ -114,7 +238,7 @@ fun ShowItemsInCart(
                 Text(
                     text = "APPLY COUPON",
                     maxLines = 1,
-                    style = Typography.h2,
+                    style = Typography.h4,
                     modifier = Modifier
                         .weight(2f)
                         .padding(horizontal = 20.dp),
@@ -134,9 +258,11 @@ fun ShowItemsInCart(
 
         item {
             CartBillDetails(viewState)
+            GrayDivider(heightDp = 15.dp)
         }
 
         item {
+            CancellationPolicy()
             GrayDivider(heightDp = 130.dp)
         }
 
@@ -144,8 +270,245 @@ fun ShowItemsInCart(
 }
 
 @Composable
-fun CartBillDetails(viewState: CartViewState, modifier: Modifier = Modifier) {
+fun CancellationPolicy(modifier: Modifier = Modifier) {
+    var expandOverview by remember { mutableStateOf(false) }
 
+    Column(
+        modifier = Modifier.padding(15.dp)
+    ) {
+        Row(
+            modifier = modifier.padding(horizontal = 0.dp, vertical = 0.dp),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Icon(
+                Icons.Default.List,
+                contentDescription = null,
+                modifier = Modifier
+                    .size(26.dp)
+            )
+            Column(
+                modifier = Modifier.padding(start = 10.dp)
+            ) {
+                Text(
+                    "Review your order and address details to avoid cancellations",
+                    style = Typography.h4
+                )
+
+                if (!expandOverview) {
+                    Spacer(modifier = Modifier.height(15.dp))
+                    Text(
+                        buildAnnotatedString {
+                            withStyle(style = SpanStyle(color = Color.Red)) {
+                                append("Note: ")
+                            }
+                            append("If you choose to cancel, you can do it within 60 seconds after placing order. Post which you will be charged 100% cancellation fee.")
+                        },
+                        style = Typography.h5
+                    )
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(10.dp))
+
+        if (expandOverview) {
+            val messagesToIcons = linkedMapOf(
+                "If you choose to cancel, you can do it within 60 seconds after placing the order" to Icons.Outlined.CheckCircle,
+                "Post 60 seconds, you will be charged a 100% cancellation fee" to Icons.Outlined.Info,
+                "However, in the event of an unusual delay of your order, you will not be charged a cancellation fee" to Icons.Outlined.Share,
+                "This policy helps us avoid food wastage and compensate restaurants / delivery partners for their efforts." to Icons.Outlined.ThumbUp
+            )
+            messagesToIcons.toList().forEach {
+                Row(
+                    modifier = modifier.padding(horizontal = 0.dp, vertical = 8.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Icon(
+                        it.second,
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(26.dp),
+                        tint = MaterialTheme.colors.primary.copy(0.7f)
+                    )
+                    Column(
+                        modifier = Modifier.padding(start = 10.dp)
+                    ) {
+                        Text(
+                            it.first,
+                            style = Typography.h5
+                        )
+                    }
+                }
+            }
+        }
+
+        Row(
+            modifier = modifier.padding(top = 15.dp),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Icon(
+                Icons.Default.List,
+                contentDescription = null,
+                modifier = Modifier
+                    .alpha(0f)
+                    .size(26.dp)
+            )
+            Column(
+                modifier = Modifier.padding(start = 10.dp)
+            ) {
+                Row {
+                    val semiBoldStyle = Typography.h5.copy(fontWeight = FontWeight.SemiBold)
+
+                    if (!expandOverview) {
+                        DashedHoverText(
+                            heading = "Overview",
+                            showHoverMessage = { expandOverview = !expandOverview },
+                            textColor = Color(0xFF3884BD),
+                            style = semiBoldStyle
+                        )
+
+                        Spacer(modifier = Modifier.width(25.dp))
+                    }
+
+                    DashedHoverText(
+                        heading = "Read Policy",
+                        showHoverMessage = { /*TODO*/ },
+                        textColor = Color(0xFF3884BD),
+                        style = semiBoldStyle
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun CartBillDetails(viewState: CartViewState, modifier: Modifier = Modifier) {
+    val cartAmount = viewState.cartAmount
+
+    cartAmount?.let {
+        Column(
+            modifier = modifier.padding(15.dp)
+        ) {
+            Text(
+                text = "Bill Details",
+                style = Typography.h4
+            )
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .padding(vertical = 5.dp)
+                    .fillMaxWidth()
+            ) {
+                Text(text = "Item Total", style = Typography.h5)
+                Text("₹${cartAmount.itemTotal}", style = Typography.h5)
+            }
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier
+                    .padding(vertical = 0.dp)
+                    .fillMaxWidth()
+            ) {
+                val paddingVertical = 10.dp
+                Column(
+                    modifier = Modifier.fillMaxWidth(0.85f)
+                ) {
+                    DashedHoverText(
+                        "Delivery Partner Fee for 9.70 kms",
+                        showHoverMessage = {
+
+                        },
+                        modifier = Modifier.padding(vertical = paddingVertical)
+                    )
+                    Spacer(modifier = Modifier.height(3.dp))
+                    Text("Your Delivery Partner is travelling long distance to deliver your order")
+                }
+                Text(
+                    "₹${cartAmount.deliveryFee}",
+                    style = Typography.h5,
+                    modifier = Modifier.padding(vertical = paddingVertical)
+                )
+            }
+
+            Divider(
+                thickness = 0.75.dp,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 10.dp)
+            )
+
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .padding(vertical = 10.dp)
+                    .fillMaxWidth()
+            ) {
+                Text(text = "Delivery Tip", style = Typography.h5)
+                if (cartAmount.deliveryFee.equals(0)) {
+                    Text(
+                        "Add tip",
+                        fontWeight = FontWeight.SemiBold,
+                        color = MaterialTheme.colors.primary,
+                        style = Typography.h5
+                    )
+                } else {
+                    Text(
+                        "₹${cartAmount.deliveryFee}",
+                        style = Typography.h5
+                    )
+                }
+            }
+
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .padding(vertical = 0.dp)
+                    .fillMaxWidth()
+            ) {
+                Box {
+                    DashedHoverText(
+                        "Taxes and Charges",
+                        showHoverMessage = {
+
+                        },
+                        modifier = Modifier.padding(vertical = 5.dp)
+                    )
+                    Spacer(modifier = Modifier.height(3.dp))
+                }
+                Text(
+                    "₹${cartAmount.calculateTotalTaxCharges()}",
+                    style = Typography.h5
+                )
+            }
+
+            Divider(
+                thickness = 0.75.dp,
+                modifier = Modifier
+                    .padding(vertical = 10.dp)
+                    .fillMaxWidth()
+            )
+
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .padding(vertical = 5.dp)
+                    .fillMaxWidth()
+            ) {
+                Text(
+                    "To Pay",
+                    style = Typography.h4
+                )
+                Text(
+                    "₹${cartAmount.toPayTotal()}",
+                    style = Typography.h4
+                )
+            }
+        }
+    }
 }
 
 @Composable
@@ -162,8 +525,8 @@ fun OrderingSuggestions(modifier: Modifier = Modifier) {
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier.padding(horizontal = 15.dp)
     ) {
-        Image(
-            Icons.Outlined.List,
+        Icon(
+            painterResource(id = R.drawable.ic_list),
             contentDescription = null,
             modifier = Modifier.size(20.dp)
         )
@@ -173,7 +536,7 @@ fun OrderingSuggestions(modifier: Modifier = Modifier) {
             modifier = Modifier,
             placeholder = {
                 Text(
-                    "Any restaurant request? We will try our best to convey it",
+                    "Any restaurant request? We will try our best to convey it.",
                     modifier = Modifier.fillMaxHeight(),
                     textAlign = TextAlign.Center,
                     style = searchTextStyle,
@@ -190,75 +553,6 @@ fun OrderingSuggestions(modifier: Modifier = Modifier) {
                 disabledIndicatorColor = Color.Transparent
             ),
             maxLines = 1
-        )
-    }
-}
-
-@Composable
-fun CartFoodItem(food: Food, modifier: Modifier = Modifier) {
-    Row(
-        modifier = modifier
-    ) {
-        Icon(
-            painter = painterResource(id = R.drawable.ic_foodtype),
-            contentDescription = null,
-            tint = when (food.foodType) {
-                FoodType.VEG -> Color(0xFF008000)
-                FoodType.NON_VEG -> Color(0xFF008000)
-            },
-            modifier = Modifier.padding(end = 5.dp)
-        )
-
-        Column(
-            modifier = Modifier
-                .padding(horizontal = 2.dp)
-                .weight(2f)
-        ) {
-            Text(
-                text = food.name,
-                style = Typography.h3,
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis
-            )
-
-            Text(
-                "Pan Pizza",
-                modifier = Modifier.padding(vertical = 5.dp)
-            )
-
-            Row {
-                Text("CUSTOMIZE")
-                Icon(
-                    painterResource(id = R.drawable.ic_expand),
-                    null,
-                    modifier = Modifier
-                        .padding(horizontal = 3.dp)
-                        .align(Alignment.CenterVertically)
-                        .size(15.dp),
-                    tint = MaterialTheme.colors.primary
-                )
-            }
-
-        }
-
-        if (food.quantityInCart != 0) {
-            AddToCartComposable(
-                cartQuantity = food.quantityInCart,
-                onQuantityChange = {
-                    food.quantityInCart = it
-                },
-                modifier = Modifier
-                    .weight(1f)
-            )
-        }
-
-        Text(
-            text = "₹${(food.price * food.quantityInCart)}",
-            style = Typography.h4,
-            modifier = Modifier
-                .padding(horizontal = 5.dp)
-                .weight(1f),
-            textAlign = TextAlign.Right
         )
     }
 }
@@ -337,7 +631,10 @@ fun NoItemsInCart(
                 contentColor = MaterialTheme.colors.primary
             ),
             contentPadding = PaddingValues(horizontal = 10.dp),
-            border = BorderStroke(ButtonDefaults.OutlinedBorderSize, MaterialTheme.colors.primary),
+            border = BorderStroke(
+                ButtonDefaults.OutlinedBorderSize,
+                MaterialTheme.colors.primary
+            ),
         ) {
             Text(
                 "Browse Restaurants".uppercase(Locale.getDefault()),

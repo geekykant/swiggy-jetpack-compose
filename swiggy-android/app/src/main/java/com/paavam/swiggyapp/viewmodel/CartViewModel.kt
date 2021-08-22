@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.math.roundToInt
 
 @HiltViewModel
 class CartViewModel @Inject constructor(
@@ -34,16 +35,42 @@ class CartViewModel @Inject constructor(
                 is ResponseResult.Error -> emptyList() /* Throw error message */
             }
 
+            val cartAmount = CartAmount(982.00f, 35.00f, 0, 25f)
+
             _state.value = CartViewState(
                 cartFoodList = foodsList,
                 mainRestaurant = PreviewData.prepareARestaurant(),
-                refreshing = refreshing.value
+                refreshing = refreshing.value,
+                totalAmount = cartAmount.toPayTotal()
             )
         }
     }
 }
 
+data class CartAmount(
+    var itemTotal: Float = 0f,
+    var deliveryFee: Float = 0f,
+    var deliveryTip: Int = 0,
+    var packingCharges: Float = 25f,
+    private var restaurantGSTRate: Float = 18.00f
+) {
+    private val beforeTaxAmount = itemTotal + deliveryTip + deliveryFee
+
+    fun calculatePayableGSTAmount(): Float {
+        return (restaurantGSTRate * beforeTaxAmount) / 100f
+    }
+
+    fun calculateTotalTaxCharges(): Float {
+        return packingCharges + calculatePayableGSTAmount()
+    }
+
+    fun toPayTotal(): Float {
+        return (beforeTaxAmount + calculateTotalTaxCharges()).roundToInt().toFloat()
+    }
+}
+
 data class CartViewState(
+    val cartAmount: CartAmount? = null,
     val cartFoodList: List<Food> = emptyList(),
     val mainRestaurant: Restaurant? = null,
     val isShopOpen: Boolean = true,

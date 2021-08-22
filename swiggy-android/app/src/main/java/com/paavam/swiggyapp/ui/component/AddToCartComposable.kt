@@ -5,6 +5,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
@@ -55,12 +56,12 @@ fun AddToCartComposable(
             )
             Text(
                 text = cartQuantity.toString(),
-                style = Typography.h1,
+                style = Typography.h3,
                 color = greenColor,
-                fontSize = 15.sp,
                 fontWeight = fontWeight,
                 textAlign = TextAlign.Center,
-                modifier = Modifier.weight(1f)
+                modifier = Modifier
+                    .defaultMinSize(minWidth = 35.dp)
             )
             Icon(
                 painter = painterResource(id = R.drawable.ic_add),

@@ -5,7 +5,7 @@ data class Food(
     val name: String,
     val foodType: FoodType,
     val starText: String?,
-    val price: Float,
+    val price: Int,
     val foodContents: String?,
     val imageUrl: String?,
     var quantityInCart: Int = 0
