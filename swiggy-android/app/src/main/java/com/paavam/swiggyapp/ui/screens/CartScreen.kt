@@ -2,6 +2,7 @@ package com.paavam.swiggyapp.ui.screens
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -24,10 +25,7 @@ import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.layout.onSizeChanged
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
@@ -41,7 +39,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.google.accompanist.insets.*
+import com.google.accompanist.insets.ProvideWindowInsets
+import com.google.accompanist.insets.navigationBarsPadding
+import com.google.accompanist.insets.systemBarsPadding
 import com.paavam.swiggyapp.R
 import com.paavam.swiggyapp.model.Restaurant
 import com.paavam.swiggyapp.ui.component.GrayDivider
@@ -58,6 +58,7 @@ import java.util.*
 import kotlin.math.min
 import kotlin.math.roundToInt
 
+@ExperimentalFoundationApi
 @Composable
 fun CartScreen(
     navController: NavController,
@@ -72,36 +73,32 @@ fun CartScreen(
     isScrollStateChanged = scrollState.firstVisibleItemIndex != 0
 
     val position by animateFloatAsState(if (isScrollStateChanged) 0f else -45f)
-    var topAppBarSize by remember { mutableStateOf(0) }
 
     ProvideWindowInsets {
-        Surface {
+        Surface(
+            modifier = Modifier
+                .fillMaxSize()
+                .systemBarsPadding(),
+            color = Color.White
+        ) {
             Box(Modifier.fillMaxSize()) {
                 CartTopAppBar(
                     viewModel = viewModel,
                     onBackClick = { navController.navigate(NavScreen.Home.route) },
                     modifier = Modifier
-//                        .offset(0.dp, position.dp)
-//                        .alpha(min(1f, 1 + (position / 45f)))
-                        .graphicsLayer {
-                            alpha = min(1f, 1 + (position / 45f))
-                            translationY = (position)
-                        }
-                        .onSizeChanged { topAppBarSize = it.height }
-                        .statusBarsPadding()
+                        .offset(0.dp, position.dp)
+                        .alpha(min(1f, 1 + (position / 45f)))
+//                        .graphicsLayer {
+//                            alpha = min(1f, 1 + (position / 45f))
+//                            translationY = (position)
+//                        }
                         .navigationBarsPadding(bottom = false)
-                        .onSizeChanged { topAppBarSize = it.height }
                 )
                 when (viewState.cartFoodList.isEmpty()) {
                     true -> NoItemsInCart(navController, outerPaddingValues)
                     else -> ShowItemsInCart(
                         viewState,
-                        scrollState,
-                        rememberInsetsPaddingValues(
-                            insets = LocalWindowInsets.current.systemBars,
-                            applyTop = false,
-                            additionalTop = with(LocalDensity.current) { topAppBarSize.toDp() }
-                        )
+                        scrollState
                     )
                 }
             }
@@ -175,21 +172,15 @@ fun CartTopAppBar(
     }
 }
 
+@ExperimentalFoundationApi
 @Composable
 fun ShowItemsInCart(
     viewState: CartViewState,
     scrollState: LazyListState,
-    outerPaddingValues: PaddingValues,
     modifier: Modifier = Modifier
 ) {
     LazyColumn(
-//        contentPadding = outerPaddingValues,
-        modifier = modifier
-            .padding(
-//                top = outerPaddingValues.calculateTopPadding(),
-//                bottom = outerPaddingValues.calculateBottomPadding()
-            )
-            .fillMaxSize(),
+        modifier = modifier.fillMaxSize(),
         contentPadding = PaddingValues(top = 15.dp),
         state = scrollState
     ) {

@@ -242,7 +242,7 @@ fun StickyTopAppBar(isScrollStateChanged: Boolean, modifier: Modifier = Modifier
                         )
                     }
                     Text(
-                        "Tra-32 (last House On Right), Elamakkara Mamangalam, Ernakulam",
+                        "Jar-99 (last House On Right), JamshedPur, Kakakollam",
                         fontSize = 12.sp,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
