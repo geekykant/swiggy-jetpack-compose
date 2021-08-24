@@ -241,4 +241,19 @@ object PreviewData {
         }
         return prepList
     }
+
+    fun prepareUsersAddresses(): List<UserAddress> {
+        return listOf(
+            UserAddress(
+                "Home",
+                "Jar-99 (last House On Right), JamshedPur, Kakakollam",
+                AddressType.HOME
+            ),
+            UserAddress(
+                "Other",
+                "Golden Jubilee Mens Hostel, Tkm, Unnamed place time blah",
+                AddressType.OTHER
+            )
+        )
+    }
 }

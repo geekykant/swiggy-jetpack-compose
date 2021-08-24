@@ -30,4 +30,7 @@ class SwiggyService @Inject constructor() {
 
     suspend fun preparePopularCuisines(): ResponseResult<List<Cuisine>> =
         ResponseResult.success(PreviewData.preparePopularCurations())
+
+    fun fetchUsersAddress(): ResponseResult<List<UserAddress>> =
+        ResponseResult.success(PreviewData.prepareUsersAddresses())
 }
