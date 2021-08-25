@@ -1,5 +1,7 @@
 package com.paavam.swiggyapp.ui.utils
 
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.ColorMatrix
 import com.paavam.swiggyapp.R
 import javax.inject.Singleton
 
@@ -13,4 +15,15 @@ object UiUtils {
     )
 
     fun fetchRandomPlaceholder() = placeholderImagesList.random()
+
+    val shopClosedBlackFilter = ColorFilter.colorMatrix(
+        ColorMatrix(
+            floatArrayOf(
+                0.33f, 0.33f, 0.33f, 0f, 0f,
+                0.33f, 0.33f, 0.33f, 0f, 0f,
+                0.33f, 0.33f, 0.33f, 0f, 0f,
+                0f, 0f, 0f, 1f, 0f
+            )
+        )
+    )
 }

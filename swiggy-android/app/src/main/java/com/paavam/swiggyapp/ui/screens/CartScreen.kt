@@ -25,6 +25,7 @@ import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.painterResource
@@ -82,18 +83,6 @@ fun CartScreen(
             color = Color.White
         ) {
             Box(Modifier.fillMaxSize()) {
-                CartTopAppBar(
-                    viewModel = viewModel,
-                    onBackClick = { navController.navigate(NavScreen.Home.route) },
-                    modifier = Modifier
-                        .offset(0.dp, position.dp)
-                        .alpha(min(1f, 1 + (position / 45f)))
-//                        .graphicsLayer {
-//                            alpha = min(1f, 1 + (position / 45f))
-//                            translationY = (position)
-//                        }
-                        .navigationBarsPadding(bottom = false)
-                )
                 when (viewState.cartFoodList.isEmpty()) {
                     true -> NoItemsInCart(navController, outerPaddingValues)
                     else -> ShowItemsInCart(
@@ -101,6 +90,16 @@ fun CartScreen(
                         scrollState
                     )
                 }
+                CartTopAppBar(
+                    viewModel = viewModel,
+                    onBackClick = { navController.navigate(NavScreen.Home.route) },
+                    modifier = Modifier
+                        .graphicsLayer {
+                            alpha = min(1f, 1 + (position / 45f))
+                            translationY = (position)
+                        }
+                        .navigationBarsPadding(bottom = false)
+                )
             }
         }
     }

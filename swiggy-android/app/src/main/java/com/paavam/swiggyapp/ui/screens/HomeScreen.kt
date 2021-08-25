@@ -60,7 +60,7 @@ fun MainContent(
     Scaffold(
         topBar = {
             isScrollStateChanged = scrollState.firstVisibleItemScrollOffset != 0
-            StickyTopAppBar(isScrollStateChanged)
+            HomeTopAppBar(isScrollStateChanged)
         }
     ) {
         HomeScreen(scrollState, outerPaddingValues)
@@ -217,7 +217,7 @@ fun TopHelloBar(contentList: List<HelloBar>, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun StickyTopAppBar(isScrollStateChanged: Boolean, modifier: Modifier = Modifier) {
+fun HomeTopAppBar(isScrollStateChanged: Boolean, modifier: Modifier = Modifier) {
     TopAppBar(
         title = {
             Row(
@@ -227,14 +227,14 @@ fun StickyTopAppBar(isScrollStateChanged: Boolean, modifier: Modifier = Modifier
                 Column(
                     modifier = Modifier
                         .clickable { }
-                        .padding(0.dp, 0.dp)
+                        .padding(0.dp, 8.dp)
                         .weight(0.6f)
                 ) {
                     Row {
                         Image(
                             painter = painterResource(R.drawable.ic_location),
                             contentDescription = null,
-                            modifier = Modifier.padding(3.dp)
+                            modifier = Modifier.padding(end = 5.dp)
                         )
                         Text(
                             text = "Home",
@@ -252,7 +252,7 @@ fun StickyTopAppBar(isScrollStateChanged: Boolean, modifier: Modifier = Modifier
                 Column(
                     modifier = Modifier
                         .clickable { }
-                        .padding(4.dp)
+                        .padding(5.dp, 15.dp)
                         .weight(0.2f)
                         .align(Alignment.CenterVertically),
                 ) {

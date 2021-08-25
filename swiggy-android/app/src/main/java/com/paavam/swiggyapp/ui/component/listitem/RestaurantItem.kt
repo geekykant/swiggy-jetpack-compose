@@ -62,6 +62,7 @@ fun RestaurantItem(
                         .height(110.dp)
                         .width(90.dp)
                         .clip(RoundedCornerShape(5.dp)),
+                    //TODO: if swiggymodel shows closed -> colorFilter = if (r.isShopClosed) UiUtils.shopClosedBlackFilter else null
                 )
             }
 

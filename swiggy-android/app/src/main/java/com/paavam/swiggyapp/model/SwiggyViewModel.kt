@@ -19,7 +19,7 @@ class SwiggyViewModel @Inject constructor(
     private val _viewState = MutableStateFlow(SwiggyAppState())
     val viewState: StateFlow<SwiggyAppState> get() = _viewState
 
-    private val _askAddressModal = MutableStateFlow(true)
+    private val _askAddressModal = MutableStateFlow(false)
     val askAddressModal: StateFlow<Boolean> get() = _askAddressModal
 
     init {
@@ -39,7 +39,7 @@ class SwiggyViewModel @Inject constructor(
         }
     }
 
-    fun changeAddressSheetState(show: Boolean){
+    fun changeAddressSheetState(show: Boolean) {
         _askAddressModal.value = show
     }
 

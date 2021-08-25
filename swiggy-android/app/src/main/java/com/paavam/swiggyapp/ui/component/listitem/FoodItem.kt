@@ -11,8 +11,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.ColorMatrix
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.imageResource
@@ -102,20 +100,11 @@ fun FoodItem(
                     contentScale = ContentScale.Crop,
                     placeHolder = placeholder,
                     error = placeholder,
-                    modifier = androidx.compose.ui.Modifier
+                    modifier = Modifier
                         .height(110.dp)
                         .clip(RoundedCornerShape(5.dp))
                         .fillMaxWidth(),
-                    colorFilter = if (isShopClosed) ColorFilter.colorMatrix(
-                        ColorMatrix(
-                            floatArrayOf(
-                                0.33f, 0.33f, 0.33f, 0f, 0f,
-                                0.33f, 0.33f, 0.33f, 0f, 0f,
-                                0.33f, 0.33f, 0.33f, 0f, 0f,
-                                0f, 0f, 0f, 1f, 0f
-                            )
-                        )
-                    ) else null
+                    colorFilter = if (isShopClosed) UiUtils.shopClosedBlackFilter else null
                 )
             }
 

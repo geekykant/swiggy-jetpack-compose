@@ -56,12 +56,12 @@ fun SwiggyMain() {
                 topBar = { },
                 bottomBar = { BottomNavigationBar(navController) }
             ) { outerPaddingValues ->
+                // sets the NavHost and default start to [NavScreen.Home]
                 Navigation(navController, outerPaddingValues)
             }
         }
 
         val askAddressModal = viewModel.askAddressModal.collectAsState()
-
         when (askAddressModal.value) {
             true -> LaunchedEffect(Unit) { sheetState.show() }
             false -> LaunchedEffect(Unit) { sheetState.hide() }
@@ -96,20 +96,20 @@ fun AddressPickBottomSheet(
                             contentDescription = null,
                             modifier = Modifier
                                 .size(20.dp),
-                            tint = Color.White.copy(0.9f)
+                            tint = Color.White
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
                             text = "Location Permission is off",
                             style = Typography.h2,
-                            color = Color.White.copy(0.9f)
+                            color = Color.White
                         )
                     }
                     Spacer(modifier = Modifier.height(5.dp))
                     Text(
                         "Granting location permission will ensure accurate address and hassle free delivery",
                         style = Typography.h5,
-                        color = Color.White.copy(0.9f),
+                        color = Color.White,
                     )
                 }
 
