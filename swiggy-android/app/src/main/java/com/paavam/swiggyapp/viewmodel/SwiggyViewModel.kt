@@ -1,8 +1,9 @@
-package com.paavam.swiggyapp.model
+package com.paavam.swiggyapp.viewmodel
 
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.paavam.swiggyapp.model.UserAddress
 import com.paavam.swiggyapp.repository.AppRepository
 import com.paavam.swiggyapp.repository.ResponseResult
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -19,7 +20,7 @@ class SwiggyViewModel @Inject constructor(
     private val _viewState = MutableStateFlow(SwiggyAppState())
     val viewState: StateFlow<SwiggyAppState> get() = _viewState
 
-    private val _askAddressModal = MutableStateFlow(false)
+    private val _askAddressModal = MutableStateFlow(true)
     val askAddressModal: StateFlow<Boolean> get() = _askAddressModal
 
     init {

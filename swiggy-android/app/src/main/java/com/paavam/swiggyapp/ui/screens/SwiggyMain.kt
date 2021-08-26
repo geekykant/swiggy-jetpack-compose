@@ -5,17 +5,14 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Home
-import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -25,14 +22,14 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.paavam.swiggyapp.R
-import com.paavam.swiggyapp.model.AddressType
-import com.paavam.swiggyapp.model.SwiggyViewModel
+import com.paavam.swiggyapp.lib.AddressChooserRadio
 import com.paavam.swiggyapp.model.UserAddress
 import com.paavam.swiggyapp.ui.navigation.NavScreen
 import com.paavam.swiggyapp.ui.navigation.Navigation
 import com.paavam.swiggyapp.ui.theme.SwiggyTheme
 import com.paavam.swiggyapp.ui.theme.Typography
-import com.paavam.swiggyapp.ui.utils.noRippleClickable
+import com.paavam.swiggyapp.ui.utils.PermissionUtils
+import com.paavam.swiggyapp.viewmodel.SwiggyViewModel
 import java.util.*
 
 @ExperimentalMaterialApi
@@ -43,12 +40,34 @@ fun SwiggyMain() {
         val viewModel: SwiggyViewModel = hiltViewModel()
         val navController = rememberNavController()
 
-        val sheetState =
-            rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
+        val sheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden)
+        val context = LocalContext.current
 
         ModalBottomSheetLayout(
             sheetState = sheetState,
-            sheetContent = { AddressPickBottomSheet(viewModel) },
+            sheetContent = {
+                if (!PermissionUtils.isFineLocationGranted(context)) {
+                    AddressPickBottomSheet(
+                        viewModel,
+                        locationPermissionTitle = "Location Permission is off",
+                        grantButtonText = "GRANT",
+                        onGrantButtonClick = {
+                            viewModel.changeAddressSheetState(false)
+                            //PermissionUtils.requestAccessFineLocationPermission()
+                        }
+                    )
+                } else if (!PermissionUtils.isLocationEnabled(context)) {
+                    AddressPickBottomSheet(
+                        viewModel,
+                        locationPermissionTitle = "Device Location is turned off",
+                        grantButtonText = "TURN ON",
+                        onGrantButtonClick = {
+                            viewModel.changeAddressSheetState(false)
+                            //PermissionUtils.requestAccessFineLocationPermission()
+                        }
+                    )
+                }
+            },
             modifier = Modifier.fillMaxSize(),
             sheetBackgroundColor = Color.White
         ) {
@@ -72,7 +91,10 @@ fun SwiggyMain() {
 @ExperimentalMaterialApi
 @Composable
 fun AddressPickBottomSheet(
-    viewModel: SwiggyViewModel
+    viewModel: SwiggyViewModel,
+    locationPermissionTitle: String,
+    grantButtonText: String,
+    onGrantButtonClick: () -> Unit
 ) {
     Column {
         Box(
@@ -100,7 +122,7 @@ fun AddressPickBottomSheet(
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = "Location Permission is off",
+                            text = locationPermissionTitle,
                             style = Typography.h2,
                             color = Color.White
                         )
@@ -115,9 +137,7 @@ fun AddressPickBottomSheet(
 
                 Button(
                     shape = RoundedCornerShape(8.dp),
-                    onClick = {
-                        viewModel.changeAddressSheetState(false)
-                    },
+                    onClick = onGrantButtonClick,
                     colors = ButtonDefaults.buttonColors(
                         backgroundColor = Color(0xFFF7F7F7),
                         contentColor = Color(0xFF41A0EC)
@@ -127,7 +147,7 @@ fun AddressPickBottomSheet(
                         .height(30.dp)
                 ) {
                     Text(
-                        "GRANT",
+                        grantButtonText,
                         style = Typography.h5,
                         fontWeight = FontWeight.Bold
                     )
@@ -156,7 +176,7 @@ fun AddressPickBottomSheet(
                     addressList,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(15.dp),
+                        .padding(15.dp, 20.dp),
                     selectedAddress = { address ->
                         selectedAddress = address
                     }
@@ -219,31 +239,16 @@ fun PickAddressForDelivery(
     selectedAddress: (UserAddress) -> Unit,
     modifier: Modifier
 ) {
+    val selectedId = remember { mutableStateOf(-1) }
+
     addressList.forEach {
-        Row(
-            modifier = modifier
-                .noRippleClickable { selectedAddress(it) }
-        ) {
-            Icon(
-                if (it.type == AddressType.HOME) Icons.Outlined.Home else Icons.Outlined.LocationOn,
-                contentDescription = null,
-                modifier = Modifier
-                    .size(26.dp)
-            )
-            Spacer(modifier = Modifier.width(10.dp))
-            Column {
-                Text(
-                    it.label,
-                    style = Typography.h2.copy(fontWeight = FontWeight.SemiBold)
-                )
-                Text(
-                    text = it.fullAddress,
-                    style = Typography.h5,
-                    overflow = TextOverflow.Ellipsis,
-                    maxLines = 1
-                )
+        AddressChooserRadio(
+            address = it,
+            selected = it.id == selectedId.value,
+            onClick = {
+                selectedId.value = it.id
             }
-        }
+        )
     }
 }
 
