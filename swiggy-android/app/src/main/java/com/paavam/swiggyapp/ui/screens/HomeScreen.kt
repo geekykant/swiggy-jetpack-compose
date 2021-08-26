@@ -32,6 +32,7 @@ import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.paavam.swiggyapp.R
 import com.paavam.swiggyapp.lib.LazyHorizontalGrid
 import com.paavam.swiggyapp.lib.items
+import com.paavam.swiggyapp.model.AddressType
 import com.paavam.swiggyapp.model.HelloBar
 import com.paavam.swiggyapp.model.QuickTile
 import com.paavam.swiggyapp.ui.RestaurantActivity
@@ -47,6 +48,7 @@ import com.paavam.swiggyapp.ui.component.text.AnnouncementHeading
 import com.paavam.swiggyapp.ui.component.text.SectionHeading
 import com.paavam.swiggyapp.ui.theme.Typography
 import com.paavam.swiggyapp.viewmodel.HomeViewModel
+import com.paavam.swiggyapp.viewmodel.SwiggyViewModel
 import kotlinx.coroutines.delay
 
 @ExperimentalFoundationApi
@@ -218,6 +220,13 @@ fun TopHelloBar(contentList: List<HelloBar>, modifier: Modifier = Modifier) {
 
 @Composable
 fun HomeTopAppBar(isScrollStateChanged: Boolean, modifier: Modifier = Modifier) {
+    val viewModel: SwiggyViewModel = hiltViewModel()
+    val addressState = viewModel.defaultAddress.collectAsState()
+
+    println("Changed to ${addressState.value}")
+
+    val address = addressState.value
+
     TopAppBar(
         title = {
             Row(
@@ -237,12 +246,12 @@ fun HomeTopAppBar(isScrollStateChanged: Boolean, modifier: Modifier = Modifier) 
                             modifier = Modifier.padding(end = 5.dp)
                         )
                         Text(
-                            text = "Home",
+                            text = if (address?.type == AddressType.HOME) "Home" else "Other",
                             fontWeight = FontWeight.ExtraBold
                         )
                     }
                     Text(
-                        "Jar-99 (last House On Right), JamshedPur, Kakakollam",
+                        text = address?.fullAddress ?: " ",
                         fontSize = 12.sp,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,

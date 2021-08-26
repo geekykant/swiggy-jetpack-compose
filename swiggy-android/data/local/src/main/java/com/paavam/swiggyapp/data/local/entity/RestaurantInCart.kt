@@ -1,4 +1,4 @@
-package com.paavam.swiggyapp.database
+package com.paavam.swiggyapp.data.local.entity
 
 //@Entity(tableName = "RestaurantInCart", primaryKeys = ["restaurantId"])
 //data class RestaurantInCart(

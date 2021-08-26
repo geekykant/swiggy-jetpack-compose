@@ -246,15 +246,15 @@ object PreviewData {
         return listOf(
             UserAddress(
                 1,
-                "Home",
                 "Jar-99 (last House On Right), JamshedPur, Kakakollam",
-                AddressType.HOME
+                AddressType.HOME,
+                "My Home"
             ),
             UserAddress(
                 2,
-                "Other",
                 "Golden Jubilee Mens Hostel, Tkm, Unnamed place time blah",
-                AddressType.OTHER
+                AddressType.OTHER,
+                "Work Place"
             )
         )
     }

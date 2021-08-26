@@ -2,9 +2,10 @@ package com.paavam.swiggyapp.model
 
 data class UserAddress(
     val id: Int,
-    val label: String,
     val fullAddress: String,
-    val type: AddressType
+    val type: AddressType,
+    val friendlyLabel: String,
+    val landmark: String? = null
 )
 
 enum class AddressType {

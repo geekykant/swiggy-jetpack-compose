@@ -1,4 +1,4 @@
-package com.paavam.swiggyapp.database
+package com.paavam.swiggyapp.data.local.dao
 
 //@Dao
 //interface FoodCartDao{

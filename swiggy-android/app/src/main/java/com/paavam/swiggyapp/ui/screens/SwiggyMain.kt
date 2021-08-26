@@ -23,7 +23,6 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.paavam.swiggyapp.R
 import com.paavam.swiggyapp.lib.AddressChooserRadio
-import com.paavam.swiggyapp.model.UserAddress
 import com.paavam.swiggyapp.ui.navigation.NavScreen
 import com.paavam.swiggyapp.ui.navigation.Navigation
 import com.paavam.swiggyapp.ui.theme.SwiggyTheme
@@ -155,6 +154,11 @@ fun AddressPickBottomSheet(
             }
         }
 
+        /**
+         * Choose Address from User addresses
+         */
+        val selectedId = remember { mutableStateOf(-1) }
+        val addressList = viewModel.viewState.value.userAddressList
 
         Column(
             modifier = Modifier.padding(horizontal = 15.dp, vertical = 0.dp)
@@ -166,89 +170,71 @@ fun AddressPickBottomSheet(
             )
             Divider(thickness = 0.75.dp)
 
-            val addressList = viewModel.viewState.value.userAddressList
-            var selectedAddress by remember { mutableStateOf<UserAddress?>(null) }
-
             Column(
                 modifier = Modifier.padding(vertical = 5.dp)
             ) {
-                PickAddressForDelivery(
-                    addressList,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(15.dp, 20.dp),
-                    selectedAddress = { address ->
-                        selectedAddress = address
-                    }
-                )
-            }
+                addressList.forEach {
+                    AddressChooserRadio(
+                        address = it,
+                        selected = it.id == selectedId.value,
+                        onClick = {
+                            selectedId.value = it.id
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 0.dp, vertical = 5.dp)
+                    )
+                }
 
-            Divider(thickness = 0.75.dp)
+                Divider(thickness = 0.75.dp)
 
-            Row(
-                modifier = Modifier.padding(horizontal = 15.dp, vertical = 22.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(
-                    painterResource(id = R.drawable.ic_search),
-                    contentDescription = null,
-                    modifier = Modifier
-                        .size(20.dp),
-                    tint = MaterialTheme.colors.primary.copy(0.9f)
-                )
-                Spacer(modifier = Modifier.width(15.dp))
-                Text(
-                    text = "Enter Location Manually",
-                    style = Typography.h5
-                )
-            }
+                Row(
+                    modifier = Modifier.padding(horizontal = 15.dp, vertical = 22.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        painterResource(id = R.drawable.ic_search),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(20.dp),
+                        tint = MaterialTheme.colors.primary.copy(0.9f)
+                    )
+                    Spacer(modifier = Modifier.width(15.dp))
+                    Text(
+                        text = "Enter Location Manually",
+                        style = Typography.h5
+                    )
+                }
 
-            var isSelected by remember { mutableStateOf(false) }
-            selectedAddress?.let {
-                isSelected = true
-            }
+                var isEnabled by remember { mutableStateOf(false) }
+                isEnabled = selectedId.value != -1
 
-            Button(
-                onClick = { isSelected = !isSelected },
-                colors = ButtonDefaults.buttonColors(
-                    backgroundColor = if (isSelected) Color.LightGray else MaterialTheme.colors.primaryVariant,
-                    contentColor = if (isSelected) Color.White
-                    else Color.White.copy(alpha = 0.7f)
-                ),
-                enabled = isSelected
-            ) {
-                Text(
-                    "SELECT & PROCEED",
-                    style = Typography.h5,
-                    fontWeight = FontWeight.SemiBold,
-                    modifier = Modifier
-                        .padding(horizontal = 2.dp, vertical = 5.dp)
-                        .align(Alignment.CenterVertically)
-                        .fillMaxWidth(),
-                    textAlign = TextAlign.Center
-                )
+                Button(
+                    onClick = {
+                        viewModel.assignDefaultAddress(addressList.find { it.id == selectedId.value })
+                        viewModel.changeAddressSheetState(show = false)
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        backgroundColor = if (isEnabled) MaterialTheme.colors.primaryVariant else Color.LightGray,
+                        contentColor = Color.White
+                    ),
+                    enabled = isEnabled,
+                    elevation = ButtonDefaults.elevation(0.dp, 0.dp, 0.dp)
+                ) {
+                    Text(
+                        "SELECT & PROCEED",
+                        style = Typography.h5,
+                        fontWeight = FontWeight.SemiBold,
+                        modifier = Modifier
+                            .padding(horizontal = 2.dp, vertical = 5.dp)
+                            .align(Alignment.CenterVertically)
+                            .fillMaxWidth(),
+                        textAlign = TextAlign.Center
+                    )
+                }
+                Spacer(modifier = Modifier.height(20.dp))
             }
-            Spacer(modifier = Modifier.height(20.dp))
         }
-    }
-}
-
-@Composable
-fun PickAddressForDelivery(
-    addressList: List<UserAddress>,
-    selectedAddress: (UserAddress) -> Unit,
-    modifier: Modifier
-) {
-    val selectedId = remember { mutableStateOf(-1) }
-
-    addressList.forEach {
-        AddressChooserRadio(
-            address = it,
-            selected = it.id == selectedId.value,
-            onClick = {
-                selectedId.value = it.id
-            }
-        )
     }
 }
 
@@ -270,7 +256,8 @@ fun BottomNavigationBar(navController: NavController) {
         val currentDestination = navBackStackEntry?.destination
 
         items.forEach { screen ->
-            val isSelectedRoute = currentDestination?.hierarchy?.any { it.route == screen.route }
+            val isSelectedRoute =
+                currentDestination?.hierarchy?.any { it.route == screen.route }
             BottomNavigationItem(
                 icon = {
                     when (isSelectedRoute) {

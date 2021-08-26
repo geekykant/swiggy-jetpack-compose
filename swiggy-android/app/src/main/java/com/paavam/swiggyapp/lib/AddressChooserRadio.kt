@@ -48,7 +48,6 @@ fun AddressChooserRadio(
             indication = null
         )
         .run {
-            println("$selected changed")
             if (selected) {
                 border(
                     BorderStroke(2.dp, MaterialTheme.colors.primaryVariant),
