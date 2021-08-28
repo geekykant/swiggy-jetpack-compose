@@ -24,8 +24,8 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.paavam.swiggyapp.model.AddressType
-import com.paavam.swiggyapp.model.UserAddress
+import com.paavam.swiggyapp.core.data.user.model.AddressType
+import com.paavam.swiggyapp.core.data.user.model.UserAddress
 import com.paavam.swiggyapp.ui.theme.Typography
 
 @Composable
@@ -79,7 +79,7 @@ fun AddressChooserRadio(
         Spacer(modifier = Modifier.width(10.dp))
         Column {
             Text(
-                address.label,
+                address.friendlyLabel,
                 style = Typography.h2,
                 fontWeight = if (selected) FontWeight.Bold else FontWeight.SemiBold
             )

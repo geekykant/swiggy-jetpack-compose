@@ -30,16 +30,16 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.paavam.swiggyapp.R
+import com.paavam.swiggyapp.core.data.message.model.HelloBar
+import com.paavam.swiggyapp.core.data.message.model.QuickTile
+import com.paavam.swiggyapp.core.data.user.model.AddressType
 import com.paavam.swiggyapp.lib.LazyHorizontalGrid
 import com.paavam.swiggyapp.lib.items
-import com.paavam.swiggyapp.model.AddressType
-import com.paavam.swiggyapp.model.HelloBar
-import com.paavam.swiggyapp.model.QuickTile
 import com.paavam.swiggyapp.ui.RestaurantActivity
 import com.paavam.swiggyapp.ui.component.DoubleRowRestaurants
 import com.paavam.swiggyapp.ui.component.FooterStaticImage
 import com.paavam.swiggyapp.ui.component.HorizontalSliderUi
-import com.paavam.swiggyapp.ui.component.anim.AnimateUpDown
+import com.paavam.swiggyapp.ui.component.anim.AnimateTextUpDown
 import com.paavam.swiggyapp.ui.component.image.BannerImage
 import com.paavam.swiggyapp.ui.component.listitem.CuisineItem
 import com.paavam.swiggyapp.ui.component.listitem.QuickTileItem
@@ -214,7 +214,7 @@ fun TopHelloBar(contentList: List<HelloBar>, modifier: Modifier = Modifier) {
                 .clip(roundShape),
             contentScale = ContentScale.Inside,
         )
-        AnimateUpDown(contentList[i].message, 2)
+        AnimateTextUpDown(contentList[i].message, 2)
     }
 }
 

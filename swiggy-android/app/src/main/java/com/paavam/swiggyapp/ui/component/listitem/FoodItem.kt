@@ -11,20 +11,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.paavam.swiggyapp.R
-import com.paavam.swiggyapp.model.Food
-import com.paavam.swiggyapp.model.FoodType
+import com.paavam.swiggyapp.core.data.food.model.Food
+import com.paavam.swiggyapp.core.data.food.model.FoodType
 import com.paavam.swiggyapp.ui.component.AddToCartComposable
+import com.paavam.swiggyapp.ui.component.image.ImageWithPlaceholder
 import com.paavam.swiggyapp.ui.theme.Typography
 import com.paavam.swiggyapp.ui.utils.UiUtils
-import com.skydoves.landscapist.glide.GlideImage
 
 @Composable
 fun FoodItem(
@@ -93,13 +91,10 @@ fun FoodItem(
                 .height(height),
             contentAlignment = Alignment.TopStart
         ) {
-            val placeholder = ImageBitmap.imageResource(UiUtils.fetchRandomPlaceholder())
             food.imageUrl?.let {
-                GlideImage(
-                    imageModel = it,
+                ImageWithPlaceholder(
+                    imageUrl= it,
                     contentScale = ContentScale.Crop,
-                    placeHolder = placeholder,
-                    error = placeholder,
                     modifier = Modifier
                         .height(110.dp)
                         .clip(RoundedCornerShape(5.dp))

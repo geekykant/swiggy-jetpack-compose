@@ -8,29 +8,23 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.paavam.swiggyapp.R
+import com.paavam.swiggyapp.ui.component.image.ImageWithPlaceholder
 import com.paavam.swiggyapp.ui.theme.Typography
-import com.paavam.swiggyapp.ui.utils.UiUtils
-import com.skydoves.landscapist.glide.GlideImage
 
 @Composable
 fun FooterStaticImage(
     modifier: Modifier = Modifier,
     imageUrl: String = "https://res.cloudinary.com/swiggy/image/upload/fl_lossy,f_auto,q_auto/footer_graphic_vxojqs",
 ) {
-    val placeholder = ImageBitmap.imageResource(UiUtils.fetchRandomPlaceholder())
-    GlideImage(
-        imageModel = imageUrl,
+    ImageWithPlaceholder(
+        imageUrl = imageUrl,
         contentScale = ContentScale.FillWidth,
-        placeHolder = placeholder,
-        error = placeholder,
-        modifier = modifier
-            .fillMaxWidth()
+        modifier = modifier.fillMaxWidth(),
+        colorFilter = null
     )
 }
 

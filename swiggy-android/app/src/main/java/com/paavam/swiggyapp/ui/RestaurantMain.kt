@@ -32,14 +32,19 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.paavam.swiggyapp.PreviewData
+import com.paavam.swiggyapp.core.data.PreviewData
 import com.paavam.swiggyapp.R
-import com.paavam.swiggyapp.model.*
+import com.paavam.swiggyapp.core.data.food.model.Food
+import com.paavam.swiggyapp.core.data.message.model.HelloBar
+import com.paavam.swiggyapp.core.data.offer.model.Offer
+import com.paavam.swiggyapp.core.data.restaurant.model.MainSectionFoods
+import com.paavam.swiggyapp.core.data.restaurant.model.Restaurant
+import com.paavam.swiggyapp.core.data.restaurant.model.SubSectionsFoods
 import com.paavam.swiggyapp.ui.component.DashedDivider
 import com.paavam.swiggyapp.ui.component.FooterLicenseInfo
 import com.paavam.swiggyapp.ui.component.GrayDivider
 import com.paavam.swiggyapp.ui.component.HorizontalSliderUi
-import com.paavam.swiggyapp.ui.component.anim.AnimateUpDown
+import com.paavam.swiggyapp.ui.component.anim.AnimateTextUpDown
 import com.paavam.swiggyapp.ui.component.listitem.FoodItem
 import com.paavam.swiggyapp.ui.component.listitem.OfferWideItem
 import com.paavam.swiggyapp.ui.component.text.SectionHeading
@@ -462,7 +467,7 @@ fun ThreeSectionDetails(r: Restaurant) {
                     i = ((i + 1) % movingList.size)
                 }
             }
-            AnimateUpDown(
+            AnimateTextUpDown(
                 movingList[i],
                 1,
                 Modifier

@@ -29,11 +29,6 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
 
-            buildConfigField "String", "SERVER_URL", '"https://api.paava.com/swiggy/v1"'
-        }
-
-        debug {
-            buildConfigField "String", "SERVER_URL", '"https://api.paava.com/swiggy/v1"'
         }
     }
     compileOptions {
@@ -54,6 +49,8 @@ android {
 }
 
 dependencies {
+    implementation project(path: ':core')
+    implementation project(path: ':repository')
     // Networking
     def okhttp = '5.0.0-alpha.2'
     def retrofit_version = '2.9.0'
@@ -90,6 +87,10 @@ dependencies {
     implementation("com.google.dagger:hilt-android:$hilt_version")
     kapt("com.google.dagger:hilt-android-compiler:$hilt_version")
     implementation 'androidx.hilt:hilt-navigation-compose:1.0.0-alpha03'
+
+    def jetpackHiltVersion = "1.0.0"
+    api "androidx.hilt:hilt-work:$jetpackHiltVersion"
+    kapt "androidx.hilt:hilt-compiler:$jetpackHiltVersion"
 
     //Room
     def room_version = "2.3.0"

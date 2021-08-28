@@ -6,6 +6,6 @@ package com.paavam.swiggyapp.di
 //
 //    @Provides
 //    @Singleton
-//    fun provideRoomDatabase(application: Application):
+//    fun provideRoomDatabase(application: Application) = SwiggyDatabase.getInstance(application)
 //
 //}

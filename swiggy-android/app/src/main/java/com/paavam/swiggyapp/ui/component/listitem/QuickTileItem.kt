@@ -11,17 +11,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
+import com.paavam.swiggyapp.ui.component.image.ImageWithPlaceholder
 import com.paavam.swiggyapp.ui.theme.Typography
-import com.paavam.swiggyapp.ui.utils.UiUtils
-import com.skydoves.landscapist.glide.GlideImage
 
 @Composable
 fun QuickTileItem(heading: String, tagline: String, imageUrl: String) {
@@ -51,12 +48,9 @@ fun QuickTileItem(heading: String, tagline: String, imageUrl: String) {
                 fontWeight = FontWeight.ExtraBold
             )
 
-            val placeholder = ImageBitmap.imageResource(UiUtils.fetchRandomPlaceholder())
-            GlideImage(
-                imageModel = imageUrl,
+            ImageWithPlaceholder(
+                imageUrl = imageUrl,
                 contentScale = ContentScale.Crop,
-                placeHolder = placeholder,
-                error = placeholder,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(110.dp)

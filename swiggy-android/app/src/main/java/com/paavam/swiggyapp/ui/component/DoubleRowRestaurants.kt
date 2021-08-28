@@ -8,7 +8,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import com.paavam.swiggyapp.lib.LazyHorizontalGrid
 import com.paavam.swiggyapp.lib.items
-import com.paavam.swiggyapp.model.Restaurant
+import com.paavam.swiggyapp.core.data.restaurant.model.Restaurant
 import com.paavam.swiggyapp.ui.RestaurantActivity
 import com.paavam.swiggyapp.ui.component.listitem.RestaurantItem
 

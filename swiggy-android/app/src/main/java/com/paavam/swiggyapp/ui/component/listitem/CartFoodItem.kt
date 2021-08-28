@@ -13,8 +13,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.paavam.swiggyapp.R
-import com.paavam.swiggyapp.model.Food
-import com.paavam.swiggyapp.model.FoodType
+import com.paavam.swiggyapp.core.data.food.model.Food
+import com.paavam.swiggyapp.core.data.food.model.FoodType
 import com.paavam.swiggyapp.ui.component.AddToCartComposable
 import com.paavam.swiggyapp.ui.theme.Typography
 

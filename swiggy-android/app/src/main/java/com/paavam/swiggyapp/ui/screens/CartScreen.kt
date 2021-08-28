@@ -24,10 +24,8 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
@@ -44,17 +42,16 @@ import com.google.accompanist.insets.ProvideWindowInsets
 import com.google.accompanist.insets.navigationBarsPadding
 import com.google.accompanist.insets.systemBarsPadding
 import com.paavam.swiggyapp.R
-import com.paavam.swiggyapp.model.Restaurant
+import com.paavam.swiggyapp.core.data.restaurant.model.Restaurant
 import com.paavam.swiggyapp.ui.component.GrayDivider
+import com.paavam.swiggyapp.ui.component.image.ImageWithPlaceholder
 import com.paavam.swiggyapp.ui.component.listitem.CartFoodItem
 import com.paavam.swiggyapp.ui.component.text.DashedHoverText
 import com.paavam.swiggyapp.ui.navigation.NavScreen
 import com.paavam.swiggyapp.ui.theme.Prox
 import com.paavam.swiggyapp.ui.theme.Typography
-import com.paavam.swiggyapp.ui.utils.UiUtils
 import com.paavam.swiggyapp.viewmodel.CartViewModel
 import com.paavam.swiggyapp.viewmodel.CartViewState
-import com.skydoves.landscapist.glide.GlideImage
 import java.util.*
 import kotlin.math.min
 import kotlin.math.roundToInt
@@ -553,13 +550,10 @@ fun BasicRestaurantDetails(mainRestaurant: Restaurant, modifier: Modifier = Modi
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier
     ) {
-        val placeholder = ImageBitmap.imageResource(UiUtils.fetchRandomPlaceholder())
         mainRestaurant.imageUrl?.let {
-            GlideImage(
-                imageModel = it,
+            ImageWithPlaceholder(
+                imageUrl= it,
                 contentScale = ContentScale.FillWidth,
-                placeHolder = placeholder,
-                error = placeholder,
                 modifier = Modifier
                     .size(60.dp, 60.dp)
             )

@@ -32,6 +32,15 @@ android {
 }
 
 dependencies {
+    // Moshi
+    def retrofit_version = '2.9.0'
+    api "com.squareup.retrofit2:converter-moshi:$retrofit_version"
+    api "com.squareup.moshi:moshi-kotlin:1.12.0"
+
+    // Coroutines
+    def coroutinesVersion = '1.5.1'
+    api "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion"
+
     // JavaX Inject
     implementation "javax.inject:javax.inject:1"
 

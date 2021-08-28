@@ -9,12 +9,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.unit.dp
-import com.paavam.swiggyapp.ui.utils.UiUtils
-import com.skydoves.landscapist.glide.GlideImage
 
 @Composable
 fun BannerImage(imageUrl: String, modifier: Modifier = Modifier) {
@@ -24,16 +20,14 @@ fun BannerImage(imageUrl: String, modifier: Modifier = Modifier) {
             .padding(horizontal = 15.dp, vertical = 0.dp)
             .fillMaxWidth()
     ) {
-        val placeholder = ImageBitmap.imageResource(UiUtils.fetchRandomPlaceholder())
-        GlideImage(
-            imageModel = imageUrl,
+        ImageWithPlaceholder(
+            imageUrl = imageUrl,
             contentScale = ContentScale.Crop,
-            placeHolder = placeholder,
-            error = placeholder,
             modifier = Modifier
                 .height(210.dp)
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(15.dp)),
+            colorFilter = null,
         )
     }
 }

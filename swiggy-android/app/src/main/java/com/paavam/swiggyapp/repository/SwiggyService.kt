@@ -1,7 +1,14 @@
 package com.paavam.swiggyapp.repository
 
-import com.paavam.swiggyapp.PreviewData
-import com.paavam.swiggyapp.model.*
+import com.paavam.swiggyapp.core.ResponseResult
+import com.paavam.swiggyapp.core.data.PreviewData
+import com.paavam.swiggyapp.core.data.cuisine.model.Cuisine
+import com.paavam.swiggyapp.core.data.food.model.Food
+import com.paavam.swiggyapp.core.data.message.model.HelloBar
+import com.paavam.swiggyapp.core.data.message.model.QuickTile
+import com.paavam.swiggyapp.core.data.restaurant.model.Restaurant
+import com.paavam.swiggyapp.core.data.restaurant.model.RestaurantFoodModel
+import com.paavam.swiggyapp.core.data.user.model.UserAddress
 import javax.inject.Inject
 
 /**

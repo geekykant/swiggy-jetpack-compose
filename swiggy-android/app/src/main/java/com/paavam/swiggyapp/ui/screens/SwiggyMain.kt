@@ -176,9 +176,9 @@ fun AddressPickBottomSheet(
                 addressList.forEach {
                     AddressChooserRadio(
                         address = it,
-                        selected = it.id == selectedId.value,
+                        selected = it.addressId == selectedId.value,
                         onClick = {
-                            selectedId.value = it.id
+                            selectedId.value = it.addressId
                         },
                         modifier = Modifier
                             .fillMaxWidth()
@@ -211,7 +211,7 @@ fun AddressPickBottomSheet(
 
                 Button(
                     onClick = {
-                        viewModel.assignDefaultAddress(addressList.find { it.id == selectedId.value })
+                        viewModel.assignDefaultAddress(addressList.find { it.addressId == selectedId.value })
                         viewModel.changeAddressSheetState(show = false)
                     },
                     colors = ButtonDefaults.buttonColors(

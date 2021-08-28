@@ -68,7 +68,7 @@ fun AddToCartComposable(
                 contentDescription = null,
                 modifier = Modifier
                     .clickable { onQuantityChange(cartQuantity + 1) }
-                    .padding(horizontal = 5.dp, vertical = 3.dp),
+                    .padding(horizontal = 5.dp, vertical = 5.dp),
                 tint = greenColor
             )
         }

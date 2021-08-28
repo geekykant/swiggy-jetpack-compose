@@ -1,6 +1,7 @@
 package com.paavam.swiggyapp.repository
 
-import com.paavam.swiggyapp.model.UserAddress
+import com.paavam.swiggyapp.core.ResponseResult
+import com.paavam.swiggyapp.core.data.user.model.UserAddress
 import javax.inject.Inject
 
 /**

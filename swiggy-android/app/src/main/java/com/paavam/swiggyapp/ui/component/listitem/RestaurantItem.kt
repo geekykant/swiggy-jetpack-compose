@@ -14,22 +14,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.paavam.swiggyapp.PreviewData
 import com.paavam.swiggyapp.R
-import com.paavam.swiggyapp.model.OfferSnackType
-import com.paavam.swiggyapp.model.Restaurant
+import com.paavam.swiggyapp.core.data.PreviewData
+import com.paavam.swiggyapp.core.data.offer.model.OfferSnackType
+import com.paavam.swiggyapp.core.data.restaurant.model.Restaurant
 import com.paavam.swiggyapp.ui.component.BasicOfferSnackComposable
 import com.paavam.swiggyapp.ui.component.FlatDealOfferSnackComposable
+import com.paavam.swiggyapp.ui.component.image.ImageWithPlaceholder
 import com.paavam.swiggyapp.ui.theme.Typography
-import com.paavam.swiggyapp.ui.utils.UiUtils
-import com.skydoves.landscapist.glide.GlideImage
 
 @Composable
 fun RestaurantItem(
@@ -45,7 +42,6 @@ fun RestaurantItem(
             .padding(horizontal = 15.dp, vertical = 15.dp)
             .heightIn(0.dp, height)
     ) {
-        val placeholder = ImageBitmap.imageResource(UiUtils.fetchRandomPlaceholder())
         Box(
             modifier = Modifier
                 .padding(horizontal = 2.dp, vertical = 0.dp)
@@ -53,16 +49,14 @@ fun RestaurantItem(
                 .height(height),
         ) {
             r.imageUrl?.let {
-                GlideImage(
-                    imageModel = it,
+                ImageWithPlaceholder(
+                    imageUrl = it,
                     contentScale = ContentScale.Crop,
-                    placeHolder = placeholder,
-                    error = placeholder,
                     modifier = Modifier
                         .height(110.dp)
                         .width(90.dp)
-                        .clip(RoundedCornerShape(5.dp)),
-                    //TODO: if swiggymodel shows closed -> colorFilter = if (r.isShopClosed) UiUtils.shopClosedBlackFilter else null
+                        .clip(RoundedCornerShape(5.dp))
+                    //TODO: if swiggymodel shows closed -> colorFilter = if (r.isShopClosed) UiUtils.shopClosedBlackFilter else null,
                 )
             }
 
@@ -106,7 +100,7 @@ fun RestaurantItem(
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
-                if(r.isBestSafety){
+                if (r.isBestSafety) {
                     Image(
                         painter = painterResource(id = R.drawable.ic_best_safety),
                         contentDescription = null,
@@ -151,7 +145,7 @@ fun RestaurantItem(
 
             LazyColumn {
                 if (!r.allOffers.isNullOrEmpty()) {
-                    items(items = r.allOffers) { offer ->
+                    items(items = r.allOffers!!) { offer ->
                         Row {
                             Icon(
                                 painterResource(id = R.drawable.ic_offers_filled),

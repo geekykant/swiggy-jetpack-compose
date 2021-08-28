@@ -1,8 +1,7 @@
 package com.paavam.swiggyapp.data.remote.model.response
 
-data class UserAddressResponse(
+data class UserAddressResponse<T>(
     override val status: State,
     override val message: String,
-//    val data: List<>,
-    val token: String?
+    val data: T,
 ) : BaseResponse
