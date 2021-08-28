@@ -3,8 +3,8 @@ package com.paavam.swiggyapp.core.data
 import com.paavam.swiggyapp.core.data.cuisine.model.Cuisine
 import com.paavam.swiggyapp.core.data.food.model.Food
 import com.paavam.swiggyapp.core.data.food.model.FoodType
-import com.paavam.swiggyapp.core.data.message.model.HelloBar
-import com.paavam.swiggyapp.core.data.message.model.QuickTile
+import com.paavam.swiggyapp.core.data.props.model.HelloBar
+import com.paavam.swiggyapp.core.data.props.model.QuickTile
 import com.paavam.swiggyapp.core.data.offer.model.Offer
 import com.paavam.swiggyapp.core.data.offer.model.OfferSnackType
 import com.paavam.swiggyapp.core.data.restaurant.model.MainSectionFoods

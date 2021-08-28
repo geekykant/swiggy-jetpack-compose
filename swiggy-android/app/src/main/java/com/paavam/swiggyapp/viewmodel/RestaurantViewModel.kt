@@ -2,10 +2,9 @@ package com.paavam.swiggyapp.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.paavam.swiggyapp.core.ResponseResult
+import com.paavam.swiggyapp.core.data.PreviewData
 import com.paavam.swiggyapp.core.data.restaurant.model.Restaurant
 import com.paavam.swiggyapp.core.data.restaurant.model.RestaurantFoodModel
-import com.paavam.swiggyapp.repository.RestaurantsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -14,7 +13,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class RestaurantViewModel @Inject constructor(
-    private val restaurantsRepository: RestaurantsRepository
+//    private val swiggyRestaurantRepository: SwiggyRestaurantRepository
 ) : ViewModel() {
     private val _state = MutableStateFlow(RestaurantViewState())
     val state: StateFlow<RestaurantViewState> get() = _state
@@ -24,16 +23,17 @@ class RestaurantViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            val restaurant =
-                when (val restaurantResult = restaurantsRepository.fetchThisRestaurant()) {
-                    is ResponseResult.Success -> restaurantResult.data
-                    is ResponseResult.Error -> null /* Throw error message */
-                }
-            val restaurantFoods = when (val restaurantFoodsResult =
-                restaurantsRepository.fetchThisRestaurantFoods()) {
-                is ResponseResult.Success -> restaurantFoodsResult.data
-                is ResponseResult.Error -> null /* Throw error message */
-            }
+            val restaurant = PreviewData.prepareARestaurant()
+////                when (val restaurantResult = swiggyRestaurantRepository.fetchThisRestaurant()) {
+////                    is ResponseResult.Success -> restaurantResult.data
+////                    is ResponseResult.Error -> null /* Throw error message */
+//                }
+            val restaurantFoods = PreviewData.prepareAllRestaurantFoods()
+//                when (val restaurantFoodsResult =
+//                swiggyRestaurantRepository.fetchThisRestaurantFoods()) {
+//                is ResponseResult.Success -> restaurantFoodsResult.data
+//                is ResponseResult.Error -> null /* Throw error message */
+//            }
 
             _state.value = RestaurantViewState(
                 restaurant = restaurant,

@@ -2,12 +2,11 @@ package com.paavam.swiggyapp.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.paavam.swiggyapp.core.ResponseResult
+import com.paavam.swiggyapp.core.data.PreviewData
 import com.paavam.swiggyapp.core.data.cuisine.model.Cuisine
-import com.paavam.swiggyapp.core.data.message.model.HelloBar
-import com.paavam.swiggyapp.core.data.message.model.QuickTile
+import com.paavam.swiggyapp.core.data.props.model.HelloBar
+import com.paavam.swiggyapp.core.data.props.model.QuickTile
 import com.paavam.swiggyapp.core.data.restaurant.model.Restaurant
-import com.paavam.swiggyapp.repository.HomeRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,7 +16,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val homeRepository: HomeRepository
+//    private val homeRepository: HomeRepository
 ):ViewModel() {
     private val _state = MutableStateFlow(HomeViewState())
     val state: StateFlow<HomeViewState> get() = _state
@@ -30,25 +29,26 @@ class HomeViewModel @Inject constructor(
 
     private fun prepareHomeData() {
         viewModelScope.launch {
-            val quickTiles = when (val quickTiles = homeRepository.fetchTilesContent()) {
-                is ResponseResult.Success -> quickTiles.data
-                is ResponseResult.Error -> emptyList() /* Throw error message */
-            }
-            val helloBarMessages =
-                when (val helloBarMessages = homeRepository.fetchHelloBarContent()) {
-                    is ResponseResult.Success -> helloBarMessages.data
-                    is ResponseResult.Error -> emptyList() /* Throw error message */
-                }
-            val nearbyRestaurants =
-                when (val nearbyRestaurants = homeRepository.fetchRestaurantsList()) {
-                    is ResponseResult.Success -> nearbyRestaurants.data
-                    is ResponseResult.Error -> emptyList() /* Throw error message */
-                }
-            val popularCurations =
-                when (val popularCurations = homeRepository.fetchPopularCuisines()) {
-                    is ResponseResult.Success -> popularCurations.data
-                    is ResponseResult.Error -> emptyList() /* Throw error message */
-                }
+            val quickTiles = PreviewData.prepareTilesContent()
+//                when (val quickTiles = homeRepository.fetchTilesContent()) {
+//                is ResponseResult.Success -> quickTiles.data
+//                is ResponseResult.Error -> emptyList() /* Throw error message */
+//            }
+            val helloBarMessages = PreviewData.prepareHelloBarContent()
+//                when (val helloBarMessages = homeRepository.fetchHelloBarContent()) {
+//                    is ResponseResult.Success -> helloBarMessages.data
+//                    is ResponseResult.Error -> emptyList() /* Throw error message */
+//                }
+            val nearbyRestaurants = PreviewData.prepareRestaurants()
+//                when (val nearbyRestaurants = homeRepository.fetchRestaurantsList()) {
+//                    is ResponseResult.Success -> nearbyRestaurants.data
+//                    is ResponseResult.Error -> emptyList() /* Throw error message */
+//                }
+            val popularCurations = PreviewData.preparePopularCurations()
+//                when (val popularCurations = homeRepository.fetchPopularCuisines()) {
+//                    is ResponseResult.Success -> popularCurations.data
+//                    is ResponseResult.Error -> emptyList() /* Throw error message */
+//                }
 
             _state.value = HomeViewState(
                 quickTiles = quickTiles,

@@ -30,8 +30,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.paavam.swiggyapp.R
-import com.paavam.swiggyapp.core.data.message.model.HelloBar
-import com.paavam.swiggyapp.core.data.message.model.QuickTile
+import com.paavam.swiggyapp.core.data.props.model.HelloBar
+import com.paavam.swiggyapp.core.data.props.model.QuickTile
 import com.paavam.swiggyapp.core.data.user.model.AddressType
 import com.paavam.swiggyapp.lib.LazyHorizontalGrid
 import com.paavam.swiggyapp.lib.items

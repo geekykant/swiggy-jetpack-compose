@@ -35,7 +35,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.paavam.swiggyapp.core.data.PreviewData
 import com.paavam.swiggyapp.R
 import com.paavam.swiggyapp.core.data.food.model.Food
-import com.paavam.swiggyapp.core.data.message.model.HelloBar
+import com.paavam.swiggyapp.core.data.props.model.HelloBar
 import com.paavam.swiggyapp.core.data.offer.model.Offer
 import com.paavam.swiggyapp.core.data.restaurant.model.MainSectionFoods
 import com.paavam.swiggyapp.core.data.restaurant.model.Restaurant

@@ -2,10 +2,8 @@ package com.paavam.swiggyapp.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.paavam.swiggyapp.core.ResponseResult
 import com.paavam.swiggyapp.core.data.PreviewData
 import com.paavam.swiggyapp.core.data.user.model.UserAddress
-import com.paavam.swiggyapp.repository.AppRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -14,7 +12,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SwiggyViewModel @Inject constructor(
-    private val appRepository: AppRepository
+//    private val appRepository: AppRepository
 ) : ViewModel() {
     private val _viewState = MutableStateFlow(SwiggyAppState())
     val viewState: StateFlow<SwiggyAppState> get() = _viewState
@@ -32,10 +30,11 @@ class SwiggyViewModel @Inject constructor(
 
     private fun fetchInitState() {
         viewModelScope.launch {
-            val userAddressList = when (val addresses = appRepository.fetchUsersAddress()) {
-                is ResponseResult.Success -> addresses.data
-                is ResponseResult.Error -> emptyList() /* Throw error message */
-            }
+            val userAddressList = PreviewData.prepareUsersAddresses()
+//                when (val addresses = appRepository.fetchUsersAddress()) {
+//                is ResponseResult.Success -> addresses.data
+//                is ResponseResult.Error -> emptyList() /* Throw error message */
+//            }
 
             _viewState.value = SwiggyAppState(
                 userAddressList = userAddressList
