@@ -46,4 +46,15 @@ object NetworkModule {
             .build()
             .create(SwiggyAuthService::class.java)
     }
+
+//    @Provides
+//    @Singleton
+//    fun providesServiceCartService(): SwiggyCartService {
+//        val loggingInterceptor = HttpLoggingInterceptor()
+//        loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY)
+//        return baseRetrofitBuilder
+//            .client(okHttpClientBuilder.addInterceptor(loggingInterceptor).build())
+//            .build()
+//            .create(SwiggyCartService::class.java)
+//    }
 }

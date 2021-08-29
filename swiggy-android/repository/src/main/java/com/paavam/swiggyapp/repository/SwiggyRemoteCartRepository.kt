@@ -15,7 +15,7 @@ class SwiggyRemoteCartRepository @Inject internal constructor(
     private val swiggyCartService: SwiggyCartService
 ) : SwiggyCartRepository {
 
-    override suspend fun fetchUsersCartFoods(): Flow<ResponseResult<List<Food>>> = flow {
+    override fun fetchUsersCartFoods(): Flow<ResponseResult<List<Food>>> = flow {
         val cartResponse = swiggyCartService.fetchUsersCartFoods().getResponse()
         val state = when (cartResponse.status) {
             State.SUCCESS -> ResponseResult.success(cartResponse.data)
@@ -24,7 +24,7 @@ class SwiggyRemoteCartRepository @Inject internal constructor(
         emit(state)
     }.catch { emit(ResponseResult.error("Unable to get users by id")) }
 
-    override suspend fun fetchUsersCartFoodById(foodId: String): Flow<ResponseResult<Food>> = flow {
+    override fun fetchUsersCartFoodById(foodId: String): Flow<ResponseResult<Food>> = flow {
         runCatching {
             val response = swiggyCartService.fetchUsersCartFoodById(foodId).getResponse()
             when (response.status) {

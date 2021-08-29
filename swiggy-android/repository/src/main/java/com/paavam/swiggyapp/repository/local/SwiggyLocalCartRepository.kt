@@ -14,7 +14,7 @@ class SwiggyLocalCartRepository @Inject constructor(
     private val cartDao: CartDao
 ) : SwiggyCartRepository {
 
-    override suspend fun fetchUsersCartFoods(): Flow<ResponseResult<List<Food>>> {
+    override fun fetchUsersCartFoods(): Flow<ResponseResult<List<Food>>> {
         return cartDao
             .getAllCartItems()
             .map { foods ->
@@ -34,7 +34,7 @@ class SwiggyLocalCartRepository @Inject constructor(
             .catch { emit(ResponseResult.success(emptyList())) }
     }
 
-    override suspend fun fetchUsersCartFoodById(foodId: String): Flow<ResponseResult<Food>> = flow {
+    override fun fetchUsersCartFoodById(foodId: String): Flow<ResponseResult<Food>> = flow {
          cartDao
             .getCartItemById(foodId.toLong())
             .map {

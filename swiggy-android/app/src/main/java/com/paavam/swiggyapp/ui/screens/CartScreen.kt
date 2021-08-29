@@ -42,7 +42,9 @@ import com.google.accompanist.insets.ProvideWindowInsets
 import com.google.accompanist.insets.navigationBarsPadding
 import com.google.accompanist.insets.systemBarsPadding
 import com.paavam.swiggyapp.R
+import com.paavam.swiggyapp.core.data.model.Food
 import com.paavam.swiggyapp.core.data.model.Restaurant
+import com.paavam.swiggyapp.core.ui.UiState
 import com.paavam.swiggyapp.ui.component.GrayDivider
 import com.paavam.swiggyapp.ui.component.image.ImageWithPlaceholder
 import com.paavam.swiggyapp.ui.component.listitem.CartFoodItem
@@ -79,24 +81,32 @@ fun CartScreen(
                 .systemBarsPadding(),
             color = Color.White
         ) {
+            val scope = rememberCoroutineScope()
+            val foods = viewModel.cartFoods.collectAsState(UiState.loading()).value
+
             Box(Modifier.fillMaxSize()) {
-                when (viewState.cartFoodList.isEmpty()) {
-                    true -> NoItemsInCart(navController, outerPaddingValues)
-                    else -> ShowItemsInCart(
-                        viewState,
-                        scrollState
-                    )
+                when (foods) {
+                    is UiState.Success -> {
+                        ShowItemsInCart(
+                            foods.data,
+                            viewModel.state.value,
+                            scrollState
+                        )
+                        CartTopAppBar(
+                            viewModel = viewModel,
+                            foods.data,
+                            onBackClick = { navController.navigate(NavScreen.Home.route) },
+                            modifier = Modifier
+                                .graphicsLayer {
+                                    alpha = min(1f, 1 + (position / 45f))
+                                    translationY = (position)
+                                }
+                                .navigationBarsPadding(bottom = false)
+                        )
+                    }
+                    is UiState.Failed -> println("--->" + foods.message)
+                    is UiState.Loading -> NoItemsInCart(navController, outerPaddingValues)
                 }
-                CartTopAppBar(
-                    viewModel = viewModel,
-                    onBackClick = { navController.navigate(NavScreen.Home.route) },
-                    modifier = Modifier
-                        .graphicsLayer {
-                            alpha = min(1f, 1 + (position / 45f))
-                            translationY = (position)
-                        }
-                        .navigationBarsPadding(bottom = false)
-                )
             }
         }
     }
@@ -105,6 +115,7 @@ fun CartScreen(
 @Composable
 fun CartTopAppBar(
     viewModel: CartViewModel,
+    foods: List<Food>,
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -135,7 +146,7 @@ fun CartTopAppBar(
                                 Text(
                                     text = if (r.isShopClosed) "Closed for delivery"
                                     else
-                                        "${viewState.value.cartFoodList.sumOf { it.quantityInCart }} items, To pay: ₹${viewState.value.totalAmount?.roundToInt()}",
+                                        "${foods.sumOf { it.quantityInCart }} items, To pay: ₹${viewState.value.totalAmount?.roundToInt()}",
                                     fontSize = 12.sp,
                                     maxLines = 1,
                                     overflow = TextOverflow.Ellipsis,
@@ -171,6 +182,7 @@ fun CartTopAppBar(
 @ExperimentalFoundationApi
 @Composable
 fun ShowItemsInCart(
+    foods: List<Food>,
     viewState: CartViewState,
     scrollState: LazyListState,
     modifier: Modifier = Modifier
@@ -187,7 +199,7 @@ fun ShowItemsInCart(
             Spacer(modifier = Modifier.height(20.dp))
         }
 
-        items(items = viewState.cartFoodList) {
+        items(items = foods) {
             CartFoodItem(
                 food = it,
                 modifier = Modifier
@@ -552,7 +564,7 @@ fun BasicRestaurantDetails(mainRestaurant: Restaurant, modifier: Modifier = Modi
     ) {
         mainRestaurant.imageUrl?.let {
             ImageWithPlaceholder(
-                imageUrl= it,
+                imageUrl = it,
                 contentScale = ContentScale.FillWidth,
                 modifier = Modifier
                     .size(60.dp, 60.dp)

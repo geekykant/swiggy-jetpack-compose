@@ -30,9 +30,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.paavam.swiggyapp.R
+import com.paavam.swiggyapp.core.data.model.AddressType
 import com.paavam.swiggyapp.core.data.model.HelloBar
 import com.paavam.swiggyapp.core.data.model.QuickTile
-import com.paavam.swiggyapp.core.data.model.AddressType
 import com.paavam.swiggyapp.lib.LazyHorizontalGrid
 import com.paavam.swiggyapp.lib.items
 import com.paavam.swiggyapp.ui.RestaurantActivity
@@ -222,8 +222,6 @@ fun TopHelloBar(contentList: List<HelloBar>, modifier: Modifier = Modifier) {
 fun HomeTopAppBar(isScrollStateChanged: Boolean, modifier: Modifier = Modifier) {
     val viewModel: SwiggyViewModel = hiltViewModel()
     val addressState = viewModel.defaultAddress.collectAsState()
-
-    println("Changed to ${addressState.value}")
 
     val address = addressState.value
 

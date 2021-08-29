@@ -6,26 +6,31 @@ import com.paavam.swiggyapp.data.remote.model.response.CartResponse
 import com.paavam.swiggyapp.data.remote.model.response.State
 import retrofit2.Response
 import retrofit2.http.POST
+import javax.inject.Inject
 
-interface SwiggyCartService {
+class SwiggyCartService @Inject constructor() {
 
-    @POST("")
     suspend fun fetchUsersCartFoods(): Response<CartResponse<List<Food>>> =
         Response.success(CartResponse(State.SUCCESS, "Success", PreviewData.prepareCartFoods()))
 
     @POST("")
-    suspend fun fetchUsersCartFoodById(foodId: String): Response<CartResponse<Food>>
+    suspend fun fetchUsersCartFoodById(foodId: String): Response<CartResponse<Food>> =
+        Response.success(CartResponse(State.SUCCESS, "Success", PreviewData.prepareCartFoods()[0]))
 
     @POST("")
-    suspend fun addUsersCartFood(food: Food): Response<CartResponse<String>>
+    suspend fun addUsersCartFood(food: Food): Response<CartResponse<String>> =
+        Response.success(CartResponse(State.SUCCESS, "Success", " "))
 
     @POST("")
-    suspend fun updateUsersCartFood(foodId: Long, food: Food): Response<CartResponse<String>>
+    suspend fun updateUsersCartFood(foodId: Long, food: Food): Response<CartResponse<String>> =
+        Response.success(CartResponse(State.SUCCESS, "Success", " "))
 
     @POST("")
-    suspend fun addUsersCartFoods(foods: List<Food>): Response<CartResponse<String>>
+    suspend fun addUsersCartFoods(foods: List<Food>): Response<CartResponse<String>> =
+        Response.success(CartResponse(State.SUCCESS, "Success", " "))
 
     @POST("")
-    suspend fun deleteCartItem(foodId: Long): Response<CartResponse<String>>
+    suspend fun deleteCartItem(foodId: Long): Response<CartResponse<String>> =
+        Response.success(CartResponse(State.SUCCESS, "Success", " "))
 
 }
