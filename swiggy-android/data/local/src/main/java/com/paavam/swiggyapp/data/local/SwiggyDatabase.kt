@@ -4,16 +4,18 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import com.paavam.swiggyapp.data.local.dao.CartDao
 import com.paavam.swiggyapp.data.local.dao.UserAddressDao
+import com.paavam.swiggyapp.data.local.entity.CartEntity
 import com.paavam.swiggyapp.data.local.entity.UserAddressEntity
 
 @Database(
-    entities = [UserAddressEntity::class],
+    entities = [UserAddressEntity::class, CartEntity::class],
     version = 1
 )
 abstract class SwiggyDatabase : RoomDatabase() {
 
-    //    abstract fun getFoodCartDao(): FoodCartDao
+    abstract fun getFoodCartDao(): CartDao
     abstract fun getUserAddressDao(): UserAddressDao
 
     companion object {

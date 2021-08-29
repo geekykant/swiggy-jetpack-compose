@@ -17,8 +17,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.paavam.swiggyapp.R
-import com.paavam.swiggyapp.core.data.food.model.Food
-import com.paavam.swiggyapp.core.data.food.model.FoodType
+import com.paavam.swiggyapp.core.data.model.Food
+import com.paavam.swiggyapp.core.data.model.FoodType
 import com.paavam.swiggyapp.ui.component.AddToCartComposable
 import com.paavam.swiggyapp.ui.component.image.ImageWithPlaceholder
 import com.paavam.swiggyapp.ui.theme.Typography

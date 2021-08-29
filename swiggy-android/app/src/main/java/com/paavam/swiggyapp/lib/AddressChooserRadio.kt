@@ -24,8 +24,8 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.paavam.swiggyapp.core.data.user.model.AddressType
-import com.paavam.swiggyapp.core.data.user.model.UserAddress
+import com.paavam.swiggyapp.core.data.model.AddressType
+import com.paavam.swiggyapp.core.data.model.UserAddress
 import com.paavam.swiggyapp.ui.theme.Typography
 
 @Composable

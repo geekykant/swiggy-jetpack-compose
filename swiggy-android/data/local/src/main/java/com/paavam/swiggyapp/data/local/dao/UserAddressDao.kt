@@ -1,8 +1,8 @@
 package com.paavam.swiggyapp.data.local.dao
 
 import androidx.room.Dao
-import androidx.room.Delete
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.paavam.swiggyapp.data.local.entity.UserAddressEntity
 import kotlinx.coroutines.flow.Flow
@@ -19,12 +19,12 @@ abstract class UserAddressDao {
     @Insert
     abstract fun addAddress(userAddress: UserAddressEntity)
 
-    @Delete
+    @Query("DELETE FROM userAddress WHERE address_id = :addressId")
     abstract fun deleteAddressById(addressId: Int)
 
     @Query("DELETE FROM UserAddress")
     abstract fun deleteAllAddresses()
 
-    @Query("DELETE FROM UserAddress")
-    abstract fun updateAddressById(addressId: String, userAddress: UserAddressEntity)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    abstract fun updateAddressById(userAddress: UserAddressEntity)
 }

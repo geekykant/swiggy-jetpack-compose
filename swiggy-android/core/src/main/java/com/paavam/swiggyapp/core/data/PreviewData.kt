@@ -1,18 +1,18 @@
 package com.paavam.swiggyapp.core.data
 
-import com.paavam.swiggyapp.core.data.cuisine.model.Cuisine
-import com.paavam.swiggyapp.core.data.food.model.Food
-import com.paavam.swiggyapp.core.data.food.model.FoodType
-import com.paavam.swiggyapp.core.data.props.model.HelloBar
-import com.paavam.swiggyapp.core.data.props.model.QuickTile
+import com.paavam.swiggyapp.core.data.model.Food
+import com.paavam.swiggyapp.core.data.model.FoodType
+import com.paavam.swiggyapp.core.data.model.Cuisine
+import com.paavam.swiggyapp.core.data.model.HelloBar
+import com.paavam.swiggyapp.core.data.model.QuickTile
 import com.paavam.swiggyapp.core.data.offer.model.Offer
 import com.paavam.swiggyapp.core.data.offer.model.OfferSnackType
-import com.paavam.swiggyapp.core.data.restaurant.model.MainSectionFoods
-import com.paavam.swiggyapp.core.data.restaurant.model.Restaurant
-import com.paavam.swiggyapp.core.data.restaurant.model.RestaurantFoodModel
-import com.paavam.swiggyapp.core.data.restaurant.model.SubSectionsFoods
-import com.paavam.swiggyapp.core.data.user.model.AddressType
-import com.paavam.swiggyapp.core.data.user.model.UserAddress
+import com.paavam.swiggyapp.core.data.model.MainSectionFoods
+import com.paavam.swiggyapp.core.data.model.Restaurant
+import com.paavam.swiggyapp.core.data.model.RestaurantFoodModel
+import com.paavam.swiggyapp.core.data.model.SubSectionsFoods
+import com.paavam.swiggyapp.core.data.model.AddressType
+import com.paavam.swiggyapp.core.data.model.UserAddress
 
 
 object PreviewData {
@@ -270,4 +270,12 @@ object PreviewData {
             )
         )
     }
+
+
+    fun prepareSearchCuisines() = listOf(
+        Cuisine("Biriyani", "https://res.cloudinary.com/swiggy/image/upload/fl_lossy,f_auto,w_200,h_200,c_fill/r_max/oywmb7ianhtutwcgnieg.png"),
+        Cuisine("Pizzas", "https://res.cloudinary.com/paavam/image/upload/fl_lossy,f_auto,w_200,h_200,c_fill/r_max/b592fde4c60335141c86c5bd1756b7fd_l6gpcz.png"),
+        Cuisine("Cakes & Desserts", "https://res.cloudinary.com/paavam/image/upload/fl_lossy,f_auto,w_200,h_200,c_fill/r_max/cakes_desserts_kj7nzw.png"),
+        Cuisine("North Indian", "https://res.cloudinary.com/paavam/image/upload/fl_lossy,f_auto,w_200,h_200,c_fill/r_max/pngwing.com_soubv1.png"),
+    )
 }

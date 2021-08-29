@@ -1,6 +1,6 @@
 package com.paavam.swiggyapp.repository.mapper
 
-import com.paavam.swiggyapp.core.data.user.model.UserAddress
+import com.paavam.swiggyapp.core.data.model.UserAddress
 import com.paavam.swiggyapp.data.remote.model.request.UserAddressRequest
 
 object UserAddressMapper {

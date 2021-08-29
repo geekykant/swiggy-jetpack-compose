@@ -8,7 +8,7 @@ dependencyResolutionManagement {
 rootProject.name = "swiggy"
 include ':app'
 include ':data'
-//include ':data:local'
+include ':data:local'
 include ':data:remote'
 include ':core'
 include ':repository'

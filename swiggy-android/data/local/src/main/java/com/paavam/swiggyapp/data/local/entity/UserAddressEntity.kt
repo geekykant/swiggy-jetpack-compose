@@ -12,7 +12,7 @@ data class UserAddressEntity(
     val fullAddress: String,
 
     @ColumnInfo(name = "address_type")
-    val type: AddressType,
+    val type: EntityAddressType,
 
     @ColumnInfo(name = "friendly_label")
     val friendlyLabel: String,
@@ -21,6 +21,6 @@ data class UserAddressEntity(
     val landmark: String? = null
 )
 
-enum class AddressType {
+enum class EntityAddressType {
     HOME, OTHER
 }

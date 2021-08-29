@@ -13,7 +13,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.paavam.swiggyapp.core.data.cuisine.model.Cuisine
+import com.paavam.swiggyapp.core.data.model.Cuisine
 import com.paavam.swiggyapp.ui.component.image.ImageWithPlaceholder
 
 @Composable

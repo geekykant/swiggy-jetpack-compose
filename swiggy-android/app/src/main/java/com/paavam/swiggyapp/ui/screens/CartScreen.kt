@@ -42,7 +42,7 @@ import com.google.accompanist.insets.ProvideWindowInsets
 import com.google.accompanist.insets.navigationBarsPadding
 import com.google.accompanist.insets.systemBarsPadding
 import com.paavam.swiggyapp.R
-import com.paavam.swiggyapp.core.data.restaurant.model.Restaurant
+import com.paavam.swiggyapp.core.data.model.Restaurant
 import com.paavam.swiggyapp.ui.component.GrayDivider
 import com.paavam.swiggyapp.ui.component.image.ImageWithPlaceholder
 import com.paavam.swiggyapp.ui.component.listitem.CartFoodItem

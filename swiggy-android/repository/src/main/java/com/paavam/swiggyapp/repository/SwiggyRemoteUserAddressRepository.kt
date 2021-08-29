@@ -1,8 +1,8 @@
 package com.paavam.swiggyapp.repository
 
 import com.paavam.swiggyapp.core.ResponseResult
-import com.paavam.swiggyapp.core.data.user.model.UserAddress
-import com.paavam.swiggyapp.core.data.user.repository.SwiggyUserAddressRepository
+import com.paavam.swiggyapp.core.data.model.UserAddress
+import com.paavam.swiggyapp.core.data.repository.SwiggyUserAddressRepository
 import com.paavam.swiggyapp.data.remote.api.SwiggyUserAddressService
 import com.paavam.swiggyapp.data.remote.model.response.State
 import com.paavam.swiggyapp.data.remote.util.getResponse
@@ -79,13 +79,12 @@ class SwiggyRemoteUserAddressRepository @Inject internal constructor(
     }
 
     override suspend fun updateAddressById(
-        addressId: String,
+        addressId: Int,
         userAddress: UserAddress
     ): ResponseResult<String> {
         return runCatching {
             val addressResponse =
                 userAddressService.updateAddressById(
-                    addressId.toInt(),
                     UserAddressMapper.mapUserAddressToRequest(userAddress)
                 ).getResponse()
             when (addressResponse.status) {

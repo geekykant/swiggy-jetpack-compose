@@ -3,9 +3,9 @@ package com.paavam.swiggyapp.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.paavam.swiggyapp.core.data.PreviewData
-import com.paavam.swiggyapp.core.data.food.model.Food
+import com.paavam.swiggyapp.core.data.model.Food
 import com.paavam.swiggyapp.core.data.offer.model.Offer
-import com.paavam.swiggyapp.core.data.restaurant.model.Restaurant
+import com.paavam.swiggyapp.core.data.model.Restaurant
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

@@ -34,12 +34,12 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.paavam.swiggyapp.core.data.PreviewData
 import com.paavam.swiggyapp.R
-import com.paavam.swiggyapp.core.data.food.model.Food
-import com.paavam.swiggyapp.core.data.props.model.HelloBar
+import com.paavam.swiggyapp.core.data.model.Food
+import com.paavam.swiggyapp.core.data.model.HelloBar
 import com.paavam.swiggyapp.core.data.offer.model.Offer
-import com.paavam.swiggyapp.core.data.restaurant.model.MainSectionFoods
-import com.paavam.swiggyapp.core.data.restaurant.model.Restaurant
-import com.paavam.swiggyapp.core.data.restaurant.model.SubSectionsFoods
+import com.paavam.swiggyapp.core.data.model.MainSectionFoods
+import com.paavam.swiggyapp.core.data.model.Restaurant
+import com.paavam.swiggyapp.core.data.model.SubSectionsFoods
 import com.paavam.swiggyapp.ui.component.DashedDivider
 import com.paavam.swiggyapp.ui.component.FooterLicenseInfo
 import com.paavam.swiggyapp.ui.component.GrayDivider

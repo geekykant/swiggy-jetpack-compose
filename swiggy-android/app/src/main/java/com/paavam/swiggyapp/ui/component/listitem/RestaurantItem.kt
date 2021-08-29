@@ -22,7 +22,7 @@ import androidx.compose.ui.unit.dp
 import com.paavam.swiggyapp.R
 import com.paavam.swiggyapp.core.data.PreviewData
 import com.paavam.swiggyapp.core.data.offer.model.OfferSnackType
-import com.paavam.swiggyapp.core.data.restaurant.model.Restaurant
+import com.paavam.swiggyapp.core.data.model.Restaurant
 import com.paavam.swiggyapp.ui.component.BasicOfferSnackComposable
 import com.paavam.swiggyapp.ui.component.FlatDealOfferSnackComposable
 import com.paavam.swiggyapp.ui.component.image.ImageWithPlaceholder

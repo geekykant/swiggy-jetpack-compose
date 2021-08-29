@@ -1,9 +1,9 @@
 package com.paavam.swiggyapp.repository
 
 import com.paavam.swiggyapp.core.ResponseResult
-import com.paavam.swiggyapp.core.data.restaurant.model.Restaurant
-import com.paavam.swiggyapp.core.data.restaurant.model.RestaurantFoodModel
-import com.paavam.swiggyapp.core.data.restaurant.repository.SwiggyRestaurantRepository
+import com.paavam.swiggyapp.core.data.model.Restaurant
+import com.paavam.swiggyapp.core.data.model.RestaurantFoodModel
+import com.paavam.swiggyapp.core.data.repository.SwiggyRestaurantRepository
 import com.paavam.swiggyapp.data.remote.api.SwiggyRestaurantService
 import com.paavam.swiggyapp.data.remote.model.response.State
 import com.paavam.swiggyapp.data.remote.util.getResponse

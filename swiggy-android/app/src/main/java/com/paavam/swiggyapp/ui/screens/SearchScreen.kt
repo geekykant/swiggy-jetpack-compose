@@ -21,7 +21,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.paavam.swiggyapp.core.data.PreviewData
-import com.paavam.swiggyapp.core.data.cuisine.model.prepareSearchCuisines
 import com.paavam.swiggyapp.ui.component.listitem.CuisineItem
 import com.paavam.swiggyapp.ui.component.listitem.RecentSearchItem
 import com.paavam.swiggyapp.ui.component.text.SectionHeading
@@ -73,7 +72,7 @@ fun SearchScreen(
                 showSeeAllText = false,
             )
 
-            val searchCuisinesList = prepareSearchCuisines()
+            val searchCuisinesList = PreviewData.prepareSearchCuisines()
             Row(
                 modifier = Modifier
                     .fillMaxWidth()

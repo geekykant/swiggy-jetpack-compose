@@ -1,19 +1,22 @@
 package com.paavam.swiggyapp.core.task
 
-import com.paavam.swiggyapp.core.SwiggyAddressTask
+import com.paavam.swiggyapp.core.SwiggyCartTask
+import kotlinx.coroutines.flow.Flow
 import java.util.*
 import javax.inject.Singleton
 
 @Singleton
 interface SwiggyTaskManager {
 
-    fun syncNotes(): UUID
+    fun syncCart(): UUID
 
-    fun scheduleAddressTask(swiggyAddressTask: SwiggyAddressTask): UUID
+    fun scheduleTask(swiggyCartTask: SwiggyCartTask): UUID
 
-    fun getTaskState(taskId: UUID): UUID
+    fun getTaskState(taskId: Long): TaskState?
 
-    fun observeTask(taskId: UUID): UUID
+    fun observeTask(taskId: Long): Flow<TaskState>
 
     fun abortAllTasks()
+
+    fun getTaskIdFromCartItemId(cartItemId: Long) = cartItemId
 }

@@ -1,8 +1,8 @@
 package com.paavam.swiggyapp.data.remote.api
 
 import com.paavam.swiggyapp.core.data.PreviewData
-import com.paavam.swiggyapp.core.data.props.model.HelloBar
-import com.paavam.swiggyapp.core.data.props.model.QuickTile
+import com.paavam.swiggyapp.core.data.model.HelloBar
+import com.paavam.swiggyapp.core.data.model.QuickTile
 import com.paavam.swiggyapp.data.remote.model.response.PropsResponse
 import com.paavam.swiggyapp.data.remote.model.response.State
 import retrofit2.Response

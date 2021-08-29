@@ -3,10 +3,10 @@ package com.paavam.swiggyapp.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.paavam.swiggyapp.core.data.PreviewData
-import com.paavam.swiggyapp.core.data.cuisine.model.Cuisine
-import com.paavam.swiggyapp.core.data.props.model.HelloBar
-import com.paavam.swiggyapp.core.data.props.model.QuickTile
-import com.paavam.swiggyapp.core.data.restaurant.model.Restaurant
+import com.paavam.swiggyapp.core.data.model.Cuisine
+import com.paavam.swiggyapp.core.data.model.HelloBar
+import com.paavam.swiggyapp.core.data.model.QuickTile
+import com.paavam.swiggyapp.core.data.model.Restaurant
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow

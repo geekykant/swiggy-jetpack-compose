@@ -1,6 +1,6 @@
 package com.paavam.swiggyapp.data.remote.api
 
-import com.paavam.swiggyapp.core.data.user.model.UserAddress
+import com.paavam.swiggyapp.core.data.model.UserAddress
 import com.paavam.swiggyapp.data.remote.model.request.UserAddressRequest
 import com.paavam.swiggyapp.data.remote.model.response.UserAddressResponse
 import retrofit2.Response
@@ -25,7 +25,6 @@ interface SwiggyUserAddressService {
 
     @GET("")
     suspend fun updateAddressById(
-        addressId: Int,
         userAddress: UserAddressRequest
     ): Response<UserAddressResponse<UserAddress>>
 

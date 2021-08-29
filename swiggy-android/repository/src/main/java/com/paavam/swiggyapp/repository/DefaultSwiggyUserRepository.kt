@@ -1,9 +1,9 @@
 package com.paavam.swiggyapp.repository
 
 import com.paavam.swiggyapp.core.ResponseResult
-import com.paavam.swiggyapp.core.data.user.model.AuthCredential
-import com.paavam.swiggyapp.core.data.user.model.AuthUser
-import com.paavam.swiggyapp.core.data.user.repository.SwiggyUserRepository
+import com.paavam.swiggyapp.core.data.model.AuthCredential
+import com.paavam.swiggyapp.core.data.model.AuthUser
+import com.paavam.swiggyapp.core.data.repository.SwiggyUserRepository
 import com.paavam.swiggyapp.data.remote.api.SwiggyAuthService
 import com.paavam.swiggyapp.data.remote.model.response.State
 import com.paavam.swiggyapp.data.remote.util.getResponse

@@ -1,8 +1,8 @@
 package com.paavam.swiggyapp.repository
 
 import com.paavam.swiggyapp.core.ResponseResult
-import com.paavam.swiggyapp.core.data.cuisine.model.Cuisine
-import com.paavam.swiggyapp.core.data.cuisine.repository.SwiggyCuisineRepository
+import com.paavam.swiggyapp.core.data.model.Cuisine
+import com.paavam.swiggyapp.core.data.repository.SwiggyCuisineRepository
 import com.paavam.swiggyapp.data.remote.api.SwiggyCuisineService
 import com.paavam.swiggyapp.data.remote.model.response.State
 import com.paavam.swiggyapp.data.remote.util.getResponse

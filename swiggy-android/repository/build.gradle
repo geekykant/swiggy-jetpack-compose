@@ -33,8 +33,8 @@ android {
 
 dependencies {
     implementation project(path: ':core')
-    implementation project(path: ':data:remote')
-//    implementation project(path: ':data:local')
+    api project(path: ':data:remote')
+    api project(path: ':data:local')
 
     // JavaX Inject
     implementation "javax.inject:javax.inject:1"
