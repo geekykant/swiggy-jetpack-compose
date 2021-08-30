@@ -7,6 +7,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
@@ -17,12 +18,16 @@ import com.paavam.swiggyapp.core.data.model.Food
 import com.paavam.swiggyapp.core.data.model.FoodType
 import com.paavam.swiggyapp.ui.component.AddToCartComposable
 import com.paavam.swiggyapp.ui.theme.Typography
+import com.paavam.swiggyapp.ui.utils.addShimmer
 
 @Composable
-fun CartFoodItem(food: Food, modifier: Modifier = Modifier) {
+fun CartFoodItem(
+    food: Food,
+    isLoading: Boolean = false,
+    modifier: Modifier = Modifier
+) {
     Row(
-        modifier = modifier
-            .fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Icon(
@@ -31,7 +36,8 @@ fun CartFoodItem(food: Food, modifier: Modifier = Modifier) {
             tint = when (food.foodType) {
                 FoodType.VEG -> Color(0xFF008000)
                 FoodType.NON_VEG -> Color(0xFF008000)
-            }
+            },
+            modifier = Modifier.alpha(if (isLoading) 0f else 1f)
         )
 
         Column {
@@ -41,16 +47,25 @@ fun CartFoodItem(food: Food, modifier: Modifier = Modifier) {
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier
+                    .defaultMinSize(minWidth = 40.dp, minHeight = 2.dp)
                     .fillMaxWidth(0.45f)
+                    .addShimmer(isLoading)
             )
 
             Text(
                 "Pan Pizza",
-                modifier = Modifier.padding(vertical = 5.dp)
+                modifier = Modifier
+                    .padding(vertical = 5.dp)
+                    .defaultMinSize(minWidth = 20.dp, minHeight = 2.dp)
+                    .addShimmer(isLoading)
             )
 
-            Row {
-                Text("CUSTOMIZE")
+            Row(
+                modifier = Modifier.alpha(if (isLoading) 0f else 1f)
+            ) {
+                Text(
+                    "CUSTOMIZE",
+                )
                 Icon(
                     painterResource(id = R.drawable.ic_expand),
                     null,
@@ -61,16 +76,16 @@ fun CartFoodItem(food: Food, modifier: Modifier = Modifier) {
                     tint = MaterialTheme.colors.primary
                 )
             }
-
         }
 
-        if (food.quantityInCart != 0) {
+        if (food.quantityInCart != 0 || isLoading) {
             AddToCartComposable(
-                cartQuantity = food.quantityInCart,
+                cartQuantity = if (isLoading) 0 else food.quantityInCart,
                 onQuantityChange = {
                     food.quantityInCart = it
                 },
-                modifier = Modifier.padding(horizontal = 2.dp)
+                modifier = Modifier.padding(horizontal = 2.dp),
+                isLoading = isLoading
             )
         }
         Text(
@@ -78,7 +93,9 @@ fun CartFoodItem(food: Food, modifier: Modifier = Modifier) {
             style = Typography.h3,
             modifier = Modifier
                 .fillMaxWidth(0.6f)
-                .padding(top = 5.dp),
+                .padding(top = 5.dp)
+                .defaultMinSize(minWidth = 15.dp, minHeight = 2.dp)
+                .addShimmer(isLoading),
             textAlign = TextAlign.Right
         )
     }

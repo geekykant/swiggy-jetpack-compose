@@ -1,5 +1,7 @@
 package com.paavam.swiggyapp.viewmodel
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.paavam.swiggyapp.core.ResponseResult
@@ -11,6 +13,7 @@ import com.paavam.swiggyapp.core.data.repository.SwiggyCartRepository
 import com.paavam.swiggyapp.core.ui.UiState
 import com.paavam.swiggyapp.di.RemoteRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -23,7 +26,13 @@ class CartViewModel @Inject constructor(
     private val _state = MutableStateFlow(CartViewState())
     val state: StateFlow<CartViewState> get() = _state
 
-    private val refreshing = MutableStateFlow(false)
+
+    private val _userMessageToRestaurant = MutableLiveData("")
+    val userMessageToRestaurant: LiveData<String> = _userMessageToRestaurant
+
+    fun onUserMessageToRestaurantChange(newText: String) {
+        _userMessageToRestaurant.value = newText
+    }
 
     val cartFoods: SharedFlow<UiState<List<Food>>> = cartRepository
         .fetchUsersCartFoods()
@@ -32,8 +41,12 @@ class CartViewModel @Inject constructor(
                 is ResponseResult.Success -> UiState.success(result.data)
                 is ResponseResult.Error -> UiState.failed(result.message)
             }
-        }.onStart { emit(UiState.loading()) }
+        }.onStart {
+            emit(UiState.loading())
+            delay(800)
+        }
         .shareIn(viewModelScope, SharingStarted.WhileSubscribed())
+
 
     init {
         prepareCartData()
@@ -41,19 +54,12 @@ class CartViewModel @Inject constructor(
 
     private fun prepareCartData() {
         viewModelScope.launch {
-//            val foods = when (val foodList = cartRepository.fetchUsersCartFoods()) {
-//                is ResponseResult.Success -> foodList.data
-//                is ResponseResult.Error -> throw Exception(foodList.message) /* Throw error message */
-//            }
-
-//            val foods = PreviewData.prepareCartFoods()
-
             val cartAmount = CartAmount(982.00f, 35.00f, 0, 25f)
 
             _state.value = CartViewState(
-//                cartFoodList = foods,
+//                cartFoodList = cartFoods,
                 mainRestaurant = PreviewData.prepareARestaurant(),
-                refreshing = refreshing.value,
+//                refreshing = refreshing.value,
                 totalAmount = cartAmount.toPayTotal()
             )
         }

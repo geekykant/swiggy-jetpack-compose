@@ -58,6 +58,18 @@ fun Modifier.addShimmer(visible: Boolean) = composed {
     placeholder(
         visible = visible,
         highlight = PlaceholderHighlight.shimmer(),
-        color = Color(0x66DDDDDD)
+        color = Color(0x40DDDDDD)
     )
+}
+
+fun Modifier.addTopBarBottomLine() = composed {
+    drawWithContent {
+        drawContent()
+        drawLine(
+            color = Color(0x14000000),
+            start = Offset(0f, this.size.height),
+            end = Offset(this.size.width, this.size.height),
+            strokeWidth = 3f,
+        )
+    }
 }

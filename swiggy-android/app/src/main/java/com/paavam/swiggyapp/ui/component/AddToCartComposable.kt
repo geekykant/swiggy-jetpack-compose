@@ -13,6 +13,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
@@ -28,6 +29,7 @@ import com.paavam.swiggyapp.ui.theme.Typography
 fun AddToCartComposable(
     cartQuantity: Int,
     onQuantityChange: (Int) -> Unit,
+    isLoading: Boolean = false,
     modifier: Modifier = Modifier
 ) {
     val roundShape = RoundedCornerShape(3.dp)
@@ -36,13 +38,14 @@ fun AddToCartComposable(
     val fontWeight = FontWeight.ExtraBold
     val borderColor = Color(0x1A000000)
 
-    if (cartQuantity > 0) {
+    if (cartQuantity > 0 || isLoading) {
         Row(
             modifier = modifier
                 .clip(roundShape)
                 .shadow(8.dp, roundShape)
                 .background(backgroundColor, roundShape)
-                .border(1.dp, borderColor, shape = roundShape),
+                .border(1.dp, borderColor, shape = roundShape)
+                .alpha(if (isLoading) 0f else 1f),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
@@ -62,6 +65,7 @@ fun AddToCartComposable(
                 textAlign = TextAlign.Center,
                 modifier = Modifier
                     .defaultMinSize(minWidth = 35.dp)
+                    .alpha(if (isLoading) 0f else 1f)
             )
             Icon(
                 painter = painterResource(id = R.drawable.ic_add),
@@ -87,7 +91,7 @@ fun AddToCartComposable(
             color = greenColor,
             fontSize = 15.sp,
             fontWeight = fontWeight,
-            textAlign = TextAlign.Center
+            textAlign = TextAlign.Center,
         )
     }
 }
