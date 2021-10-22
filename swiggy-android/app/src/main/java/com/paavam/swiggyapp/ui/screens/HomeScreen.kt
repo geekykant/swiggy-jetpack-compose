@@ -36,6 +36,7 @@ import com.paavam.swiggyapp.core.data.model.QuickTile
 import com.paavam.swiggyapp.lib.LazyHorizontalGrid
 import com.paavam.swiggyapp.lib.items
 import com.paavam.swiggyapp.ui.RestaurantActivity
+import com.paavam.swiggyapp.ui.component.DoubleRowRectangleRestaurants
 import com.paavam.swiggyapp.ui.component.DoubleRowRestaurants
 import com.paavam.swiggyapp.ui.component.FooterStaticImage
 import com.paavam.swiggyapp.ui.component.HorizontalSliderUi
@@ -162,6 +163,20 @@ fun HomeScreen(
                     onRestaurantClick = {
                         context.startActivity(Intent(context, RestaurantActivity::class.java))
                     }
+                )
+            }
+
+            item {
+                SectionHeading(
+                    "Latest on the block!",
+                    null,
+                    R.drawable.ic_offers_filled,
+                    showSeeAllIcon = false,
+                    showSeeAllText = false
+                )
+                DoubleRowRectangleRestaurants(
+                    spotlightRestaurants = viewState.nearbyRestaurants,
+                    paddingValues = PaddingValues(horizontal = 15.dp)
                 )
             }
 

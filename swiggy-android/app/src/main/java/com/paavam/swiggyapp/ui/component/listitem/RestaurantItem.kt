@@ -19,10 +19,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.paavam.swiggyapp.R
 import com.paavam.swiggyapp.core.data.PreviewData
-import com.paavam.swiggyapp.core.data.offer.model.OfferSnackType
 import com.paavam.swiggyapp.core.data.model.Restaurant
+import com.paavam.swiggyapp.core.data.offer.model.OfferSnackType
 import com.paavam.swiggyapp.ui.component.BasicOfferSnackComposable
 import com.paavam.swiggyapp.ui.component.FlatDealOfferSnackComposable
 import com.paavam.swiggyapp.ui.component.image.ImageWithPlaceholder
@@ -117,7 +118,8 @@ fun RestaurantItem(
             Text(text = r.location, maxLines = 1)
             Row(
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 Icon(
                     painterResource(id = R.drawable.ic_rating),
@@ -162,6 +164,88 @@ fun RestaurantItem(
                 }
             }
 
+        }
+    }
+}
+
+@Composable
+fun RestaurantItemLarge(
+    r: Restaurant,
+    modifier: Modifier = Modifier,
+    onRestaurantClick: (r: Restaurant) -> Unit
+) {
+    val height = 100.dp
+    Column(
+        modifier = modifier
+            .clickable { onRestaurantClick(r) }
+            .padding(horizontal = 0.dp, vertical = 5.dp)
+    ) {
+        Box(
+            modifier = Modifier
+                .padding(horizontal = 2.dp, vertical = 0.dp)
+                .fillMaxWidth()
+                .sizeIn(maxHeight = height)
+        ) {
+            r.imageUrl?.let {
+                ImageWithPlaceholder(
+                    imageUrl = it,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .clip(RoundedCornerShape(5.dp))
+                    //TODO: if swiggymodel shows closed -> colorFilter = if (r.isShopClosed) UiUtils.shopClosedBlackFilter else null,
+                )
+            }
+
+            val snackModifier = Modifier
+                .align(Alignment.BottomStart)
+                .padding(bottom = 5.dp)
+            r.getMaxOffer()?.run {
+                BasicOfferSnackComposable(
+                    message = r.getMaxOfferSnackMessage(),
+                    invert = true,
+                    textSize = 13.sp,
+                    modifier = snackModifier
+                )
+            }
+        }
+
+        Column(
+            modifier = Modifier
+                .padding(top = 3.dp)
+                .fillMaxHeight(),
+            verticalArrangement = Arrangement.SpaceEvenly
+        ) {
+            Text(
+                text = r.name,
+                style = Typography.h2,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    painterResource(id = R.drawable.ic_rating),
+                    contentDescription = null,
+                    tint = Color.DarkGray,
+                    modifier = Modifier.padding(end = 2.dp)
+                )
+                Text(
+                    text = r.rating.toString(),
+                    modifier = Modifier.padding(horizontal = 3.dp, vertical = 0.dp)
+                )
+                Text(
+                    text = ".",
+                    modifier = Modifier.padding(horizontal = 3.dp, vertical = 0.dp)
+                )
+                Text(
+                    text = "41 mins",
+                    modifier = Modifier.padding(horizontal = 3.dp, vertical = 0.dp)
+                )
+            }
         }
     }
 }

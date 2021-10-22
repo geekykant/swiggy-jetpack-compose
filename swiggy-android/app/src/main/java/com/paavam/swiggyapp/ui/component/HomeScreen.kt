@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.paavam.swiggyapp.ui.theme.Typography
@@ -40,6 +41,7 @@ fun BasicOfferSnackComposable(
     message: String,
     invert: Boolean,
     onClick: () -> Unit = {},
+    textSize: TextUnit = 15.sp,
     modifier: Modifier
 ) {
     val roundShape = RoundedCornerShape(5.dp)
@@ -66,7 +68,7 @@ fun BasicOfferSnackComposable(
             .border(1.dp, borderColor, shape = roundShape)
             .padding(horizontal = 10.dp, vertical = 3.dp),
         color = textColor,
-        fontSize = 15.sp,
+        fontSize = textSize,
         fontWeight = fontWeight
     )
 }

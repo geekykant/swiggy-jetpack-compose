@@ -3,10 +3,7 @@ package com.paavam.swiggyapp.ui
 import android.app.Activity
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -32,14 +29,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.paavam.swiggyapp.core.data.PreviewData
 import com.paavam.swiggyapp.R
-import com.paavam.swiggyapp.core.data.model.Food
-import com.paavam.swiggyapp.core.data.model.HelloBar
+import com.paavam.swiggyapp.core.data.PreviewData
+import com.paavam.swiggyapp.core.data.model.*
 import com.paavam.swiggyapp.core.data.offer.model.Offer
-import com.paavam.swiggyapp.core.data.model.MainSectionFoods
-import com.paavam.swiggyapp.core.data.model.Restaurant
-import com.paavam.swiggyapp.core.data.model.SubSectionsFoods
 import com.paavam.swiggyapp.ui.component.DashedDivider
 import com.paavam.swiggyapp.ui.component.FooterLicenseInfo
 import com.paavam.swiggyapp.ui.component.GrayDivider
@@ -522,45 +515,81 @@ fun ThreeSectionDetails(r: Restaurant) {
 @Composable
 fun PureVegComposable() {
     val isPureVeg = true
-    Row(
-        modifier = Modifier
-            .padding(horizontal = 15.dp, vertical = 10.dp)
-            .fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween
+    Column(
+        modifier = Modifier.padding(horizontal = 15.dp)
     ) {
         Row(
-            verticalAlignment = Alignment.CenterVertically
+            modifier = Modifier
+                .padding(vertical = 10.dp)
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            when (isPureVeg) {
-                true -> {
-                    Image(
-                        painter = painterResource(id = R.drawable.ic_pureveg),
-                        contentDescription = null
-                    )
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                when (isPureVeg) {
+                    true -> {
+                        Image(
+                            painter = painterResource(id = R.drawable.ic_pureveg),
+                            contentDescription = null
+                        )
+                    }
+                    else -> {
+                        var foodTypePreference by remember { mutableStateOf(false) }
+                        Switch(
+                            checked = foodTypePreference,
+                            onCheckedChange = {
+                                foodTypePreference = !foodTypePreference
+                            }
+                        )
+                    }
                 }
-                else -> {
-                    var foodTypePreference by remember { mutableStateOf(false) }
-                    Switch(
-                        checked = foodTypePreference,
-                        onCheckedChange = {
-                            foodTypePreference = !foodTypePreference
-                        }
+                Text(
+                    text = if (isPureVeg) "PURE VEG" else "VEG ONLY",
+                    style = Typography.h3,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(horizontal = 5.dp)
+                )
+            }
+            Image(
+                painter = painterResource(id = R.drawable.ic_best_safety),
+                contentDescription = null,
+                modifier = Modifier
+                    .width(85.dp)
+            )
+        }
+        if (isPureVeg) {
+            Spacer(modifier = Modifier.height(10.dp))
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .border(BorderStroke(1.dp, Color(0x1A000000)))
+                    .fillMaxWidth()
+                    .padding(10.dp)
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.ic_pureveg),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(42.dp)
+                        .padding(8.dp)
+                )
+                Column(
+                    modifier = Modifier.padding(horizontal = 8.dp)
+                ) {
+                    Text(
+                        text = "Showing only vegetarian options.",
+                        style = Typography.h5,
+                        fontWeight = FontWeight.SemiBold,
+
+                        )
+                    Spacer(modifier = Modifier.height(5.dp))
+                    Text(
+                        text = "Tap on the VEG ONLY button to turn off the setting",
                     )
                 }
             }
-            Text(
-                text = if (isPureVeg) "PURE VEG" else "VEG ONLY",
-                style = Typography.h3,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(horizontal = 5.dp)
-            )
         }
-        Image(
-            painter = painterResource(id = R.drawable.ic_best_safety),
-            contentDescription = null,
-            modifier = Modifier
-                .width(85.dp)
-        )
     }
 }
 
