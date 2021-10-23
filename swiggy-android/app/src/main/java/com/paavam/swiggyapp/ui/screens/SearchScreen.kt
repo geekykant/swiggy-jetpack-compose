@@ -31,15 +31,15 @@ import com.paavam.swiggyapp.viewmodel.SearchViewModel
 
 @Composable
 fun SearchScreen(
-    outerPaddingValues: PaddingValues,
+    outerPadding: PaddingValues,
     modifier: Modifier = Modifier,
     searchViewModel: SearchViewModel = viewModel()
 ) {
     LazyColumn(
         modifier = modifier
             .padding(
-                top = outerPaddingValues.calculateTopPadding(),
-                bottom = outerPaddingValues.calculateBottomPadding()
+                top = outerPadding.calculateTopPadding(),
+                bottom = outerPadding.calculateBottomPadding()
             )
             .fillMaxSize(),
         contentPadding = PaddingValues(vertical = 15.dp)

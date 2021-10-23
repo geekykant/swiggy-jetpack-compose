@@ -1,5 +1,6 @@
 package com.paavam.swiggyapp.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.paavam.swiggyapp.core.data.PreviewData
@@ -20,9 +21,16 @@ class SwiggyViewModel @Inject constructor(
     private val _askAddressModal = MutableStateFlow(true)
     val askAddressModal: StateFlow<Boolean> get() = _askAddressModal
 
-    private val _defaultAddress =
-        MutableStateFlow<UserAddress?>(PreviewData.prepareUsersAddresses()[0])
-    val defaultAddress: StateFlow<UserAddress?> get() = _defaultAddress
+//    private val _defaultAddress =
+//        MutableStateFlow<UserAddress?>(PreviewData.prepareUsersAddresses()[0])
+//    val defaultAddress: StateFlow<UserAddress?> get() = _defaultAddress
+
+    val defaultAddress: MutableStateFlow<UserAddress?> = MutableStateFlow(PreviewData.prepareUsersAddresses()[0])
+
+    override fun onCleared() {
+        super.onCleared()
+        Log.d("mohankumar", "cleared")
+    }
 
     init {
         fetchInitState()
@@ -47,7 +55,8 @@ class SwiggyViewModel @Inject constructor(
     }
 
     fun assignDefaultAddress(address: UserAddress?) {
-        _defaultAddress.value = address
+//        _defaultAddress.value = address
+        defaultAddress.value = address
     }
 
 }

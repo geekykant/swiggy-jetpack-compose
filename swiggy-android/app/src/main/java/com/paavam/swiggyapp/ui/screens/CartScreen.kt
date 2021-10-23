@@ -61,24 +61,24 @@ import kotlin.math.roundToInt
 @Composable
 fun CartScreen(
     navController: NavController,
-    outerPaddingValues: PaddingValues
+    outerPadding: PaddingValues
 ) {
     val viewModel: CartViewModel = hiltViewModel()
-    val foodsList = viewModel.cartFoods.collectAsState(UiState.loading()).value
+    val foodsListState = viewModel.cartFoods.collectAsState(UiState.loading()).value
 
     ProvideWindowInsets {
-        when (foodsList) {
+        when (foodsListState) {
             is UiState.Loading -> LoadingCartScreen()
             is UiState.Failed -> ErrorCartScreen(
-                outerPaddingValues = outerPaddingValues,
+                outerPaddingValues = outerPadding,
                 onRetryClick = {
                     /* Check for internet/error again */
                 })
             is UiState.Success -> SuccessCartScreen(
-                foodsList = foodsList.data,
+                foodsList = foodsListState.data,
                 viewModel = viewModel,
                 navController = navController,
-                outerPaddingValues = outerPaddingValues
+                outerPaddingValues = outerPadding
             )
         }
     }

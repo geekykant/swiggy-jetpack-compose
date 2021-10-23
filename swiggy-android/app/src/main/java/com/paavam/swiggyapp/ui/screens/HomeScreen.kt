@@ -1,6 +1,5 @@
 package com.paavam.swiggyapp.ui.screens
 
-import android.content.Intent
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -27,6 +26,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.paavam.swiggyapp.R
@@ -35,7 +35,6 @@ import com.paavam.swiggyapp.core.data.model.HelloBar
 import com.paavam.swiggyapp.core.data.model.QuickTile
 import com.paavam.swiggyapp.lib.LazyHorizontalGrid
 import com.paavam.swiggyapp.lib.items
-import com.paavam.swiggyapp.ui.RestaurantActivity
 import com.paavam.swiggyapp.ui.component.DoubleRowRectangleRestaurants
 import com.paavam.swiggyapp.ui.component.DoubleRowRestaurants
 import com.paavam.swiggyapp.ui.component.FooterStaticImage
@@ -47,6 +46,7 @@ import com.paavam.swiggyapp.ui.component.listitem.QuickTileItem
 import com.paavam.swiggyapp.ui.component.listitem.RestaurantItem
 import com.paavam.swiggyapp.ui.component.text.AnnouncementHeading
 import com.paavam.swiggyapp.ui.component.text.SectionHeading
+import com.paavam.swiggyapp.ui.navigation.MainNavScreen
 import com.paavam.swiggyapp.ui.theme.Typography
 import com.paavam.swiggyapp.viewmodel.HomeViewModel
 import com.paavam.swiggyapp.viewmodel.SwiggyViewModel
@@ -55,7 +55,9 @@ import kotlinx.coroutines.delay
 @ExperimentalFoundationApi
 @Composable
 fun MainContent(
-    outerPaddingValues: PaddingValues,
+    outerPadding: PaddingValues,
+    swiggyViewModel: SwiggyViewModel,
+    mainNavController: NavController
 ) {
     val scrollState = rememberLazyListState()
     var isScrollStateChanged by remember { mutableStateOf(false) }
@@ -63,10 +65,14 @@ fun MainContent(
     Scaffold(
         topBar = {
             isScrollStateChanged = scrollState.firstVisibleItemScrollOffset != 0
-            HomeTopAppBar(isScrollStateChanged)
+            HomeTopAppBar(
+                isScrollStateChanged,
+                swiggyViewModel,
+                mainNavController
+            )
         }
     ) {
-        HomeScreen(scrollState, outerPaddingValues)
+        HomeScreen(scrollState, outerPadding, mainNavController)
     }
 }
 
@@ -74,7 +80,8 @@ fun MainContent(
 @Composable
 fun HomeScreen(
     scrollState: LazyListState, // Higher level is invoked, and reflected throughout
-    outerPaddingValues: PaddingValues
+    outerPaddingValues: PaddingValues,
+    mainNavController: NavController
 ) {
     val viewModel: HomeViewModel = hiltViewModel()
     val viewState by viewModel.state.collectAsState()
@@ -161,7 +168,7 @@ fun HomeScreen(
                     it,
                     Modifier.fillMaxWidth(),
                     onRestaurantClick = {
-                        context.startActivity(Intent(context, RestaurantActivity::class.java))
+                        mainNavController.navigate(MainNavScreen.Restaurant.route + "/${it.restaurantId}")
                     }
                 )
             }
@@ -176,7 +183,9 @@ fun HomeScreen(
                 )
                 DoubleRowRectangleRestaurants(
                     spotlightRestaurants = viewState.nearbyRestaurants,
-                    paddingValues = PaddingValues(horizontal = 15.dp)
+                    paddingValues = PaddingValues(horizontal = 15.dp),
+                    modifier = Modifier.fillParentMaxWidth(0.45f),
+                    mainNavController = mainNavController
                 )
             }
 
@@ -190,7 +199,10 @@ fun HomeScreen(
 
                     }
                 )
-                DoubleRowRestaurants(spotlightRestaurants = viewState.nearbyRestaurants)
+                DoubleRowRestaurants(
+                    spotlightRestaurants = viewState.nearbyRestaurants,
+                    mainNavController = mainNavController
+                )
             }
 
             item {
@@ -234,10 +246,14 @@ fun TopHelloBar(contentList: List<HelloBar>, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun HomeTopAppBar(isScrollStateChanged: Boolean, modifier: Modifier = Modifier) {
-    val viewModel: SwiggyViewModel = hiltViewModel()
+fun HomeTopAppBar(
+    isScrollStateChanged: Boolean,
+    viewModel: SwiggyViewModel,
+    mainNavController: NavController,
+    modifier: Modifier = Modifier,
+) {
+//    val viewModel: SwiggyViewModel = hiltViewModel()
     val addressState = viewModel.defaultAddress.collectAsState()
-
     val address = addressState.value
 
     TopAppBar(
@@ -248,7 +264,7 @@ fun HomeTopAppBar(isScrollStateChanged: Boolean, modifier: Modifier = Modifier) 
             ) {
                 Column(
                     modifier = Modifier
-                        .clickable { }
+                        .clickable { mainNavController.navigate(MainNavScreen.ShowAddresses.route) }
                         .padding(0.dp, 8.dp)
                         .weight(0.6f)
                 ) {
@@ -273,7 +289,9 @@ fun HomeTopAppBar(isScrollStateChanged: Boolean, modifier: Modifier = Modifier) 
                 }
                 Column(
                     modifier = Modifier
-                        .clickable { }
+                        .clickable {
+//                            mainNavController.navigate(MainNavScreen.ShowAddresses.route)
+                        }
                         .padding(5.dp, 15.dp)
                         .weight(0.2f)
                         .align(Alignment.CenterVertically),

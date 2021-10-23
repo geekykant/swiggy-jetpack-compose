@@ -14,3 +14,12 @@ sealed class NavScreen(
     object Account :
         NavScreen("account", R.drawable.ic_account, R.drawable.ic_account_filled, "Account")
 }
+
+sealed class MainNavScreen(
+    val route: String,
+    val title: String
+) {
+    object MainHome : MainNavScreen("main_home", "Main Home")
+    object ShowAddresses : MainNavScreen("address", "Show Addresses")
+    object Restaurant : MainNavScreen("restaurant", "Restaurant")
+}

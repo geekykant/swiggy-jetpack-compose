@@ -1,20 +1,21 @@
 package com.paavam.swiggyapp.ui.component
 
-import android.content.Intent
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.GridCells
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.paavam.swiggyapp.core.data.model.Restaurant
 import com.paavam.swiggyapp.lib.LazyHorizontalGrid
 import com.paavam.swiggyapp.lib.items
-import com.paavam.swiggyapp.ui.RestaurantActivity
 import com.paavam.swiggyapp.ui.component.listitem.RestaurantItem
 import com.paavam.swiggyapp.ui.component.listitem.RestaurantItemLarge
+import com.paavam.swiggyapp.ui.navigation.MainNavScreen
 
 /**
  * Spotlight Restaurants are in 6 columns x 2 rows.
@@ -24,7 +25,8 @@ import com.paavam.swiggyapp.ui.component.listitem.RestaurantItemLarge
 @Composable
 fun DoubleRowRestaurants(
     spotlightRestaurants: List<Restaurant>,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    mainNavController: NavController
 ) {
     fun nearestEven(size: Int): Int = if (size % 2 == 0) size else size.dec()
     val showUpToCount: Int = 12.coerceAtMost(nearestEven(spotlightRestaurants.size))
@@ -40,7 +42,7 @@ fun DoubleRowRestaurants(
                 r = it,
                 modifier = modifier.fillParentMaxWidth(0.8f),
                 onRestaurantClick = {
-                    context.startActivity(Intent(context, RestaurantActivity::class.java))
+                    mainNavController.navigate(MainNavScreen.Restaurant.route + "/${it.restaurantId}")
                 }
             )
         }
@@ -56,6 +58,7 @@ fun DoubleRowRestaurants(
 fun DoubleRowRectangleRestaurants(
     spotlightRestaurants: List<Restaurant>,
     paddingValues: PaddingValues,
+    mainNavController: NavController,
     modifier: Modifier = Modifier
 ) {
     fun nearestEven(size: Int): Int = if (size % 2 == 0) size else size.dec()
@@ -66,16 +69,16 @@ fun DoubleRowRectangleRestaurants(
 
     LazyHorizontalGrid(
         cells = GridCells.Fixed(2),
-        contentPadding = paddingValues
+        contentPadding = paddingValues,
+        modifier = Modifier.fillMaxWidth()
     ) {
         items(items = spotlightRestaurantsSublist) {
             RestaurantItemLarge(
                 r = it,
-                modifier = Modifier
-                    .padding(end = 10.dp)
-                    .fillParentMaxWidth(0.45f),
+                modifier = modifier
+                    .padding(end = 10.dp),
                 onRestaurantClick = {
-                    context.startActivity(Intent(context, RestaurantActivity::class.java))
+                    mainNavController.navigate(MainNavScreen.Restaurant.route + "/${it.restaurantId}")
                 }
             )
         }

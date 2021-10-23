@@ -23,8 +23,8 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.paavam.swiggyapp.R
 import com.paavam.swiggyapp.lib.AddressChooserRadio
+import com.paavam.swiggyapp.ui.navigation.MainNavigation
 import com.paavam.swiggyapp.ui.navigation.NavScreen
-import com.paavam.swiggyapp.ui.navigation.Navigation
 import com.paavam.swiggyapp.ui.theme.SwiggyTheme
 import com.paavam.swiggyapp.ui.theme.Typography
 import com.paavam.swiggyapp.ui.utils.PermissionUtils
@@ -36,8 +36,7 @@ import java.util.*
 @Composable
 fun SwiggyMain() {
     SwiggyTheme {
-        val viewModel: SwiggyViewModel = hiltViewModel()
-        val navController = rememberNavController()
+        val swiggyViewModel = hiltViewModel<SwiggyViewModel>()
 
         val sheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden)
         val context = LocalContext.current
@@ -47,21 +46,21 @@ fun SwiggyMain() {
             sheetContent = {
                 if (!PermissionUtils.isFineLocationGranted(context)) {
                     AddressPickBottomSheet(
-                        viewModel,
+                        swiggyViewModel,
                         locationPermissionTitle = "Location Permission is off",
                         grantButtonText = "GRANT",
                         onGrantButtonClick = {
-                            viewModel.changeAddressSheetState(false)
+                            swiggyViewModel.changeAddressSheetState(false)
                             //PermissionUtils.requestAccessFineLocationPermission()
                         }
                     )
                 } else if (!PermissionUtils.isLocationEnabled(context)) {
                     AddressPickBottomSheet(
-                        viewModel,
+                        swiggyViewModel,
                         locationPermissionTitle = "Device Location is turned off",
                         grantButtonText = "TURN ON",
                         onGrantButtonClick = {
-                            viewModel.changeAddressSheetState(false)
+                            swiggyViewModel.changeAddressSheetState(false)
                             //PermissionUtils.requestAccessFineLocationPermission()
                         }
                     )
@@ -70,22 +69,21 @@ fun SwiggyMain() {
             modifier = Modifier.fillMaxSize(),
             sheetBackgroundColor = Color.White
         ) {
-            Scaffold(
-                topBar = { },
-                bottomBar = { BottomNavigationBar(navController) }
-            ) { outerPaddingValues ->
-                // sets the NavHost and default start to [NavScreen.Home]
-                Navigation(navController, outerPaddingValues)
-            }
+            val mainNavController = rememberNavController()
+            MainNavigation(
+                mainNavController,
+                swiggyViewModel
+            )
         }
 
-        val askAddressModal = viewModel.askAddressModal.collectAsState()
+        val askAddressModal = swiggyViewModel.askAddressModal.collectAsState()
         when (askAddressModal.value) {
             true -> LaunchedEffect(Unit) { sheetState.show() }
             false -> LaunchedEffect(Unit) { sheetState.hide() }
         }
     }
 }
+
 
 @ExperimentalMaterialApi
 @Composable

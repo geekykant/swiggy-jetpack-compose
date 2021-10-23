@@ -1,6 +1,5 @@
 package com.paavam.swiggyapp.ui
 
-import android.app.Activity
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.*
@@ -20,7 +19,6 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -28,7 +26,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import com.paavam.swiggyapp.R
 import com.paavam.swiggyapp.core.data.PreviewData
 import com.paavam.swiggyapp.core.data.model.*
@@ -52,13 +50,14 @@ import kotlinx.coroutines.delay
 import java.util.*
 
 @Composable
-fun RestaurantMain() {
+fun RestaurantMain(
+    restaurantId: Long,
+    mainNavController: NavController
+) {
     SwiggyTheme {
-        val viewModel: RestaurantViewModel = hiltViewModel()
+        val viewModel = RestaurantViewModel(restaurantId = restaurantId)
         val scrollState = rememberLazyListState()
         var isScrollStateChanged by remember { mutableStateOf(false) }
-
-        val context = LocalContext.current as Activity
 
         Scaffold(
             topBar = {
@@ -67,7 +66,7 @@ fun RestaurantMain() {
                     viewModel,
                     isScrollStateChanged,
                     onBackClick = {
-                        context.finish()
+                        mainNavController.popBackStack()
                     }
                 )
             },

@@ -33,12 +33,12 @@ import com.paavam.swiggyapp.ui.theme.Typography
 fun RestaurantItem(
     r: Restaurant,
     modifier: Modifier = Modifier,
-    onRestaurantClick: (r: Restaurant) -> Unit
+    onRestaurantClick: () -> Unit
 ) {
     val height = 120.dp
     Row(
         modifier = modifier
-            .clickable { onRestaurantClick(r) }
+            .clickable { onRestaurantClick() }
             .fillMaxWidth()
             .padding(horizontal = 15.dp, vertical = 15.dp)
             .heightIn(0.dp, height)
@@ -172,12 +172,12 @@ fun RestaurantItem(
 fun RestaurantItemLarge(
     r: Restaurant,
     modifier: Modifier = Modifier,
-    onRestaurantClick: (r: Restaurant) -> Unit
+    onRestaurantClick: () -> Unit
 ) {
     val height = 100.dp
     Column(
         modifier = modifier
-            .clickable { onRestaurantClick(r) }
+            .clickable { onRestaurantClick() }
             .padding(horizontal = 0.dp, vertical = 5.dp)
     ) {
         Box(
