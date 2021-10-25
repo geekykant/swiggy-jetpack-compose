@@ -19,7 +19,6 @@ import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -30,15 +29,14 @@ import androidx.navigation.NavController
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.paavam.swiggyapp.R
+import com.paavam.swiggyapp.core.data.PreviewData
 import com.paavam.swiggyapp.core.data.model.AddressType
 import com.paavam.swiggyapp.core.data.model.HelloBar
 import com.paavam.swiggyapp.core.data.model.QuickTile
+import com.paavam.swiggyapp.core.ui.UiState
 import com.paavam.swiggyapp.lib.LazyHorizontalGrid
 import com.paavam.swiggyapp.lib.items
-import com.paavam.swiggyapp.ui.component.DoubleRowRectangleRestaurants
-import com.paavam.swiggyapp.ui.component.DoubleRowRestaurants
-import com.paavam.swiggyapp.ui.component.FooterStaticImage
-import com.paavam.swiggyapp.ui.component.HorizontalSliderUi
+import com.paavam.swiggyapp.ui.component.*
 import com.paavam.swiggyapp.ui.component.anim.AnimateTextUpDown
 import com.paavam.swiggyapp.ui.component.image.BannerImage
 import com.paavam.swiggyapp.ui.component.listitem.CuisineItem
@@ -48,6 +46,7 @@ import com.paavam.swiggyapp.ui.component.text.AnnouncementHeading
 import com.paavam.swiggyapp.ui.component.text.SectionHeading
 import com.paavam.swiggyapp.ui.navigation.MainNavScreen
 import com.paavam.swiggyapp.ui.theme.Typography
+import com.paavam.swiggyapp.ui.utils.addShimmer
 import com.paavam.swiggyapp.viewmodel.HomeViewModel
 import com.paavam.swiggyapp.viewmodel.SwiggyViewModel
 import kotlinx.coroutines.delay
@@ -62,6 +61,8 @@ fun MainContent(
     val scrollState = rememberLazyListState()
     var isScrollStateChanged by remember { mutableStateOf(false) }
 
+    val homeViewModel: HomeViewModel = hiltViewModel()
+
     Scaffold(
         topBar = {
             isScrollStateChanged = scrollState.firstVisibleItemScrollOffset != 0
@@ -72,7 +73,89 @@ fun MainContent(
             )
         }
     ) {
-        HomeScreen(scrollState, outerPadding, mainNavController)
+
+//        val nearbyRestaurantsState =
+//            homeViewModel.nearbyRestaurants.collectAsState(UiState.loading()).value
+//
+//        val popularCurationsState =
+//            homeViewModel.popularCurations.collectAsState(UiState.loading()).value
+
+//        when (nearbyRestaurantsState) {
+//            is UiState.Loading -> LoadingHomeScreen()
+//            is UiState.Failed -> ErrorHomeScreen()
+//            is UiState.Success -> HomeScreen(
+//                scrollState,
+//                outerPadding,
+//                mainNavController,
+//                homeViewModel,
+//                nearbyRestaurantsState.data,
+//            )
+//        }
+
+        HomeScreen(
+            scrollState,
+            outerPadding,
+            mainNavController,
+            homeViewModel
+        )
+    }
+}
+
+@Composable
+fun ErrorHomeScreen() {
+    //
+}
+
+@Composable
+fun LoadingHomeScreen() {
+    Column(
+        modifier = Modifier
+            .padding(horizontal = 15.dp)
+
+    ) {
+        GrayDivider(
+            modifier = Modifier
+                .height(130.dp)
+                .padding(vertical = 10.dp)
+                .addShimmer(true)
+        )
+        GrayDivider(
+            modifier = Modifier
+                .height(130.dp)
+                .padding(vertical = 10.dp)
+                .addShimmer(true)
+        )
+        GrayDivider(
+            modifier = Modifier
+                .height(80.dp)
+                .padding(vertical = 10.dp)
+                .addShimmer(true)
+        )
+        GrayDivider(
+            modifier = Modifier
+                .width(230.dp)
+                .height(20.dp)
+                .padding(vertical = 10.dp)
+                .addShimmer(true)
+        )
+
+        Spacer(
+            modifier = Modifier
+                .height(20.dp)
+                .addShimmer(true)
+        )
+
+        Row(
+            modifier = Modifier.padding(vertical = 10.dp)
+        ) {
+//            (1..10).toList()
+        }
+
+        Row(
+            modifier = Modifier.padding(vertical = 10.dp)
+        ) {
+
+        }
     }
 }
 
@@ -81,16 +164,30 @@ fun MainContent(
 fun HomeScreen(
     scrollState: LazyListState, // Higher level is invoked, and reflected throughout
     outerPaddingValues: PaddingValues,
-    mainNavController: NavController
+    mainNavController: NavController,
+    homeViewModel: HomeViewModel,
+//    nearbyRestaurants: List<Restaurant>
 ) {
-    val viewModel: HomeViewModel = hiltViewModel()
-    val viewState by viewModel.state.collectAsState()
-
+    val homeViewState by homeViewModel.state.collectAsState()
     val widgetBottomPadding = 10.dp
 
+    val nearbyRestaurantsState =
+        homeViewModel.nearbyRestaurants.collectAsState(UiState.loading()).value
+
+    val popularCurationsState =
+        homeViewModel.popularCurations.collectAsState(UiState.loading()).value
+
+//    val quickTilesState =
+//        homeViewModel.quickTiles.collectAsState(UiState.loading()).value
+//    val helloBarState =
+//        homeViewModel.helloBarMessages.collectAsState(UiState.loading()).value
+
+    val helloBarMessages = homeViewModel.helloBarMessages.collectAsState()
+    val quickTiles = homeViewModel.quickTiles.collectAsState()
+
     SwipeRefresh(
-        state = rememberSwipeRefreshState(viewState.refreshing),
-        onRefresh = { viewModel.refresh(force = true) },
+        state = rememberSwipeRefreshState(homeViewState.refreshing),
+        onRefresh = { homeViewModel.refresh(force = true) },
     ) {
         LazyColumn(
             modifier = Modifier
@@ -100,7 +197,7 @@ fun HomeScreen(
         ) {
             // Top announcements section
             item {
-                viewState.helloBarMessages?.let { TopHelloBar(it) }
+                TopHelloBar(helloBarMessages.value)
                 AnnouncementHeading(
                     message = "As per state mandates, we will be operational till 8:00 PM",
                     modifier = Modifier.padding(bottom = widgetBottomPadding),
@@ -110,7 +207,8 @@ fun HomeScreen(
             //Categories or Quick Tiles
             item {
                 QuickTilesList(
-                    viewState.quickTiles, Modifier
+                    quickTiles.value,
+                    modifier = Modifier
                         .fillMaxWidth()
                         .padding(bottom = widgetBottomPadding)
                 )
@@ -125,28 +223,53 @@ fun HomeScreen(
 
             item {
                 SectionHeading(
-                    title = "Popular Curations",
+                    "Top Picks For You",
+                    null,
+                    R.drawable.ic_offers_filled,
+                    showSeeAllIcon = false,
                     showSeeAllText = false
                 )
-                LazyHorizontalGrid(
-                    cells = GridCells.Fixed(2),
-                    modifier = Modifier
-                        .padding(vertical = 10.dp)
-                        .padding(bottom = widgetBottomPadding),
-                    contentPadding = PaddingValues(start = 10.dp)
-                ) {
-                    items(items = viewState.popularCurations) {
-                        CuisineItem(
-                            it,
-                            modifier = Modifier
-                                .clickable { }
-                                .padding(horizontal = 8.dp, vertical = 10.dp)
-                                .fillParentMaxWidth(0.25f),
-                            fontSize = 14.sp,
-                            bottomTextPadding = PaddingValues(top = 10.dp)
+                val topPicksRestaurants = PreviewData.prepareRestaurants()
+                SingleRowRestaurants(
+                    topPicksRestaurants,
+                    paddingValues = PaddingValues(start = 15.dp),
+                    mainNavController
+                )
+            }
+
+            item {
+                when (popularCurationsState) {
+                    is UiState.Success -> {
+                        val cuisineList = popularCurationsState.data
+                        SectionHeading(
+                            title = "Popular Curations",
+                            showSeeAllText = false
                         )
+                        LazyHorizontalGrid(
+                            cells = GridCells.Fixed(2),
+                            modifier = Modifier
+                                .padding(vertical = 10.dp)
+                                .padding(bottom = widgetBottomPadding),
+                            contentPadding = PaddingValues(start = 10.dp)
+                        ) {
+                            items(items = cuisineList) {
+                                CuisineItem(
+                                    it,
+                                    modifier = Modifier
+                                        .clickable { }
+                                        .padding(horizontal = 8.dp, vertical = 10.dp)
+                                        .fillParentMaxWidth(0.25f),
+                                    fontSize = 14.sp,
+                                    bottomTextPadding = PaddingValues(top = 10.dp)
+                                )
+                            }
+                        }
+                    }
+                    else -> {
+                        /* Do something  */
                     }
                 }
+
             }
 
             item {
@@ -161,9 +284,8 @@ fun HomeScreen(
                 )
             }
 
-
-            items(items = viewState.nearbyRestaurants) {
-                val context = LocalContext.current
+            val nearbyRestaurants = PreviewData.prepareRestaurants()
+            items(items = nearbyRestaurants) {
                 RestaurantItem(
                     it,
                     Modifier.fillMaxWidth(),
@@ -182,7 +304,7 @@ fun HomeScreen(
                     showSeeAllText = false
                 )
                 DoubleRowRectangleRestaurants(
-                    spotlightRestaurants = viewState.nearbyRestaurants,
+                    spotlightRestaurants = nearbyRestaurants,
                     paddingValues = PaddingValues(horizontal = 15.dp),
                     modifier = Modifier.fillParentMaxWidth(0.45f),
                     mainNavController = mainNavController
@@ -200,7 +322,7 @@ fun HomeScreen(
                     }
                 )
                 DoubleRowRestaurants(
-                    spotlightRestaurants = viewState.nearbyRestaurants,
+                    spotlightRestaurants = nearbyRestaurants,
                     mainNavController = mainNavController
                 )
             }
@@ -217,6 +339,8 @@ fun TopHelloBar(contentList: List<HelloBar>, modifier: Modifier = Modifier) {
     val roundShape = RoundedCornerShape(50)
     var i by remember { mutableStateOf(0) }
     val helloCount = contentList.size
+
+    if(helloCount == 0) return
 
     LaunchedEffect(true) {
         while (true) {
@@ -248,12 +372,11 @@ fun TopHelloBar(contentList: List<HelloBar>, modifier: Modifier = Modifier) {
 @Composable
 fun HomeTopAppBar(
     isScrollStateChanged: Boolean,
-    viewModel: SwiggyViewModel,
+    swiggyViewModel: SwiggyViewModel,
     mainNavController: NavController,
     modifier: Modifier = Modifier,
 ) {
-//    val viewModel: SwiggyViewModel = hiltViewModel()
-    val addressState = viewModel.defaultAddress.collectAsState()
+    val addressState = swiggyViewModel.defaultAddress.collectAsState()
     val address = addressState.value
 
     TopAppBar(

@@ -66,7 +66,7 @@ fun RestaurantMain(
                     viewModel,
                     isScrollStateChanged,
                     onBackClick = {
-                        mainNavController.popBackStack()
+                        mainNavController.navigateUp()
                     }
                 )
             },

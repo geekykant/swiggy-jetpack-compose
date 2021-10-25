@@ -18,6 +18,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.paavam.swiggyapp.R
@@ -28,6 +29,7 @@ import com.paavam.swiggyapp.ui.component.BasicOfferSnackComposable
 import com.paavam.swiggyapp.ui.component.FlatDealOfferSnackComposable
 import com.paavam.swiggyapp.ui.component.image.ImageWithPlaceholder
 import com.paavam.swiggyapp.ui.theme.Typography
+import kotlin.random.Random
 
 @Composable
 fun RestaurantItem(
@@ -246,6 +248,65 @@ fun RestaurantItemLarge(
                     modifier = Modifier.padding(horizontal = 3.dp, vertical = 0.dp)
                 )
             }
+        }
+    }
+}
+@Composable
+fun RestaurantItemSquare(
+    r: Restaurant,
+    modifier: Modifier = Modifier,
+    onRestaurantClick: () -> Unit,
+    size: Dp = 80.dp,
+) {
+    Column(
+        modifier = modifier
+            .width(width = size)
+            .clickable { onRestaurantClick() }
+            .padding(horizontal = 0.dp, vertical = 5.dp)
+    ) {
+        Box(
+            modifier = Modifier
+                .padding(horizontal = 2.dp, vertical = 0.dp)
+                .fillMaxWidth(),
+        ) {
+            r.imageUrl?.let {
+                ImageWithPlaceholder(
+                    imageUrl = it,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .size(size)
+                        .clip(RoundedCornerShape(5.dp))
+                    //TODO: if swiggymodel shows closed -> colorFilter = if (r.isShopClosed) UiUtils.shopClosedBlackFilter else null,
+                )
+            }
+            val snackModifier = Modifier
+                .align(Alignment.BottomCenter)
+            r.getMaxOffer()?.run {
+                BasicOfferSnackComposable(
+                    message = r.getMaxOfferSnackMessage(),
+                    invert = true,
+                    textSize = 11.sp,
+                    modifier = snackModifier
+                )
+            }
+        }
+
+        Column(
+            modifier = Modifier
+                .padding(top = 3.dp)
+                .fillMaxHeight()
+        ) {
+            Text(
+                text = r.name,
+                style = Typography.h4,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis
+            )
+            val randomTimeInt = Random.nextInt(20, 45)
+            Text(
+                text = "$randomTimeInt mins",
+                modifier = Modifier.padding(horizontal = 0.dp, vertical = 3.dp)
+            )
         }
     }
 }

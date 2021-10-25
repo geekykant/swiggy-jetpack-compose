@@ -18,7 +18,7 @@ class SwiggyViewModel @Inject constructor(
     private val _viewState = MutableStateFlow(SwiggyAppState())
     val viewState: StateFlow<SwiggyAppState> get() = _viewState
 
-    private val _askAddressModal = MutableStateFlow(true)
+    private val _askAddressModal = MutableStateFlow(false)
     val askAddressModal: StateFlow<Boolean> get() = _askAddressModal
 
 //    private val _defaultAddress =
@@ -26,11 +26,6 @@ class SwiggyViewModel @Inject constructor(
 //    val defaultAddress: StateFlow<UserAddress?> get() = _defaultAddress
 
     val defaultAddress: MutableStateFlow<UserAddress?> = MutableStateFlow(PreviewData.prepareUsersAddresses()[0])
-
-    override fun onCleared() {
-        super.onCleared()
-        Log.d("mohankumar", "cleared")
-    }
 
     init {
         fetchInitState()

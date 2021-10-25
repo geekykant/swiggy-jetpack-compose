@@ -7,8 +7,9 @@ import com.paavam.swiggyapp.data.remote.model.response.RestaurantResponse
 import com.paavam.swiggyapp.data.remote.model.response.State
 import retrofit2.Response
 import retrofit2.http.GET
+import javax.inject.Inject
 
-interface SwiggyRestaurantService {
+class SwiggyRestaurantService @Inject constructor(){
 
     @GET("")
     suspend fun fetchThisRestaurant(): Response<RestaurantResponse<Restaurant>> =

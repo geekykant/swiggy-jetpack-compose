@@ -1,7 +1,13 @@
 package com.paavam.swiggyapp.di
 
 import com.paavam.swiggyapp.core.data.repository.SwiggyCartRepository
+import com.paavam.swiggyapp.core.data.repository.SwiggyCuisineRepository
+import com.paavam.swiggyapp.core.data.repository.SwiggyPropsRepository
+import com.paavam.swiggyapp.core.data.repository.SwiggyRestaurantRepository
 import com.paavam.swiggyapp.repository.SwiggyRemoteCartRepository
+import com.paavam.swiggyapp.repository.SwiggyRemoteCuisineRepository
+import com.paavam.swiggyapp.repository.SwiggyRemotePropsRepository
+import com.paavam.swiggyapp.repository.SwiggyRemoteRestaurantRepository
 import com.paavam.swiggyapp.repository.local.SwiggyLocalCartRepository
 import dagger.Binds
 import dagger.Module
@@ -13,14 +19,17 @@ import javax.inject.Qualifier
 @Module
 @InstallIn(SingletonComponent::class)
 interface RepositoryModule {
+    @Binds
+    @RemoteRepository
+    fun providesRestaurantRepository(impl: SwiggyRemoteRestaurantRepository): SwiggyRestaurantRepository
 
-//    @Binds
-//    fun notyAuthRepository(notyAuthRepository: DefaultSwiggyUserRepository): SwiggyUserRepository
+    @Binds
+    @RemoteRepository
+    fun providesPropsRepository(impl: SwiggyRemotePropsRepository): SwiggyPropsRepository
 
-//    @ExperimentalCoroutinesApi
-//    @Binds
-//    @LocalRepository
-//    fun notyLocalNoteRepository(localRepository: SwiggyLocalNoteRepository): NotyNoteRepository
+    @Binds
+    @RemoteRepository
+    fun providesCuisineRepository(impl: SwiggyRemoteCuisineRepository): SwiggyCuisineRepository
 
     @ExperimentalCoroutinesApi
     @Binds

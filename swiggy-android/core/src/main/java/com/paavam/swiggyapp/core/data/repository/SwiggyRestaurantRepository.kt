@@ -3,6 +3,7 @@ package com.paavam.swiggyapp.core.data.repository
 import com.paavam.swiggyapp.core.ResponseResult
 import com.paavam.swiggyapp.core.data.model.Restaurant
 import com.paavam.swiggyapp.core.data.model.RestaurantFoodModel
+import kotlinx.coroutines.flow.Flow
 import javax.inject.Singleton
 
 /**
@@ -14,5 +15,5 @@ interface SwiggyRestaurantRepository {
 
     suspend fun fetchThisRestaurantFoods(): ResponseResult<RestaurantFoodModel>
 
-    suspend fun fetchRestaurantsList(): ResponseResult<List<Restaurant>>
+    fun fetchRestaurantsList(): Flow<ResponseResult<List<Restaurant>>>
 }

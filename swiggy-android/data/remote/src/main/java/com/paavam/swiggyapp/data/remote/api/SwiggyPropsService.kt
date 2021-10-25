@@ -6,8 +6,9 @@ import com.paavam.swiggyapp.core.data.model.QuickTile
 import com.paavam.swiggyapp.data.remote.model.response.PropsResponse
 import com.paavam.swiggyapp.data.remote.model.response.State
 import retrofit2.Response
+import javax.inject.Inject
 
-interface SwiggyPropsService {
+class SwiggyPropsService @Inject constructor() {
 
     suspend fun fetchTilesContent(): Response<PropsResponse<List<QuickTile>>> =
         Response.success(PropsResponse(State.SUCCESS, "", PreviewData.prepareTilesContent()))

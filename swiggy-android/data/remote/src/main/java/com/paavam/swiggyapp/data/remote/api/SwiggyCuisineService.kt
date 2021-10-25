@@ -6,8 +6,9 @@ import com.paavam.swiggyapp.data.remote.model.response.CuisineResponse
 import com.paavam.swiggyapp.data.remote.model.response.State
 import retrofit2.Response
 import retrofit2.http.POST
+import javax.inject.Inject
 
-interface SwiggyCuisineService{
+class SwiggyCuisineService @Inject constructor(){
 
     @POST("")
     suspend fun fetchPopularCuisines(): Response<CuisineResponse<List<Cuisine>>> =

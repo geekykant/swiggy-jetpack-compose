@@ -7,6 +7,9 @@ import com.paavam.swiggyapp.core.data.repository.SwiggyRestaurantRepository
 import com.paavam.swiggyapp.data.remote.api.SwiggyRestaurantService
 import com.paavam.swiggyapp.data.remote.model.response.State
 import com.paavam.swiggyapp.data.remote.util.getResponse
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
 class SwiggyRemoteRestaurantRepository @Inject internal constructor(
@@ -40,17 +43,13 @@ class SwiggyRemoteRestaurantRepository @Inject internal constructor(
         }
     }
 
-    override suspend fun fetchRestaurantsList(): ResponseResult<List<Restaurant>> {
-        return runCatching {
-            val restaurantResponse =
-                swiggyRestaurantService.fetchRestaurantsList().getResponse()
-            when (restaurantResponse.status) {
-                State.SUCCESS -> ResponseResult.success(restaurantResponse.data)
-                else -> ResponseResult.error(restaurantResponse.message)
-            }
-        }.getOrElse {
-            it.printStackTrace()
-            ResponseResult.error("Something went wrong!")
+    override fun fetchRestaurantsList(): Flow<ResponseResult<List<Restaurant>>> = flow {
+        val restaurantResponse =
+            swiggyRestaurantService.fetchRestaurantsList().getResponse()
+        val state = when (restaurantResponse.status) {
+            State.SUCCESS -> ResponseResult.success(restaurantResponse.data)
+            else -> ResponseResult.error(restaurantResponse.message)
         }
-    }
+        emit(state)
+    }.catch { emit(ResponseResult.error("Unable to fetch restaurants list")) }
 }

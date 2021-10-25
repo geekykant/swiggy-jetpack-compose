@@ -26,7 +26,6 @@ class CartViewModel @Inject constructor(
     private val _state = MutableStateFlow(CartViewState())
     val state: StateFlow<CartViewState> get() = _state
 
-
     private val _userMessageToRestaurant = MutableLiveData("")
     val userMessageToRestaurant: LiveData<String> = _userMessageToRestaurant
 

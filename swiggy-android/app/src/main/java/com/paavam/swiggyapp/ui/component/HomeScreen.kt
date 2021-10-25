@@ -2,7 +2,6 @@ package com.paavam.swiggyapp.ui.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
@@ -40,7 +39,6 @@ fun FlatDealOfferSnackComposable(
 fun BasicOfferSnackComposable(
     message: String,
     invert: Boolean,
-    onClick: () -> Unit = {},
     textSize: TextUnit = 15.sp,
     modifier: Modifier
 ) {
@@ -62,7 +60,6 @@ fun BasicOfferSnackComposable(
         maxLines = 1,
         style = Typography.h1,
         modifier = modifier
-            .clickable { onClick() }
             .shadow(8.dp, roundShape)
             .background(backgroundColor, roundShape)
             .border(1.dp, borderColor, shape = roundShape)

@@ -5,6 +5,8 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.GridCells
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -15,6 +17,7 @@ import com.paavam.swiggyapp.lib.LazyHorizontalGrid
 import com.paavam.swiggyapp.lib.items
 import com.paavam.swiggyapp.ui.component.listitem.RestaurantItem
 import com.paavam.swiggyapp.ui.component.listitem.RestaurantItemLarge
+import com.paavam.swiggyapp.ui.component.listitem.RestaurantItemSquare
 import com.paavam.swiggyapp.ui.navigation.MainNavScreen
 
 /**
@@ -65,8 +68,6 @@ fun DoubleRowRectangleRestaurants(
     val showUpToCount: Int = 12.coerceAtMost(nearestEven(spotlightRestaurants.size))
     val spotlightRestaurantsSublist = spotlightRestaurants.subList(0, showUpToCount)
 
-    val context = LocalContext.current
-
     LazyHorizontalGrid(
         cells = GridCells.Fixed(2),
         contentPadding = paddingValues,
@@ -77,6 +78,32 @@ fun DoubleRowRectangleRestaurants(
                 r = it,
                 modifier = modifier
                     .padding(end = 10.dp),
+                onRestaurantClick = {
+                    mainNavController.navigate(MainNavScreen.Restaurant.route + "/${it.restaurantId}")
+                }
+            )
+        }
+    }
+}
+
+@Composable
+fun SingleRowRestaurants(
+    restaurantsList: List<Restaurant>,
+    paddingValues: PaddingValues,
+    mainNavController: NavController,
+    modifier: Modifier = Modifier
+){
+    LazyRow(
+        modifier = modifier
+            .fillMaxWidth(),
+        contentPadding = paddingValues
+    ) {
+        items(items = restaurantsList) {
+            RestaurantItemSquare(
+                it,
+                Modifier
+                    .padding(horizontal = 5.dp)
+                    .fillMaxWidth(),
                 onRestaurantClick = {
                     mainNavController.navigate(MainNavScreen.Restaurant.route + "/${it.restaurantId}")
                 }
