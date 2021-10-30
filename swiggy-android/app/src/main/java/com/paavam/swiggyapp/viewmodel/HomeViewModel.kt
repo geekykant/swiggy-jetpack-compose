@@ -12,6 +12,7 @@ import com.paavam.swiggyapp.core.data.repository.SwiggyPropsRepository
 import com.paavam.swiggyapp.core.data.repository.SwiggyRestaurantRepository
 import com.paavam.swiggyapp.core.ui.UiState
 import com.paavam.swiggyapp.di.RemoteRepository
+import com.paavam.swiggyapp.ui.utils.Quad
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
@@ -26,9 +27,6 @@ class HomeViewModel @Inject constructor(
 ) : ViewModel() {
     private val _state = MutableStateFlow(HomeViewState())
     val state: StateFlow<HomeViewState> get() = _state
-
-    var helloBarMessages: MutableStateFlow<List<HelloBar>> = MutableStateFlow(emptyList())
-    var quickTiles: MutableStateFlow<List<QuickTile>> = MutableStateFlow(emptyList())
 
     private val refreshing = MutableStateFlow(false)
 
@@ -45,6 +43,32 @@ class HomeViewModel @Inject constructor(
         }
         .shareIn(viewModelScope, SharingStarted.WhileSubscribed())
 
+    val latestOnBlockRestaurants: SharedFlow<UiState<List<Restaurant>>> = restaurantRepository
+        .fetchRestaurantsList()
+        .map { result ->
+            when (result) {
+                is ResponseResult.Success -> UiState.success(result.data)
+                is ResponseResult.Error -> UiState.failed(result.message)
+            }
+        }.onStart {
+            emit(UiState.loading())
+            delay(6800)
+        }
+        .shareIn(viewModelScope, SharingStarted.WhileSubscribed())
+
+    val topOfferRestaurants: SharedFlow<UiState<List<Restaurant>>> = restaurantRepository
+        .fetchRestaurantsList()
+        .map { result ->
+            when (result) {
+                is ResponseResult.Success -> UiState.success(result.data)
+                is ResponseResult.Error -> UiState.failed(result.message)
+            }
+        }.onStart {
+            emit(UiState.loading())
+            delay(1800)
+        }
+        .shareIn(viewModelScope, SharingStarted.WhileSubscribed())
+
     val popularCurations: SharedFlow<UiState<List<Cuisine>>> = cuisineRepository
         .fetchPopularCuisines()
         .map { result ->
@@ -58,68 +82,50 @@ class HomeViewModel @Inject constructor(
         }
         .shareIn(viewModelScope, SharingStarted.WhileSubscribed())
 
-//    val quickTiles: SharedFlow<UiState<List<QuickTile>>> = propsRepository
-//        .fetchTilesContent()
-//        .map { result ->
-//            when (result) {
-//                is ResponseResult.Success -> UiState.success(result.data)
-//                is ResponseResult.Error -> UiState.failed(result.message)
-//            }
-//        }.onStart {
-//            emit(UiState.loading())
-////            delay(800)
-//        }
-//        .shareIn(viewModelScope, SharingStarted.WhileSubscribed())
-//
-//    val helloBarMessages: SharedFlow<UiState<List<HelloBar>>> = propsRepository
-//        .fetchHelloBarContent()
-//        .map { result ->
-//            when (result) {
-//                is ResponseResult.Success -> UiState.success(result.data)
-//                is ResponseResult.Error -> UiState.failed(result.message)
-//            }
-//        }.onStart {
-//            emit(UiState.loading())
-////            delay(800)
-//        }
-//        .shareIn(viewModelScope, SharingStarted.WhileSubscribed())
-
     init {
         prepareHomeData()
     }
 
     private fun prepareHomeData() {
         refreshing.value = true
+        val announcementFlow: SharedFlow<String> =
+            flowOf(UiState.success("As per state mandates, we will be operational till 8:00 PM"))
+                .map { it.data }
+                .shareIn(viewModelScope, SharingStarted.WhileSubscribed())
 
         viewModelScope.launch {
             combine(
                 propsRepository.fetchHelloBarContent(),
-                propsRepository.fetchTilesContent()
-            ) { hello, tiles ->
-                Pair(hello, tiles)
+                propsRepository.fetchTilesContent(),
+                announcementFlow,
+                restaurantRepository.fetchRestaurantsList()
+            ) { hello, tiles, msg, topPicksRest ->
+                Quad(hello, tiles, msg, topPicksRest)
+            }.onStart {
+                _state.value.initialLoadingStatus.value = UiState.loading()
+                delay(5000)
             }.collect {
                 val helloBarMessagesState = it.first
                 val quickTilesState = it.second
+                val msg = it.third
+                val topPicksRestsState = it.fourth
 
                 when {
-                    helloBarMessagesState is ResponseResult.Success
+                    topPicksRestsState is ResponseResult.Success &&
+                            helloBarMessagesState is ResponseResult.Success
                             && quickTilesState is ResponseResult.Success -> {
-                        helloBarMessages.value = helloBarMessagesState.data
-                        quickTiles.value = quickTilesState.data
-//                        _state.value = HomeViewState(
-//                            quickTiles = tiles.data,
-//                            helloBarMessages = hello.data,
-////                          popularCurations = popularCurations,
-//                            refreshing = refreshing.value,
-//                            errorMessage = null
-//                        )
+                        _state.value.helloBarMessages.value = helloBarMessagesState.data
+                        _state.value.quickTiles.value = quickTilesState.data
+                        _state.value.announcementMsg.value = msg
+                        _state.value.topPicksRestaurants.value = topPicksRestsState.data
+                        _state.value.initialLoadingStatus.value = UiState.success("success")
                     }
                     else -> {
-                        /* throw error */
+                        _state.value.initialLoadingStatus.value = UiState.failed("failed")
                     }
-                }.also {
-                    refreshing.value = false
                 }
+            }.also {
+                refreshing.value = false
             }
         }
     }
@@ -135,9 +141,11 @@ class HomeViewModel @Inject constructor(
 }
 
 data class HomeViewState(
-//    val quickTiles: List<QuickTile> = emptyList(),
-//    val helloBarMessages: List<HelloBar> = emptyList(),
-//    val popularCurations: List<Cuisine> = emptyList(),
+    var helloBarMessages: MutableStateFlow<List<HelloBar>> = MutableStateFlow(emptyList()),
+    var quickTiles: MutableStateFlow<List<QuickTile>> = MutableStateFlow(emptyList()),
+    var announcementMsg: MutableStateFlow<String> = MutableStateFlow(""),
+    var topPicksRestaurants: MutableStateFlow<List<Restaurant>> = MutableStateFlow(emptyList()),
+    val initialLoadingStatus: MutableStateFlow<UiState<String>> = MutableStateFlow(UiState.loading()),
     val refreshing: Boolean = false,
     val errorMessage: String? = null
 )

@@ -7,10 +7,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
-import androidx.compose.material.TopAppBar
+import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -29,7 +26,6 @@ import androidx.navigation.NavController
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.paavam.swiggyapp.R
-import com.paavam.swiggyapp.core.data.PreviewData
 import com.paavam.swiggyapp.core.data.model.AddressType
 import com.paavam.swiggyapp.core.data.model.HelloBar
 import com.paavam.swiggyapp.core.data.model.QuickTile
@@ -62,6 +58,7 @@ fun MainContent(
     var isScrollStateChanged by remember { mutableStateOf(false) }
 
     val homeViewModel: HomeViewModel = hiltViewModel()
+    val homeViewState = homeViewModel.state.collectAsState()
 
     Scaffold(
         topBar = {
@@ -74,30 +71,25 @@ fun MainContent(
         }
     ) {
 
-//        val nearbyRestaurantsState =
-//            homeViewModel.nearbyRestaurants.collectAsState(UiState.loading()).value
-//
-//        val popularCurationsState =
-//            homeViewModel.popularCurations.collectAsState(UiState.loading()).value
+        val initialLoadingStatus = homeViewState.value.initialLoadingStatus.collectAsState().value
 
-//        when (nearbyRestaurantsState) {
-//            is UiState.Loading -> LoadingHomeScreen()
-//            is UiState.Failed -> ErrorHomeScreen()
-//            is UiState.Success -> HomeScreen(
-//                scrollState,
-//                outerPadding,
-//                mainNavController,
-//                homeViewModel,
-//                nearbyRestaurantsState.data,
-//            )
-//        }
+        when (initialLoadingStatus) {
+            is UiState.Loading -> LoadingHomeScreen()
+            is UiState.Failed -> ErrorHomeScreen()
+            is UiState.Success -> HomeScreen(
+                scrollState,
+                outerPadding,
+                mainNavController,
+                homeViewModel,
+            )
+        }
 
-        HomeScreen(
-            scrollState,
-            outerPadding,
-            mainNavController,
-            homeViewModel
-        )
+//        HomeScreen(
+//            scrollState,
+//            outerPadding,
+//            mainNavController,
+//            homeViewModel
+//        )
     }
 }
 
@@ -171,19 +163,24 @@ fun HomeScreen(
     val homeViewState by homeViewModel.state.collectAsState()
     val widgetBottomPadding = 10.dp
 
-    val nearbyRestaurantsState =
-        homeViewModel.nearbyRestaurants.collectAsState(UiState.loading()).value
-
     val popularCurationsState =
         homeViewModel.popularCurations.collectAsState(UiState.loading()).value
 
-//    val quickTilesState =
-//        homeViewModel.quickTiles.collectAsState(UiState.loading()).value
-//    val helloBarState =
-//        homeViewModel.helloBarMessages.collectAsState(UiState.loading()).value
+    val nearbyRestaurantsState =
+        homeViewModel.nearbyRestaurants.collectAsState(UiState.loading()).value
 
-    val helloBarMessages = homeViewModel.helloBarMessages.collectAsState()
-    val quickTiles = homeViewModel.quickTiles.collectAsState()
+    val latestOnBlockRestaurantsState =
+        homeViewModel.latestOnBlockRestaurants.collectAsState(UiState.loading()).value
+
+    val topOfferRestaurantsState =
+        homeViewModel.topOfferRestaurants.collectAsState(UiState.loading()).value
+
+//    val helloBarMessages = homeViewModel.helloBarMessages.collectAsState()
+//    val quickTiles = homeViewModel.quickTiles.collectAsState()
+
+    val helloBarMessages = homeViewState.helloBarMessages.collectAsState()
+    val quickTiles = homeViewState.quickTiles.collectAsState()
+    val announcementMessage = homeViewState.announcementMsg.collectAsState()
 
     SwipeRefresh(
         state = rememberSwipeRefreshState(homeViewState.refreshing),
@@ -199,7 +196,7 @@ fun HomeScreen(
             item {
                 TopHelloBar(helloBarMessages.value)
                 AnnouncementHeading(
-                    message = "As per state mandates, we will be operational till 8:00 PM",
+                    message = announcementMessage.value,
                     modifier = Modifier.padding(bottom = widgetBottomPadding),
                 )
             }
@@ -229,10 +226,9 @@ fun HomeScreen(
                     showSeeAllIcon = false,
                     showSeeAllText = false
                 )
-                val topPicksRestaurants = PreviewData.prepareRestaurants()
                 SingleRowRestaurants(
-                    topPicksRestaurants,
-                    paddingValues = PaddingValues(start = 15.dp),
+                    homeViewState.topPicksRestaurants.value,
+                    paddingValues = PaddingValues(horizontal = 15.dp),
                     mainNavController
                 )
             }
@@ -284,47 +280,80 @@ fun HomeScreen(
                 )
             }
 
-            val nearbyRestaurants = PreviewData.prepareRestaurants()
-            items(items = nearbyRestaurants) {
-                RestaurantItem(
-                    it,
-                    Modifier.fillMaxWidth(),
-                    onRestaurantClick = {
-                        mainNavController.navigate(MainNavScreen.Restaurant.route + "/${it.restaurantId}")
+            when (nearbyRestaurantsState) {
+                is UiState.Success -> {
+                    items(items = nearbyRestaurantsState.data) {
+                        RestaurantItem(
+                            it,
+                            Modifier.fillMaxWidth(),
+                            onRestaurantClick = {
+                                mainNavController.navigate(MainNavScreen.Restaurant.route + "/${it.restaurantId}")
+                            }
+                        )
                     }
-                )
+                }
+                is UiState.Loading -> {
+                    item { ShowCircularBottomProgress() }
+                    return@LazyColumn
+                }
+                is UiState.Failed -> {
+                    // do something
+                }
             }
 
-            item {
-                SectionHeading(
-                    "Latest on the block!",
-                    null,
-                    R.drawable.ic_offers_filled,
-                    showSeeAllIcon = false,
-                    showSeeAllText = false
-                )
-                DoubleRowRectangleRestaurants(
-                    spotlightRestaurants = nearbyRestaurants,
-                    paddingValues = PaddingValues(horizontal = 15.dp),
-                    modifier = Modifier.fillParentMaxWidth(0.45f),
-                    mainNavController = mainNavController
-                )
+            when (latestOnBlockRestaurantsState) {
+                is UiState.Success -> {
+                    item {
+                        SectionHeading(
+                            "Latest on the block!",
+                            null,
+                            R.drawable.ic_offers_filled,
+                            showSeeAllIcon = false,
+                            showSeeAllText = false
+                        )
+                        DoubleRowRectangleRestaurants(
+                            spotlightRestaurants = latestOnBlockRestaurantsState.data,
+                            paddingValues = PaddingValues(horizontal = 15.dp),
+                            modifier = Modifier.fillParentMaxWidth(0.45f),
+                            mainNavController = mainNavController
+                        )
+                    }
+                }
+                is UiState.Loading -> {
+                    item { ShowCircularBottomProgress() }
+                    return@LazyColumn
+                }
+                is UiState.Failed -> {
+                    // do something
+                }
             }
 
-            item {
-                SectionHeading(
-                    "Top Offers",
-                    "Big Savings On Your Loved Eateries",
-                    R.drawable.ic_offers_filled,
-                    showSeeAllIcon = true,
-                    seeAllOnClick = {
 
+            when (topOfferRestaurantsState) {
+                is UiState.Success -> {
+                    item {
+                        SectionHeading(
+                            "Top Offers",
+                            "Big Savings On Your Loved Eateries",
+                            R.drawable.ic_offers_filled,
+                            showSeeAllIcon = true,
+                            seeAllOnClick = {
+
+                            }
+                        )
+                        DoubleRowRestaurants(
+                            spotlightRestaurants = topOfferRestaurantsState.data,
+                            mainNavController = mainNavController
+                        )
                     }
-                )
-                DoubleRowRestaurants(
-                    spotlightRestaurants = nearbyRestaurants,
-                    mainNavController = mainNavController
-                )
+                }
+                is UiState.Loading -> {
+                    item { ShowCircularBottomProgress() }
+                    return@LazyColumn
+                }
+                is UiState.Failed -> {
+                    // do something
+                }
             }
 
             item {
@@ -335,12 +364,29 @@ fun HomeScreen(
 }
 
 @Composable
+fun ShowCircularBottomProgress(
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier
+            .padding(top= 10.dp, bottom = 75.dp)
+            .fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        CircularProgressIndicator(
+            color = MaterialTheme.colors.primary
+        )
+    }
+}
+
+@Composable
 fun TopHelloBar(contentList: List<HelloBar>, modifier: Modifier = Modifier) {
     val roundShape = RoundedCornerShape(50)
     var i by remember { mutableStateOf(0) }
     val helloCount = contentList.size
 
-    if(helloCount == 0) return
+    if (helloCount == 0) return
 
     LaunchedEffect(true) {
         while (true) {
