@@ -1,6 +1,5 @@
 package com.paavam.swiggyapp.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.paavam.swiggyapp.core.data.PreviewData

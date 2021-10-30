@@ -18,11 +18,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.accompanist.pager.HorizontalPager
+import com.google.accompanist.pager.HorizontalPagerIndicator
+import com.google.accompanist.pager.rememberPagerState
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.paavam.swiggyapp.R
@@ -34,7 +39,7 @@ import com.paavam.swiggyapp.lib.LazyHorizontalGrid
 import com.paavam.swiggyapp.lib.items
 import com.paavam.swiggyapp.ui.component.*
 import com.paavam.swiggyapp.ui.component.anim.AnimateTextUpDown
-import com.paavam.swiggyapp.ui.component.image.BannerImage
+import com.paavam.swiggyapp.ui.component.image.ImageWithPlaceholder
 import com.paavam.swiggyapp.ui.component.listitem.CuisineItem
 import com.paavam.swiggyapp.ui.component.listitem.QuickTileItem
 import com.paavam.swiggyapp.ui.component.listitem.RestaurantItem
@@ -151,6 +156,7 @@ fun LoadingHomeScreen() {
     }
 }
 
+@OptIn(ExperimentalPagerApi::class)
 @ExperimentalFoundationApi
 @Composable
 fun HomeScreen(
@@ -195,10 +201,12 @@ fun HomeScreen(
             // Top announcements section
             item {
                 TopHelloBar(helloBarMessages.value)
-                AnnouncementHeading(
-                    message = announcementMessage.value,
-                    modifier = Modifier.padding(bottom = widgetBottomPadding),
-                )
+                if (announcementMessage.value.isNotBlank()) {
+                    AnnouncementHeading(
+                        message = announcementMessage.value,
+                        modifier = Modifier.padding(bottom = widgetBottomPadding),
+                    )
+                }
             }
 
             //Categories or Quick Tiles
@@ -212,17 +220,46 @@ fun HomeScreen(
             }
 
             item {
-                BannerImage(
-                    imageUrl = "https://res.cloudinary.com/paavam/image/upload/fl_lossy,f_auto,q_auto,w_550,h_310,c_fill//edilicious_eszbcy.png",
-                    modifier = Modifier.padding(bottom = widgetBottomPadding)
-                )
+                Column(
+                    Modifier
+                        .fillMaxSize()
+                        .padding(bottom = widgetBottomPadding)
+                ) {
+                    val pagerState = rememberPagerState()
+
+                    HorizontalPager(
+                        count = 5,
+                        state = pagerState,
+                        // Add 32.dp horizontal padding to 'center' the pages
+                        contentPadding = PaddingValues(start = 15.dp, end=15.dp),
+                    ) { page ->
+                        // Our page content
+                        ImageWithPlaceholder(
+                            imageUrl = "https://res.cloudinary.com/paavam/image/upload/fl_lossy,f_auto,q_auto,w_550,h_310,c_fill//edilicious_eszbcy.png",
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier
+                                .height(210.dp)
+                                .fillMaxWidth()
+                                .clip(RoundedCornerShape(15.dp)),
+                            colorFilter = null,
+                        )
+                    }
+
+                    HorizontalPagerIndicator(
+                        pagerState = pagerState,
+                        modifier = Modifier
+                            .align(Alignment.CenterHorizontally)
+                            .padding(16.dp),
+                    )
+                }
+
             }
 
             item {
                 SectionHeading(
                     "Top Picks For You",
                     null,
-                    R.drawable.ic_offers_filled,
+                    R.drawable.ic_thumbs_up,
                     showSeeAllIcon = false,
                     showSeeAllText = false
                 )
@@ -265,40 +302,6 @@ fun HomeScreen(
                         /* Do something  */
                     }
                 }
-
-            }
-
-            item {
-                SectionHeading(
-                    "All Restaurants Nearby",
-                    "Discover unique tastes near you",
-                    R.drawable.ic_shopicon,
-                    showSeeAllIcon = true,
-                    seeAllOnClick = {
-
-                    }
-                )
-            }
-
-            when (nearbyRestaurantsState) {
-                is UiState.Success -> {
-                    items(items = nearbyRestaurantsState.data) {
-                        RestaurantItem(
-                            it,
-                            Modifier.fillMaxWidth(),
-                            onRestaurantClick = {
-                                mainNavController.navigate(MainNavScreen.Restaurant.route + "/${it.restaurantId}")
-                            }
-                        )
-                    }
-                }
-                is UiState.Loading -> {
-                    item { ShowCircularBottomProgress() }
-                    return@LazyColumn
-                }
-                is UiState.Failed -> {
-                    // do something
-                }
             }
 
             when (latestOnBlockRestaurantsState) {
@@ -328,7 +331,6 @@ fun HomeScreen(
                 }
             }
 
-
             when (topOfferRestaurantsState) {
                 is UiState.Success -> {
                     item {
@@ -357,6 +359,61 @@ fun HomeScreen(
             }
 
             item {
+                SectionHeading(
+                    "All Restaurants Nearby",
+                    "Discover unique tastes near you",
+                    R.drawable.ic_shopicon,
+                    showSeeAllIcon = true,
+                    seeAllOnClick = {
+
+                    }
+                )
+            }
+
+            when (nearbyRestaurantsState) {
+                is UiState.Success -> {
+                    items(items = nearbyRestaurantsState.data) {
+                        RestaurantItem(
+                            it,
+                            Modifier.fillMaxWidth(),
+                            onRestaurantClick = {
+                                mainNavController.navigate(MainNavScreen.Restaurant.route + "/${it.restaurantId}")
+                            }
+                        )
+                    }
+                    item {
+                        Button(
+                            onClick = {},
+                            colors = ButtonDefaults.buttonColors(
+                                backgroundColor = MaterialTheme.colors.primaryVariant,
+                                contentColor = Color.White
+                            ),
+                            elevation = ButtonDefaults.elevation(0.dp, 0.dp, 0.dp),
+                            modifier = Modifier.padding(horizontal = 15.dp, vertical = 15.dp)
+                        ) {
+                            Text(
+                                "See all restaurants",
+                                style = Typography.h5,
+                                fontWeight = FontWeight.SemiBold,
+                                modifier = Modifier
+                                    .padding(horizontal = 2.dp, vertical = 5.dp)
+                                    .align(Alignment.CenterVertically)
+                                    .fillMaxWidth(),
+                                textAlign = TextAlign.Center
+                            )
+                        }
+                    }
+                }
+                is UiState.Loading -> {
+                    item { ShowCircularBottomProgress() }
+                    return@LazyColumn
+                }
+                is UiState.Failed -> {
+                    // do something
+                }
+            }
+
+            item {
                 FooterStaticImage()
             }
         }
@@ -369,7 +426,7 @@ fun ShowCircularBottomProgress(
 ) {
     Column(
         modifier = modifier
-            .padding(top= 10.dp, bottom = 75.dp)
+            .padding(top = 10.dp, bottom = 75.dp)
             .fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center

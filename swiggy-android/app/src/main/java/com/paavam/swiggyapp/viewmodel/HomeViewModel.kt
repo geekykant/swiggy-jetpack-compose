@@ -52,7 +52,7 @@ class HomeViewModel @Inject constructor(
             }
         }.onStart {
             emit(UiState.loading())
-            delay(6800)
+            delay(3800)
         }
         .shareIn(viewModelScope, SharingStarted.WhileSubscribed())
 
@@ -65,7 +65,7 @@ class HomeViewModel @Inject constructor(
             }
         }.onStart {
             emit(UiState.loading())
-            delay(1800)
+            delay(8000)
         }
         .shareIn(viewModelScope, SharingStarted.WhileSubscribed())
 
@@ -89,9 +89,14 @@ class HomeViewModel @Inject constructor(
     private fun prepareHomeData() {
         refreshing.value = true
         val announcementFlow: SharedFlow<String> =
-            flowOf(UiState.success("As per state mandates, we will be operational till 8:00 PM"))
-                .map { it.data }
-                .shareIn(viewModelScope, SharingStarted.WhileSubscribed())
+            flowOf(
+                UiState.success(
+                    listOf(
+                        "",
+                        "As per state mandates, we will be operational till 8:00 PM"
+                    ).random()
+                )
+            ).map { it.data }.shareIn(viewModelScope, SharingStarted.WhileSubscribed())
 
         viewModelScope.launch {
             combine(
@@ -103,7 +108,7 @@ class HomeViewModel @Inject constructor(
                 Quad(hello, tiles, msg, topPicksRest)
             }.onStart {
                 _state.value.initialLoadingStatus.value = UiState.loading()
-                delay(5000)
+                delay(800)
             }.collect {
                 val helloBarMessagesState = it.first
                 val quickTilesState = it.second

@@ -73,10 +73,13 @@ dependencies {
     implementation "javax.inject:javax.inject:1"
 
     //Accompanist
-    implementation 'com.google.accompanist:accompanist-systemuicontroller:0.17.0'
-    implementation 'com.google.accompanist:accompanist-insets-ui:0.17.0'
-    implementation "com.google.accompanist:accompanist-placeholder-material:0.17.0"
-    implementation "com.google.accompanist:accompanist-swiperefresh:0.17.0"
+    def accompanist_version = '0.20.0'
+    implementation "com.google.accompanist:accompanist-systemuicontroller:$accompanist_version"
+    implementation "com.google.accompanist:accompanist-insets-ui:$accompanist_version"
+    implementation "com.google.accompanist:accompanist-placeholder-material:$accompanist_version"
+    implementation "com.google.accompanist:accompanist-swiperefresh:$accompanist_version"
+    implementation "com.google.accompanist:accompanist-pager:$accompanist_version"
+    implementation "com.google.accompanist:accompanist-pager-indicators:$accompanist_version"
 
     //compose
     implementation "androidx.compose.runtime:runtime-livedata:$compose_version"
