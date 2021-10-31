@@ -91,8 +91,8 @@ fun SingleRowRestaurants(
     restaurantsList: List<Restaurant>,
     paddingValues: PaddingValues,
     mainNavController: NavController,
-    modifier: Modifier = Modifier
-){
+    modifier: Modifier = Modifier,
+) {
     LazyRow(
         modifier = modifier
             .fillMaxWidth(),

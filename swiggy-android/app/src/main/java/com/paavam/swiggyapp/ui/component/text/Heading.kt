@@ -22,7 +22,7 @@ fun SectionHeading(
     tagline: String? = null,
     iconResId: Int? = null,
     showSeeAllIcon: Boolean = false,
-    showSeeAllText: Boolean = true,
+    showSeeAllText: Boolean = false,
     seeAllText: String = "See All",
     seeAllTextColor: Color = Color.Black,
     seeAllOnClick: () -> Unit = { },

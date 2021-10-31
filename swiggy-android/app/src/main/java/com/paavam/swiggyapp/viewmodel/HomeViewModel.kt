@@ -52,7 +52,7 @@ class HomeViewModel @Inject constructor(
             }
         }.onStart {
             emit(UiState.loading())
-            delay(3800)
+//            delay(3800)
         }
         .shareIn(viewModelScope, SharingStarted.WhileSubscribed())
 
@@ -65,7 +65,7 @@ class HomeViewModel @Inject constructor(
             }
         }.onStart {
             emit(UiState.loading())
-            delay(8000)
+//            delay(8000)
         }
         .shareIn(viewModelScope, SharingStarted.WhileSubscribed())
 
@@ -87,7 +87,6 @@ class HomeViewModel @Inject constructor(
     }
 
     private fun prepareHomeData() {
-        refreshing.value = true
         val announcementFlow: SharedFlow<String> =
             flowOf(
                 UiState.success(
@@ -107,7 +106,6 @@ class HomeViewModel @Inject constructor(
             ) { hello, tiles, msg, topPicksRest ->
                 Quad(hello, tiles, msg, topPicksRest)
             }.onStart {
-                _state.value.initialLoadingStatus.value = UiState.loading()
                 delay(800)
             }.collect {
                 val helloBarMessagesState = it.first
@@ -138,6 +136,7 @@ class HomeViewModel @Inject constructor(
     fun refresh(force: Boolean = true) {
         viewModelScope.launch {
             runCatching {
+                _state.value.initialLoadingStatus.value = UiState.loading()
                 delay(3000)
                 prepareHomeData()
             }
@@ -151,6 +150,5 @@ data class HomeViewState(
     var announcementMsg: MutableStateFlow<String> = MutableStateFlow(""),
     var topPicksRestaurants: MutableStateFlow<List<Restaurant>> = MutableStateFlow(emptyList()),
     val initialLoadingStatus: MutableStateFlow<UiState<String>> = MutableStateFlow(UiState.loading()),
-    val refreshing: Boolean = false,
     val errorMessage: String? = null
 )

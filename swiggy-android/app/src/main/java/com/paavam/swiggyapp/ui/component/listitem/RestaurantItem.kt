@@ -127,7 +127,9 @@ fun RestaurantItem(
                     painterResource(id = R.drawable.ic_rating),
                     contentDescription = null,
                     tint = Color.DarkGray,
-                    modifier = Modifier.padding(end = 2.dp)
+                    modifier = Modifier
+                        .size(16.dp)
+                        .padding(end = 2.dp)
                 )
                 Text(
                     text = r.rating.toString(),
@@ -233,7 +235,9 @@ fun RestaurantItemLarge(
                     painterResource(id = R.drawable.ic_rating),
                     contentDescription = null,
                     tint = Color.DarkGray,
-                    modifier = Modifier.padding(end = 2.dp)
+                    modifier = Modifier
+                        .size(16.dp)
+                        .padding(end = 2.dp)
                 )
                 Text(
                     text = r.rating.toString(),

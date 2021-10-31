@@ -166,7 +166,6 @@ fun FoodSectionListView(
                 is MainSectionFoods -> {
                     SectionHeading(
                         title = section.getMainName(),
-                        showSeeAllText = false,
                         paddingValues = PaddingValues(15.dp, 15.dp)
                     )
                     section.subFoodSections.orEmpty().forEach { sub ->
@@ -212,7 +211,6 @@ fun SectionFoodsComposable(
         ) {
             SectionHeading(
                 title = sectionTitle,
-                showSeeAllText = false,
                 paddingValues = PaddingValues(0.dp, 8.dp)
             )
             Icon(

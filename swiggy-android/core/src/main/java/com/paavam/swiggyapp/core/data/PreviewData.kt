@@ -1,18 +1,8 @@
 package com.paavam.swiggyapp.core.data
 
-import com.paavam.swiggyapp.core.data.model.Food
-import com.paavam.swiggyapp.core.data.model.FoodType
-import com.paavam.swiggyapp.core.data.model.Cuisine
-import com.paavam.swiggyapp.core.data.model.HelloBar
-import com.paavam.swiggyapp.core.data.model.QuickTile
+import com.paavam.swiggyapp.core.data.model.*
 import com.paavam.swiggyapp.core.data.offer.model.Offer
 import com.paavam.swiggyapp.core.data.offer.model.OfferSnackType
-import com.paavam.swiggyapp.core.data.model.MainSectionFoods
-import com.paavam.swiggyapp.core.data.model.Restaurant
-import com.paavam.swiggyapp.core.data.model.RestaurantFoodModel
-import com.paavam.swiggyapp.core.data.model.SubSectionsFoods
-import com.paavam.swiggyapp.core.data.model.AddressType
-import com.paavam.swiggyapp.core.data.model.UserAddress
 
 
 object PreviewData {
@@ -30,6 +20,12 @@ object PreviewData {
             Offer(null, 40, 80, "40METOO", 129),
             Offer(null, 20, 180, "20OFFERPLOX", 600)
         )
+    )
+
+    fun prepareOffersSquareBanners() = listOf(
+        "https://res.cloudinary.com/paavam/image/upload/fl_lossy,f_auto,q_auto,c_fill,e_sharpen/preview_1_t5jhr3.png",
+        "https://res.cloudinary.com/paavam/image/upload/fl_lossy,f_auto,q_auto,c_fill,e_sharpen/preview_1_ayxop9.png",
+        "https://res.cloudinary.com/paavam/image/upload/fl_lossy,f_auto,q_auto,c_fill,e_sharpen/preview_1_u10fa6.png",
     )
 
     fun prepareCartFoods() = listOf(
@@ -273,9 +269,21 @@ object PreviewData {
 
 
     fun prepareSearchCuisines() = listOf(
-        Cuisine("Biriyani", "https://res.cloudinary.com/swiggy/image/upload/fl_lossy,f_auto,w_200,h_200,c_fill/r_max/oywmb7ianhtutwcgnieg.png"),
-        Cuisine("Pizzas", "https://res.cloudinary.com/paavam/image/upload/fl_lossy,f_auto,w_200,h_200,c_fill/r_max/b592fde4c60335141c86c5bd1756b7fd_l6gpcz.png"),
-        Cuisine("Cakes & Desserts", "https://res.cloudinary.com/paavam/image/upload/fl_lossy,f_auto,w_200,h_200,c_fill/r_max/cakes_desserts_kj7nzw.png"),
-        Cuisine("North Indian", "https://res.cloudinary.com/paavam/image/upload/fl_lossy,f_auto,w_200,h_200,c_fill/r_max/pngwing.com_soubv1.png"),
+        Cuisine(
+            "Biriyani",
+            "https://res.cloudinary.com/swiggy/image/upload/fl_lossy,f_auto,w_200,h_200,c_fill/r_max/oywmb7ianhtutwcgnieg.png"
+        ),
+        Cuisine(
+            "Pizzas",
+            "https://res.cloudinary.com/paavam/image/upload/fl_lossy,f_auto,w_200,h_200,c_fill/r_max/b592fde4c60335141c86c5bd1756b7fd_l6gpcz.png"
+        ),
+        Cuisine(
+            "Cakes & Desserts",
+            "https://res.cloudinary.com/paavam/image/upload/fl_lossy,f_auto,w_200,h_200,c_fill/r_max/cakes_desserts_kj7nzw.png"
+        ),
+        Cuisine(
+            "North Indian",
+            "https://res.cloudinary.com/paavam/image/upload/fl_lossy,f_auto,w_200,h_200,c_fill/r_max/pngwing.com_soubv1.png"
+        ),
     )
 }

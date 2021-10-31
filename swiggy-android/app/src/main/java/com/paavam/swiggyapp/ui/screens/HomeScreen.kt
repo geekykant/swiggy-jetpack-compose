@@ -1,9 +1,6 @@
 package com.paavam.swiggyapp.ui.screens
 
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -13,6 +10,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -31,6 +29,7 @@ import com.google.accompanist.pager.rememberPagerState
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.paavam.swiggyapp.R
+import com.paavam.swiggyapp.core.data.PreviewData
 import com.paavam.swiggyapp.core.data.model.AddressType
 import com.paavam.swiggyapp.core.data.model.HelloBar
 import com.paavam.swiggyapp.core.data.model.QuickTile
@@ -48,6 +47,7 @@ import com.paavam.swiggyapp.ui.component.text.SectionHeading
 import com.paavam.swiggyapp.ui.navigation.MainNavScreen
 import com.paavam.swiggyapp.ui.theme.Typography
 import com.paavam.swiggyapp.ui.utils.addShimmer
+import com.paavam.swiggyapp.ui.utils.gesturesDisabled
 import com.paavam.swiggyapp.viewmodel.HomeViewModel
 import com.paavam.swiggyapp.viewmodel.SwiggyViewModel
 import kotlinx.coroutines.delay
@@ -88,13 +88,6 @@ fun MainContent(
                 homeViewModel,
             )
         }
-
-//        HomeScreen(
-//            scrollState,
-//            outerPadding,
-//            mainNavController,
-//            homeViewModel
-//        )
     }
 }
 
@@ -130,29 +123,53 @@ fun LoadingHomeScreen() {
         )
         GrayDivider(
             modifier = Modifier
-                .width(230.dp)
+                .width(80.dp)
                 .height(20.dp)
                 .padding(vertical = 10.dp)
                 .addShimmer(true)
         )
 
+        val size = 85.dp
+        LazyRow(
+            modifier = Modifier
+                .gesturesDisabled(true)
+        ) {
+            items(items = (1..10).toList()) {
+                Column(
+                    modifier = Modifier
+                        .width(width = size)
+                        .padding(end = 10.dp)
+                ) {
+                    GrayDivider(
+                        modifier = Modifier
+                            .addShimmer(true)
+                            .size(size)
+                            .clip(RoundedCornerShape(5.dp))
+                    )
+                    GrayDivider(
+                        modifier = Modifier
+                            .padding(top = 8.dp)
+                            .addShimmer(true)
+                            .size(width = size, height = 15.dp)
+                    )
+                }
+            }
+        }
+
         Spacer(
             modifier = Modifier
                 .height(20.dp)
-                .addShimmer(true)
         )
 
-        Row(
-            modifier = Modifier.padding(vertical = 10.dp)
-        ) {
-//            (1..10).toList()
-        }
-
-        Row(
-            modifier = Modifier.padding(vertical = 10.dp)
-        ) {
-
-        }
+        ImageWithPlaceholder(
+            imageUrl = "",
+            contentScale = ContentScale.Crop,
+            modifier = Modifier
+                .addShimmer(true)
+                .height(150.dp)
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(15.dp)),
+        )
     }
 }
 
@@ -163,8 +180,7 @@ fun HomeScreen(
     scrollState: LazyListState, // Higher level is invoked, and reflected throughout
     outerPaddingValues: PaddingValues,
     mainNavController: NavController,
-    homeViewModel: HomeViewModel,
-//    nearbyRestaurants: List<Restaurant>
+    homeViewModel: HomeViewModel
 ) {
     val homeViewState by homeViewModel.state.collectAsState()
     val widgetBottomPadding = 10.dp
@@ -181,15 +197,12 @@ fun HomeScreen(
     val topOfferRestaurantsState =
         homeViewModel.topOfferRestaurants.collectAsState(UiState.loading()).value
 
-//    val helloBarMessages = homeViewModel.helloBarMessages.collectAsState()
-//    val quickTiles = homeViewModel.quickTiles.collectAsState()
-
     val helloBarMessages = homeViewState.helloBarMessages.collectAsState()
     val quickTiles = homeViewState.quickTiles.collectAsState()
     val announcementMessage = homeViewState.announcementMsg.collectAsState()
 
     SwipeRefresh(
-        state = rememberSwipeRefreshState(homeViewState.refreshing),
+        state = rememberSwipeRefreshState(homeViewState.initialLoadingStatus.value is UiState.Loading),
         onRefresh = { homeViewModel.refresh(force = true) },
     ) {
         LazyColumn(
@@ -215,33 +228,61 @@ fun HomeScreen(
                     quickTiles.value,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(bottom = widgetBottomPadding)
                 )
+            }
+
+            item {
+                val roundShape = RoundedCornerShape(18.dp)
+                SectionHeading("Gear-up for the big season!")
+                LazyRow(
+                    modifier = Modifier
+                        .padding(vertical = 5.dp)
+                        .fillMaxWidth(),
+                    contentPadding = PaddingValues(start = 15.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ){
+                    items(items = PreviewData.prepareOffersSquareBanners()){
+                        ImageWithPlaceholder(
+                            imageUrl = it,
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier
+                                .clickable {  }
+                                .size(160.dp)
+                                .shadow(2.dp, roundShape)
+                                .border(0.7.dp, Color(0x1A000000), shape = roundShape)
+                                .clip(roundShape)
+                        )
+                    }
+                }
             }
 
             item {
                 Column(
                     Modifier
                         .fillMaxSize()
-                        .padding(bottom = widgetBottomPadding)
+                        .padding(vertical = widgetBottomPadding + 10.dp)
                 ) {
-                    val pagerState = rememberPagerState()
+                    SectionHeading("Today's Featured")
 
+                    val pagerState = rememberPagerState()
                     HorizontalPager(
                         count = 5,
                         state = pagerState,
                         // Add 32.dp horizontal padding to 'center' the pages
-                        contentPadding = PaddingValues(start = 15.dp, end=15.dp),
+                        contentPadding = PaddingValues(start = 15.dp, end = 32.dp),
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        itemSpacing = 15.dp
                     ) { page ->
                         // Our page content
                         ImageWithPlaceholder(
                             imageUrl = "https://res.cloudinary.com/paavam/image/upload/fl_lossy,f_auto,q_auto,w_550,h_310,c_fill//edilicious_eszbcy.png",
                             contentScale = ContentScale.Crop,
                             modifier = Modifier
-                                .height(210.dp)
+                                .clickable { }
+                                .height(180.dp)
                                 .fillMaxWidth()
                                 .clip(RoundedCornerShape(15.dp)),
-                            colorFilter = null,
                         )
                     }
 
@@ -250,6 +291,8 @@ fun HomeScreen(
                         modifier = Modifier
                             .align(Alignment.CenterHorizontally)
                             .padding(16.dp),
+                        activeColor = MaterialTheme.colors.primaryVariant,
+                        inactiveColor = Color(0x1A000000)
                     )
                 }
 
@@ -260,8 +303,7 @@ fun HomeScreen(
                     "Top Picks For You",
                     null,
                     R.drawable.ic_thumbs_up,
-                    showSeeAllIcon = false,
-                    showSeeAllText = false
+                    showSeeAllIcon = false
                 )
                 SingleRowRestaurants(
                     homeViewState.topPicksRestaurants.value,
@@ -275,8 +317,7 @@ fun HomeScreen(
                     is UiState.Success -> {
                         val cuisineList = popularCurationsState.data
                         SectionHeading(
-                            title = "Popular Curations",
-                            showSeeAllText = false
+                            title = "Popular Curations"
                         )
                         LazyHorizontalGrid(
                             cells = GridCells.Fixed(2),
@@ -311,8 +352,7 @@ fun HomeScreen(
                             "Latest on the block!",
                             null,
                             R.drawable.ic_offers_filled,
-                            showSeeAllIcon = false,
-                            showSeeAllText = false
+                            showSeeAllIcon = false
                         )
                         DoubleRowRectangleRestaurants(
                             spotlightRestaurants = latestOnBlockRestaurantsState.data,
@@ -426,13 +466,14 @@ fun ShowCircularBottomProgress(
 ) {
     Column(
         modifier = modifier
-            .padding(top = 10.dp, bottom = 75.dp)
+            .padding(top = 20.dp, bottom = 75.dp)
             .fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
         CircularProgressIndicator(
-            color = MaterialTheme.colors.primary
+            color = MaterialTheme.colors.primary,
+            strokeWidth = 2.dp
         )
     }
 }
@@ -566,5 +607,5 @@ fun QuickTilesList(content: List<QuickTile>, modifier: Modifier = Modifier) {
         }
     }
 
-    HorizontalSliderUi(horizontalScrollState, Modifier.padding(top = 10.dp, bottom = 15.dp))
+    HorizontalSliderUi(horizontalScrollState, Modifier.padding(top = 10.dp, bottom = 20.dp))
 }

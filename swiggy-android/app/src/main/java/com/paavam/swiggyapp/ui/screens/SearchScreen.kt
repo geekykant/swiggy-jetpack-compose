@@ -68,8 +68,7 @@ fun SearchScreen(
         item {
             Spacer(modifier = modifier.height(20.dp))
             SectionHeading(
-                title = "Popular Cuisines",
-                showSeeAllText = false,
+                title = "Popular Cuisines"
             )
 
             val searchCuisinesList = PreviewData.prepareSearchCuisines()
