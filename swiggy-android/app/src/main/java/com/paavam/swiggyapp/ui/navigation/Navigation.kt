@@ -1,5 +1,10 @@
 package com.paavam.swiggyapp.ui.navigation
 
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -8,30 +13,31 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
+import com.google.accompanist.navigation.animation.AnimatedNavHost
+import com.google.accompanist.navigation.animation.composable
+import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import com.paavam.swiggyapp.ui.RestaurantMain
 import com.paavam.swiggyapp.ui.screens.*
 import com.paavam.swiggyapp.ui.theme.Typography
 import com.paavam.swiggyapp.viewmodel.SwiggyViewModel
 
+@OptIn(ExperimentalAnimationApi::class)
 @ExperimentalFoundationApi
 @Composable
 fun MainNavigation(
     mainNavController: NavHostController,
     swiggyViewModel: SwiggyViewModel
 ) {
-    NavHost(mainNavController, startDestination = MainNavScreen.MainHome.route) {
+    AnimatedNavHost(mainNavController, startDestination = MainNavScreen.MainHome.route) {
         composable(MainNavScreen.MainHome.route) {
-            val navController = rememberNavController()
+            val navController = rememberAnimatedNavController()
 
             Scaffold(
                 topBar = { },
                 bottomBar = { BottomNavigationBar(navController) }
             ) { outerPaddingValues ->
                 // sets the NavHost and default start to [NavScreen.Home]
-                Navigation(
+                NavigationSub(
                     navController,
                     outerPaddingValues,
                     swiggyViewModel,
@@ -49,7 +55,19 @@ fun MainNavigation(
 
         composable(
             MainNavScreen.Restaurant.route + "/{restaurantId}",
-//            arguments = listOf(navArgument("restaurantId") { type = NavType.LongType })
+//            arguments = listOf(navArgument("restaurantId") { type = NavType.LongType }),
+            enterTransition = { initial, _ ->
+                slideInHorizontally(initialOffsetX = { 1000 }, animationSpec = tween(300, easing = LinearEasing))
+            },
+            exitTransition = { _, target ->
+                slideOutHorizontally(targetOffsetX = { -1000 }, animationSpec = tween(300, easing = LinearEasing))
+            },
+            popEnterTransition = { initial, _ ->
+                slideInHorizontally(initialOffsetX = { -1000 }, animationSpec = tween(300, easing = LinearEasing))
+            },
+            popExitTransition = { _, target ->
+                slideOutHorizontally(targetOffsetX = { 1000 }, animationSpec = tween(300, easing = LinearEasing))
+            }
         ) {
             it.arguments?.getString("restaurantId")?.toLong()?.let { restaurantId ->
                 RestaurantMain(
@@ -62,15 +80,16 @@ fun MainNavigation(
 }
 
 
+@OptIn(ExperimentalAnimationApi::class)
 @ExperimentalFoundationApi
 @Composable
-fun Navigation(
+fun NavigationSub(
     navController: NavHostController,
     outerPadding: PaddingValues,
     swiggyViewModel: SwiggyViewModel,
     mainNavController: NavHostController
 ) {
-    NavHost(navController, startDestination = NavScreen.Home.route) {
+    AnimatedNavHost(navController, startDestination = NavScreen.Home.route) {
         composable(NavScreen.Home.route) {
             MainContent(
                 outerPadding,

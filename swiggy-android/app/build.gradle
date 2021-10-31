@@ -30,6 +30,16 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
 
         }
+        debugTest {
+            minifyEnabled = true
+            proguardFiles(
+                    getDefaultProguardFile("proguard-android.txt"),
+                    "proguard-rules.pro"
+            )
+            versionNameSuffix = "-debugTest"
+            applicationIdSuffix = ".debug"
+            signingConfig = signingConfigs.getByName("debug")
+        }
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -80,6 +90,7 @@ dependencies {
     implementation "com.google.accompanist:accompanist-swiperefresh:$accompanist_version"
     implementation "com.google.accompanist:accompanist-pager:$accompanist_version"
     implementation "com.google.accompanist:accompanist-pager-indicators:$accompanist_version"
+    implementation "com.google.accompanist:accompanist-navigation-animation:$accompanist_version"
 
     //compose
     implementation "androidx.compose.runtime:runtime-livedata:$compose_version"

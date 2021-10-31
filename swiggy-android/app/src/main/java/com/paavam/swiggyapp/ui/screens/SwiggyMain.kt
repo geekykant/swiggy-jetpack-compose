@@ -1,5 +1,6 @@
 package com.paavam.swiggyapp.ui.screens
 
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -20,7 +21,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.compose.rememberNavController
+import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import com.paavam.swiggyapp.R
 import com.paavam.swiggyapp.lib.AddressChooserRadio
 import com.paavam.swiggyapp.ui.navigation.MainNavigation
@@ -31,6 +32,7 @@ import com.paavam.swiggyapp.ui.utils.PermissionUtils
 import com.paavam.swiggyapp.viewmodel.SwiggyViewModel
 import java.util.*
 
+@OptIn(ExperimentalAnimationApi::class)
 @ExperimentalMaterialApi
 @ExperimentalFoundationApi
 @Composable
@@ -69,7 +71,7 @@ fun SwiggyMain() {
             modifier = Modifier.fillMaxSize(),
             sheetBackgroundColor = Color.White
         ) {
-            val mainNavController = rememberNavController()
+            val mainNavController = rememberAnimatedNavController()
             MainNavigation(
                 mainNavController,
                 swiggyViewModel

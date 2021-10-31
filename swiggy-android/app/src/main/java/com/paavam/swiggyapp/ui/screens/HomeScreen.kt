@@ -224,11 +224,11 @@ fun HomeScreen(
 
             //Categories or Quick Tiles
             item {
-                QuickTilesList(
-                    quickTiles.value,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                )
+//                QuickTilesList(
+//                    quickTiles.value,
+//                    modifier = Modifier
+//                        .fillMaxWidth()
+//                )
             }
 
             item {
@@ -237,8 +237,9 @@ fun HomeScreen(
                 LazyRow(
                     modifier = Modifier
                         .padding(vertical = 5.dp)
+                        .padding(bottom = widgetBottomPadding)
                         .fillMaxWidth(),
-                    contentPadding = PaddingValues(start = 15.dp),
+                    contentPadding = PaddingValues(horizontal = 15.dp),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ){
                     items(items = PreviewData.prepareOffersSquareBanners()){
@@ -246,7 +247,7 @@ fun HomeScreen(
                             imageUrl = it,
                             contentScale = ContentScale.Crop,
                             modifier = Modifier
-                                .clickable {  }
+                                .clickable { }
                                 .size(160.dp)
                                 .shadow(2.dp, roundShape)
                                 .border(0.7.dp, Color(0x1A000000), shape = roundShape)
@@ -254,48 +255,6 @@ fun HomeScreen(
                         )
                     }
                 }
-            }
-
-            item {
-                Column(
-                    Modifier
-                        .fillMaxSize()
-                        .padding(vertical = widgetBottomPadding + 10.dp)
-                ) {
-                    SectionHeading("Today's Featured")
-
-                    val pagerState = rememberPagerState()
-                    HorizontalPager(
-                        count = 5,
-                        state = pagerState,
-                        // Add 32.dp horizontal padding to 'center' the pages
-                        contentPadding = PaddingValues(start = 15.dp, end = 32.dp),
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        itemSpacing = 15.dp
-                    ) { page ->
-                        // Our page content
-                        ImageWithPlaceholder(
-                            imageUrl = "https://res.cloudinary.com/paavam/image/upload/fl_lossy,f_auto,q_auto,w_550,h_310,c_fill//edilicious_eszbcy.png",
-                            contentScale = ContentScale.Crop,
-                            modifier = Modifier
-                                .clickable { }
-                                .height(180.dp)
-                                .fillMaxWidth()
-                                .clip(RoundedCornerShape(15.dp)),
-                        )
-                    }
-
-                    HorizontalPagerIndicator(
-                        pagerState = pagerState,
-                        modifier = Modifier
-                            .align(Alignment.CenterHorizontally)
-                            .padding(16.dp),
-                        activeColor = MaterialTheme.colors.primaryVariant,
-                        inactiveColor = Color(0x1A000000)
-                    )
-                }
-
             }
 
             item {
@@ -399,6 +358,48 @@ fun HomeScreen(
             }
 
             item {
+                Column(
+                    Modifier
+                        .fillMaxSize()
+                        .padding(vertical = widgetBottomPadding + 10.dp)
+                ) {
+                    SectionHeading("Today's Featured")
+
+                    val pagerState = rememberPagerState()
+                    HorizontalPager(
+                        count = 5,
+                        state = pagerState,
+                        // Add 32.dp horizontal padding to 'center' the pages
+                        contentPadding = PaddingValues(start = 15.dp, end = 32.dp),
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        itemSpacing = 15.dp
+                    ) { page ->
+                        // Our page content
+                        ImageWithPlaceholder(
+                            imageUrl = "https://res.cloudinary.com/paavam/image/upload/fl_lossy,f_auto,q_auto,w_550,h_310,c_fill//edilicious_eszbcy.png",
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier
+                                .clickable { }
+                                .height(180.dp)
+                                .fillMaxWidth()
+                                .clip(RoundedCornerShape(15.dp)),
+                        )
+                    }
+
+                    HorizontalPagerIndicator(
+                        pagerState = pagerState,
+                        modifier = Modifier
+                            .align(Alignment.CenterHorizontally)
+                            .padding(16.dp),
+                        activeColor = MaterialTheme.colors.primaryVariant,
+                        inactiveColor = Color(0x1A000000)
+                    )
+                }
+
+            }
+
+            item {
                 SectionHeading(
                     "All Restaurants Nearby",
                     "Discover unique tastes near you",
@@ -410,17 +411,29 @@ fun HomeScreen(
                 )
             }
 
+
             when (nearbyRestaurantsState) {
                 is UiState.Success -> {
-                    items(items = nearbyRestaurantsState.data) {
-                        RestaurantItem(
-                            it,
-                            Modifier.fillMaxWidth(),
-                            onRestaurantClick = {
-                                mainNavController.navigate(MainNavScreen.Restaurant.route + "/${it.restaurantId}")
-                            }
-                        )
+                    nearbyRestaurantsState.data.forEach {
+                        item{
+                            RestaurantItem(
+                                it,
+                                Modifier.fillMaxWidth(),
+                                onRestaurantClick = {
+                                    mainNavController.navigate(MainNavScreen.Restaurant.route + "/${it.restaurantId}")
+                                }
+                            )
+                        }
                     }
+//                    items(items = nearbyRestaurantsState.data) {
+//                        RestaurantItem(
+//                            it,
+//                            Modifier.fillMaxWidth(),
+//                            onRestaurantClick = {
+//                                mainNavController.navigate(MainNavScreen.Restaurant.route + "/${it.restaurantId}")
+//                            }
+//                        )
+//                    }
                     item {
                         Button(
                             onClick = {},

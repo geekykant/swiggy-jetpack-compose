@@ -37,16 +37,19 @@ fun SectionHeading(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Row {
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 iconResId?.let {
                     Image(
                         painter = painterResource(iconResId),
                         contentDescription = null,
                         modifier = Modifier
-                            .size(28.dp)
-                            .padding(3.dp)
+                            .padding(2.dp)
+                            .size(20.dp)
                             .align(Alignment.CenterVertically)
                     )
+                    Spacer(modifier = Modifier.width(5.dp))
                 }
                 Text(
                     text = title,
