@@ -22,10 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.google.accompanist.pager.ExperimentalPagerApi
-import com.google.accompanist.pager.HorizontalPager
-import com.google.accompanist.pager.HorizontalPagerIndicator
-import com.google.accompanist.pager.rememberPagerState
+import com.google.accompanist.pager.*
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.paavam.swiggyapp.R
@@ -52,6 +49,7 @@ import com.paavam.swiggyapp.viewmodel.HomeViewModel
 import com.paavam.swiggyapp.viewmodel.SwiggyViewModel
 import kotlinx.coroutines.delay
 
+@OptIn(ExperimentalPagerApi::class)
 @ExperimentalFoundationApi
 @Composable
 fun MainContent(
@@ -64,6 +62,7 @@ fun MainContent(
 
     val homeViewModel: HomeViewModel = hiltViewModel()
     val homeViewState = homeViewModel.state.collectAsState()
+    val pagerState = rememberPagerState()
 
     Scaffold(
         topBar = {
@@ -86,6 +85,7 @@ fun MainContent(
                 outerPadding,
                 mainNavController,
                 homeViewModel,
+                pagerState
             )
         }
     }
@@ -180,7 +180,8 @@ fun HomeScreen(
     scrollState: LazyListState, // Higher level is invoked, and reflected throughout
     outerPaddingValues: PaddingValues,
     mainNavController: NavController,
-    homeViewModel: HomeViewModel
+    homeViewModel: HomeViewModel,
+    pagerState: PagerState
 ) {
     val homeViewState by homeViewModel.state.collectAsState()
     val widgetBottomPadding = 10.dp
@@ -224,11 +225,11 @@ fun HomeScreen(
 
             //Categories or Quick Tiles
             item {
-//                QuickTilesList(
-//                    quickTiles.value,
-//                    modifier = Modifier
-//                        .fillMaxWidth()
-//                )
+                QuickTilesList(
+                    quickTiles.value,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                )
             }
 
             item {
@@ -241,8 +242,8 @@ fun HomeScreen(
                         .fillMaxWidth(),
                     contentPadding = PaddingValues(horizontal = 15.dp),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ){
-                    items(items = PreviewData.prepareOffersSquareBanners()){
+                ) {
+                    items(items = PreviewData.prepareOffersSquareBanners()) {
                         ImageWithPlaceholder(
                             imageUrl = it,
                             contentScale = ContentScale.Crop,
@@ -307,18 +308,22 @@ fun HomeScreen(
             when (latestOnBlockRestaurantsState) {
                 is UiState.Success -> {
                     item {
-                        SectionHeading(
-                            "Latest on the block!",
-                            null,
-                            R.drawable.ic_offers_filled,
-                            showSeeAllIcon = false
-                        )
-                        DoubleRowRectangleRestaurants(
-                            spotlightRestaurants = latestOnBlockRestaurantsState.data,
-                            paddingValues = PaddingValues(horizontal = 15.dp),
-                            modifier = Modifier.fillParentMaxWidth(0.45f),
-                            mainNavController = mainNavController
-                        )
+                        Column(
+                            modifier = Modifier.padding(bottom = widgetBottomPadding)
+                        ) {
+                            SectionHeading(
+                                "Latest on the block!",
+                                null,
+                                R.drawable.ic_offers_filled,
+                                showSeeAllIcon = false
+                            )
+                            DoubleRowRectangleRestaurants(
+                                spotlightRestaurants = latestOnBlockRestaurantsState.data,
+                                paddingValues = PaddingValues(horizontal = 15.dp),
+                                modifier = Modifier.fillParentMaxWidth(0.45f),
+                                mainNavController = mainNavController
+                            )
+                        }
                     }
                 }
                 is UiState.Loading -> {
@@ -357,33 +362,33 @@ fun HomeScreen(
                 }
             }
 
+            val bannersUrls = PreviewData.prepareBannerImages()
+
             item {
                 Column(
-                    Modifier
-                        .fillMaxSize()
-                        .padding(vertical = widgetBottomPadding + 10.dp)
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = widgetBottomPadding)
                 ) {
                     SectionHeading("Today's Featured")
 
-                    val pagerState = rememberPagerState()
                     HorizontalPager(
-                        count = 5,
+                        count = bannersUrls.size,
                         state = pagerState,
-                        // Add 32.dp horizontal padding to 'center' the pages
                         contentPadding = PaddingValues(start = 15.dp, end = 32.dp),
                         modifier = Modifier
                             .fillMaxWidth(),
                         itemSpacing = 15.dp
-                    ) { page ->
+                    ) { page_no ->
                         // Our page content
                         ImageWithPlaceholder(
-                            imageUrl = "https://res.cloudinary.com/paavam/image/upload/fl_lossy,f_auto,q_auto,w_550,h_310,c_fill//edilicious_eszbcy.png",
+                            imageUrl = bannersUrls[page_no],
                             contentScale = ContentScale.Crop,
                             modifier = Modifier
                                 .clickable { }
                                 .height(180.dp)
                                 .fillMaxWidth()
-                                .clip(RoundedCornerShape(15.dp)),
+                                .clip(RoundedCornerShape(8.dp)),
                         )
                     }
 
@@ -396,8 +401,8 @@ fun HomeScreen(
                         inactiveColor = Color(0x1A000000)
                     )
                 }
-
             }
+
 
             item {
                 SectionHeading(
@@ -414,26 +419,15 @@ fun HomeScreen(
 
             when (nearbyRestaurantsState) {
                 is UiState.Success -> {
-                    nearbyRestaurantsState.data.forEach {
-                        item{
-                            RestaurantItem(
-                                it,
-                                Modifier.fillMaxWidth(),
-                                onRestaurantClick = {
-                                    mainNavController.navigate(MainNavScreen.Restaurant.route + "/${it.restaurantId}")
-                                }
-                            )
-                        }
+                    items(items = nearbyRestaurantsState.data) {
+                        RestaurantItem(
+                            it,
+                            Modifier.fillMaxWidth(),
+                            onRestaurantClick = {
+                                mainNavController.navigate(MainNavScreen.Restaurant.route + "/${it.restaurantId}")
+                            }
+                        )
                     }
-//                    items(items = nearbyRestaurantsState.data) {
-//                        RestaurantItem(
-//                            it,
-//                            Modifier.fillMaxWidth(),
-//                            onRestaurantClick = {
-//                                mainNavController.navigate(MainNavScreen.Restaurant.route + "/${it.restaurantId}")
-//                            }
-//                        )
-//                    }
                     item {
                         Button(
                             onClick = {},

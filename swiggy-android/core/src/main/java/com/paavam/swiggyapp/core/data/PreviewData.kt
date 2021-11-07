@@ -286,4 +286,14 @@ object PreviewData {
             "https://res.cloudinary.com/paavam/image/upload/fl_lossy,f_auto,w_200,h_200,c_fill/r_max/pngwing.com_soubv1.png"
         ),
     )
+
+    fun prepareBannerImages() = listOf(
+        "https://res.cloudinary.com/paavam/fl_lossy,f_auto,q_auto,w_550,h_280,c_fill/banners/7_jvrzmj.jpg",
+        "https://res.cloudinary.com/paavam/fl_lossy,f_auto,q_auto,w_550,h_280,c_fill/banners/3_bjjgac.jpg",
+        "https://res.cloudinary.com/paavam/fl_lossy,f_auto,q_auto,w_550,h_280,c_fill/banners/6_kxr59g.jpg",
+        "https://res.cloudinary.com/paavam/fl_lossy,f_auto,q_auto,w_550,h_280,c_fill/banners/4_qvgocp.jpg",
+        "https://res.cloudinary.com/paavam/fl_lossy,f_auto,q_auto,w_550,h_280,c_fill/banners/1_lbdrsz.jpg",
+        "https://res.cloudinary.com/paavam/fl_lossy,f_auto,q_auto,w_550,h_280,c_fill/banners/2_kpfmkl.jpg",
+        "https://res.cloudinary.com/paavam/fl_lossy,f_auto,q_auto,w_550,h_280,c_fill/banners/5_y2lwyw.jpg",
+    )
 }
