@@ -16,18 +16,14 @@ class SwiggyRemoteRestaurantRepository @Inject internal constructor(
     private val swiggyRestaurantService: SwiggyRestaurantService
 ) : SwiggyRestaurantRepository {
 
-    override suspend fun fetchThisRestaurant(): ResponseResult<Restaurant> {
-        return runCatching {
-            val restaurantResponse = swiggyRestaurantService.fetchThisRestaurant().getResponse()
-            when (restaurantResponse.status) {
-                State.SUCCESS -> ResponseResult.success(restaurantResponse.data)
-                else -> ResponseResult.error(restaurantResponse.message)
-            }
-        }.getOrElse {
-            it.printStackTrace()
-            ResponseResult.error("Something went wrong!")
+    override fun fetchThisRestaurant(): Flow<ResponseResult<Restaurant>> = flow {
+        val restaurantResponse = swiggyRestaurantService.fetchThisRestaurant().getResponse()
+        val state = when (restaurantResponse.status) {
+            State.SUCCESS -> ResponseResult.success(restaurantResponse.data)
+            else -> ResponseResult.error(restaurantResponse.message)
         }
-    }
+        emit(state)
+    }.catch { emit(ResponseResult.error("Unable to fetch restaurant")) }
 
     override suspend fun fetchThisRestaurantFoods(): ResponseResult<RestaurantFoodModel> {
         return runCatching {

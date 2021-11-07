@@ -1,10 +1,8 @@
 package com.paavam.swiggyapp.ui.navigation
 
-import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.*
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -87,9 +85,14 @@ fun NavigationSub(
     navController: NavHostController,
     outerPadding: PaddingValues,
     swiggyViewModel: SwiggyViewModel,
-    mainNavController: NavHostController
+    mainNavController: NavHostController,
 ) {
-    AnimatedNavHost(navController, startDestination = NavScreen.Home.route) {
+    AnimatedNavHost(
+        navController,
+        startDestination = NavScreen.Home.route,
+        enterTransition = { _, _ -> fadeIn(animationSpec = tween(300)) },
+        exitTransition = { _, _ -> fadeOut(animationSpec = tween(300)) }
+    ) {
         composable(NavScreen.Home.route) {
             MainContent(
                 outerPadding,

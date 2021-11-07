@@ -19,11 +19,14 @@ import com.paavam.swiggyapp.core.data.model.FoodType
 import com.paavam.swiggyapp.ui.component.AddToCartComposable
 import com.paavam.swiggyapp.ui.theme.Typography
 import com.paavam.swiggyapp.ui.utils.addShimmer
+import com.paavam.swiggyapp.ui.utils.noRippleClickable
 
 @Composable
 fun CartFoodItem(
     food: Food,
     isLoading: Boolean = false,
+    onQuantityChange: (Int) -> Unit,
+    onCustomizeClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -60,21 +63,28 @@ fun CartFoodItem(
                     .addShimmer(isLoading)
             )
 
-            Row(
-                modifier = Modifier.alpha(if (isLoading) 0f else 1f)
-            ) {
-                Text(
-                    "CUSTOMIZE",
-                )
-                Icon(
-                    painterResource(id = R.drawable.ic_expand),
-                    null,
+            if (food.hasCustomizationAvailable) {
+                Row(
                     modifier = Modifier
-                        .padding(horizontal = 3.dp)
-                        .align(Alignment.CenterVertically)
-                        .size(15.dp),
-                    tint = MaterialTheme.colors.primary
-                )
+                        .alpha(if (isLoading) 0f else 1f)
+                        .run {
+                            if (!isLoading) noRippleClickable(onCustomizeClick)
+                            else this
+                        }
+                ) {
+                    Text(
+                        "CUSTOMIZE",
+                    )
+                    Icon(
+                        painterResource(id = R.drawable.ic_expand),
+                        null,
+                        modifier = Modifier
+                            .padding(horizontal = 3.dp)
+                            .align(Alignment.CenterVertically)
+                            .size(15.dp),
+                        tint = MaterialTheme.colors.primary
+                    )
+                }
             }
         }
 
@@ -82,7 +92,7 @@ fun CartFoodItem(
             AddToCartComposable(
                 cartQuantity = if (isLoading) 0 else food.quantityInCart,
                 onQuantityChange = {
-                    food.quantityInCart = it
+                    onQuantityChange(it)
                 },
                 modifier = Modifier.padding(horizontal = 2.dp),
                 isLoading = isLoading

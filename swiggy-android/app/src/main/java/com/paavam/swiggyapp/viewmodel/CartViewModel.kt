@@ -5,11 +5,11 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.paavam.swiggyapp.core.ResponseResult
-import com.paavam.swiggyapp.core.data.PreviewData
 import com.paavam.swiggyapp.core.data.model.Food
 import com.paavam.swiggyapp.core.data.model.Restaurant
 import com.paavam.swiggyapp.core.data.offer.model.Offer
 import com.paavam.swiggyapp.core.data.repository.SwiggyCartRepository
+import com.paavam.swiggyapp.core.data.repository.SwiggyRestaurantRepository
 import com.paavam.swiggyapp.core.ui.UiState
 import com.paavam.swiggyapp.di.RemoteRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -21,7 +21,8 @@ import kotlin.math.roundToInt
 
 @HiltViewModel
 class CartViewModel @Inject constructor(
-    @RemoteRepository private val cartRepository: SwiggyCartRepository
+    @RemoteRepository private val cartRepository: SwiggyCartRepository,
+    @RemoteRepository private val restaurantRepository: SwiggyRestaurantRepository
 ) : ViewModel() {
     private val _state = MutableStateFlow(CartViewState())
     val state: StateFlow<CartViewState> get() = _state
@@ -33,35 +34,61 @@ class CartViewModel @Inject constructor(
         _userMessageToRestaurant.value = newText
     }
 
-    val cartFoods: SharedFlow<UiState<List<Food>>> = cartRepository
-        .fetchUsersCartFoods()
-        .map { result ->
-            when (result) {
-                is ResponseResult.Success -> UiState.success(result.data)
-                is ResponseResult.Error -> UiState.failed(result.message)
-            }
-        }.onStart {
-            emit(UiState.loading())
-            delay(800)
-        }
-        .shareIn(viewModelScope, SharingStarted.WhileSubscribed())
-
-
     init {
         prepareCartData()
     }
 
     private fun prepareCartData() {
         viewModelScope.launch {
-            val cartAmount = CartAmount(982.00f, 35.00f, 0, 25f)
+            combine(
+                cartRepository.fetchUsersCartFoods(),
+                restaurantRepository.fetchThisRestaurant()
+            ) { cartFoods, restaurant ->
+                Pair(cartFoods, restaurant)
+            }.onStart {
+                delay(800)
+            }.collect { results ->
+                val cartFoods = results.first
+                val restaurant = results.second
 
-            _state.value = CartViewState(
-//                cartFoodList = cartFoods,
-                mainRestaurant = PreviewData.prepareARestaurant(),
-//                refreshing = refreshing.value,
-                totalAmount = cartAmount.toPayTotal()
-            )
+                if (cartFoods is ResponseResult.Success && restaurant is ResponseResult.Success) {
+                    val cartAmount = CartAmount(
+                        cartFoods.data.sumOf { it.price * it.quantityInCart }.toFloat(),
+                        35.00f,
+                        0,
+                        25f
+                    )
+                    _state.value.cartFoodList.value = cartFoods.data
+                    _state.value.mainRestaurant.value = restaurant.data
+                    _state.value.cartAmount.value = cartAmount
+                    _state.value.totalAmount.value = cartAmount.toPayTotal()
+                    _state.value.initialLoadingStatus.value = UiState.success("success")
+                } else {
+                    _state.value.initialLoadingStatus.value = UiState.failed("failed")
+                }
+            }
         }
+    }
+
+    fun notifyItemChange(food: Food, updatedQuantity: Int) {
+        viewModelScope.launch {
+            val response = cartRepository.updateUsersCartFood(food = food, foodId = food.foodId)
+            if (response is ResponseResult.Success) {
+                _state.value.cartFoodList.emit(
+                    _state.value.cartFoodList.value.toMutableList().apply {
+                        find { it.foodId == food.foodId }?.also {
+                            it.quantityInCart = updatedQuantity
+                        }
+                    })
+
+            } else {
+                //throw error
+            }
+        }
+    }
+
+    fun notifyCustomizationAdded() {
+
     }
 }
 
@@ -74,7 +101,7 @@ data class CartAmount(
 ) {
     private val beforeTaxAmount = itemTotal + deliveryTip + deliveryFee
 
-    fun calculatePayableGSTAmount(): Float {
+    private fun calculatePayableGSTAmount(): Float {
         return (restaurantGSTRate * beforeTaxAmount) / 100f
     }
 
@@ -88,12 +115,13 @@ data class CartAmount(
 }
 
 data class CartViewState(
-    val cartAmount: CartAmount? = null,
-//    val cartFoodList: List<Food> = emptyList(),
-    val mainRestaurant: Restaurant? = null,
+    val cartAmount: MutableStateFlow<CartAmount?> = MutableStateFlow(null),
+    val cartFoodList: MutableStateFlow<List<Food>> = MutableStateFlow(emptyList()),
+    val mainRestaurant: MutableStateFlow<Restaurant?> = MutableStateFlow(null),
     val isShopOpen: Boolean = true,
     val isOfferApplied: Boolean = false,
     val selectedOffer: Offer? = null,
-    val totalAmount: Float? = null,
+    val totalAmount: MutableStateFlow<Float?> = MutableStateFlow(null),
     val refreshing: Boolean = false,
+    val initialLoadingStatus: MutableStateFlow<UiState<String>> = MutableStateFlow(UiState.loading()),
 )

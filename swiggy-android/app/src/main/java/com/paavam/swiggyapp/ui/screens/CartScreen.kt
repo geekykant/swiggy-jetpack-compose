@@ -63,8 +63,8 @@ fun CartScreen(
     navController: NavController,
     outerPadding: PaddingValues
 ) {
-    val viewModel: CartViewModel = hiltViewModel()
-    val foodsListState = viewModel.cartFoods.collectAsState(UiState.loading()).value
+    val cartViewModel: CartViewModel = hiltViewModel()
+    val foodsListState = cartViewModel.state.value.initialLoadingStatus.collectAsState(UiState.loading()).value
 
     ProvideWindowInsets {
         when (foodsListState) {
@@ -75,8 +75,7 @@ fun CartScreen(
                     /* Check for internet/error again */
                 })
             is UiState.Success -> SuccessCartScreen(
-                foodsList = foodsListState.data,
-                viewModel = viewModel,
+                cartViewModel = cartViewModel,
                 navController = navController,
                 outerPaddingValues = outerPadding
             )
@@ -104,7 +103,9 @@ fun LoadingCartScreen() {
             food = Food(0L, "", FoodType.VEG, null, 0, "", ""),
             modifier = Modifier
                 .padding(vertical = 10.dp, horizontal = 15.dp),
-            isLoading = true
+            isLoading = true,
+            onQuantityChange = { },
+            onCustomizeClick = { }
         )
         GrayDivider(
             modifier = Modifier
@@ -133,11 +134,12 @@ fun ErrorCartScreen(
 @ExperimentalFoundationApi
 @Composable
 fun SuccessCartScreen(
-    viewModel: CartViewModel,
-    foodsList: List<Food> = emptyList(),
+    cartViewModel: CartViewModel,
     navController: NavController,
     outerPaddingValues: PaddingValues
 ) {
+    val foodsList = cartViewModel.state.value.cartFoodList.collectAsState().value
+
     when (foodsList.isEmpty()) {
         true -> PlaceholderMessageOutlinedButtonScreen(
             title = "Good Food Is Always Cooking",
@@ -159,14 +161,13 @@ fun SuccessCartScreen(
 
             Box(Modifier.fillMaxSize()) {
                 ShowItemsInCart(
-                    viewModel = viewModel,
-                    foods = foodsList,
-                    mainRestaurant = viewModel.state.value.mainRestaurant
+                    cartViewModel = cartViewModel,
+                    mainRestaurant = cartViewModel.state.value.mainRestaurant.value
                         ?: throw Exception("Unable to fetch main restaurant"),
                     scrollState = scrollState
                 )
                 CartTopAppBar(
-                    viewModel = viewModel,
+                    viewModel = cartViewModel,
                     foodsList,
                     onBackClick = { navController.navigate(NavScreen.Home.route) },
                     modifier = Modifier
@@ -189,7 +190,7 @@ fun CartTopAppBar(
     modifier: Modifier = Modifier
 ) {
     val viewState = viewModel.state.collectAsState()
-    val restaurant = viewState.value.mainRestaurant
+    val restaurant = viewState.value.mainRestaurant.value
 
     TopAppBar(
         title = {
@@ -210,7 +211,7 @@ fun CartTopAppBar(
                             Text(
                                 text = if (r.isShopClosed) "Closed for delivery"
                                 else
-                                    "${foods.sumOf { it.quantityInCart }} items, To pay: ₹${viewState.value.totalAmount?.roundToInt()}",
+                                    "${foods.sumOf { it.quantityInCart }} items, To pay: ₹${viewState.value.totalAmount.value?.roundToInt()}",
                                 fontSize = 12.sp,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis,
@@ -234,8 +235,11 @@ fun CartTopAppBar(
 }
 
 @Composable
-fun CartBillDetails(viewModel: CartViewModel, modifier: Modifier = Modifier) {
-    val cartAmount = viewModel.state.value.cartAmount
+fun CartBillDetails(
+    cartViewModel: CartViewModel,
+    modifier: Modifier = Modifier
+) {
+    val cartAmount = cartViewModel.state.value.cartAmount.collectAsState().value
 
     cartAmount?.let {
         Column(
@@ -365,12 +369,14 @@ fun CartBillDetails(viewModel: CartViewModel, modifier: Modifier = Modifier) {
 @ExperimentalFoundationApi
 @Composable
 fun ShowItemsInCart(
-    viewModel: CartViewModel,
-    foods: List<Food>,
+    cartViewModel: CartViewModel,
     mainRestaurant: Restaurant,
     scrollState: LazyListState,
     modifier: Modifier = Modifier
 ) {
+    val cartFoodList =
+        cartViewModel.state.value.cartFoodList.collectAsState().value
+
     LazyColumn(
         modifier = modifier.fillMaxSize(),
         contentPadding = PaddingValues(top = 15.dp),
@@ -381,11 +387,15 @@ fun ShowItemsInCart(
             Spacer(modifier = Modifier.height(20.dp))
         }
 
-        items(items = foods) {
+        items(items = cartFoodList) { food ->
             CartFoodItem(
-                food = it,
+                food = food,
                 modifier = Modifier
-                    .padding(vertical = 10.dp, horizontal = 15.dp)
+                    .padding(vertical = 10.dp, horizontal = 15.dp),
+                onQuantityChange = { newQuantity ->
+                    cartViewModel.notifyItemChange(food, newQuantity)
+                },
+                onCustomizeClick = { }
             )
         }
 
@@ -399,10 +409,10 @@ fun ShowItemsInCart(
         }
 
         item {
-            val inputText = viewModel.userMessageToRestaurant.observeAsState("")
+            val inputText = cartViewModel.userMessageToRestaurant.observeAsState("")
             InputMessageField(
                 inputText = inputText.value,
-                onTextChange = { newText -> viewModel.onUserMessageToRestaurantChange(newText) },
+                onTextChange = { newText -> cartViewModel.onUserMessageToRestaurantChange(newText) },
                 placeholderText = "Any restaurant request? We will try our best to convey it."
             )
             GrayDivider(heightDp = 15.dp)
@@ -414,7 +424,7 @@ fun ShowItemsInCart(
         }
 
         item {
-            CartBillDetails(viewModel)
+            CartBillDetails(cartViewModel)
             GrayDivider(heightDp = 15.dp)
         }
 

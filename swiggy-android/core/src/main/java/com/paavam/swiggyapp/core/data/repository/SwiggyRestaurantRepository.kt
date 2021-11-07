@@ -11,7 +11,7 @@ import javax.inject.Singleton
  */
 @Singleton
 interface SwiggyRestaurantRepository {
-    suspend fun fetchThisRestaurant(): ResponseResult<Restaurant>
+    fun fetchThisRestaurant(): Flow<ResponseResult<Restaurant>>
 
     suspend fun fetchThisRestaurantFoods(): ResponseResult<RestaurantFoodModel>
 

@@ -47,7 +47,8 @@ object PreviewData {
             515,
             "Price shown is after 10% discount. Aloo patty + four cheese slices.",
             "https://res.cloudinary.com/swiggy/image/upload/fl_lossy,f_auto,q_auto,w_208,h_208,c_fit/xe0slbhk3podrwqufs5f",
-            12
+            12,
+            hasCustomizationAvailable = true
         )
     )
 

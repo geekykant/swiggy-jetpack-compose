@@ -9,7 +9,7 @@ import retrofit2.Response
 import retrofit2.http.GET
 import javax.inject.Inject
 
-class SwiggyRestaurantService @Inject constructor(){
+class SwiggyRestaurantService @Inject constructor() {
 
     @GET("")
     suspend fun fetchThisRestaurant(): Response<RestaurantResponse<Restaurant>> =
