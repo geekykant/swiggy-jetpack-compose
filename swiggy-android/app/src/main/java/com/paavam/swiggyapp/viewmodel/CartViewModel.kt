@@ -52,16 +52,9 @@ class CartViewModel @Inject constructor(
                 val restaurant = results.second
 
                 if (cartFoods is ResponseResult.Success && restaurant is ResponseResult.Success) {
-                    val cartAmount = CartAmount(
-                        cartFoods.data.sumOf { it.price * it.quantityInCart }.toFloat(),
-                        35.00f,
-                        0,
-                        25f
-                    )
                     _state.value.cartFoodList.value = cartFoods.data
                     _state.value.mainRestaurant.value = restaurant.data
-                    _state.value.cartAmount.value = cartAmount
-                    _state.value.totalAmount.value = cartAmount.toPayTotal()
+                    notifyCartAmountChanged()
                     _state.value.initialLoadingStatus.value = UiState.success("success")
                 } else {
                     _state.value.initialLoadingStatus.value = UiState.failed("failed")
@@ -70,17 +63,36 @@ class CartViewModel @Inject constructor(
         }
     }
 
-    fun notifyItemChange(food: Food, updatedQuantity: Int) {
+    private fun notifyCartAmountChanged() {
+        val newPriceBeforeTax = _state.value.cartFoodList.value
+            .sumOf { it.price * it.quantityInCart }
+            .toFloat()
+        val cartAmount = CartAmount(
+            newPriceBeforeTax,
+            35.00f,
+            0,
+            25f
+        )
+        _state.value.cartAmount.value = cartAmount
+        _state.value.totalAmount.value = cartAmount.toPayTotal()
+    }
+
+    fun notifyCartItemChange(food: Food, updatedQuantity: Int) {
         viewModelScope.launch {
             val response = cartRepository.updateUsersCartFood(food = food, foodId = food.foodId)
             if (response is ResponseResult.Success) {
-                _state.value.cartFoodList.emit(
-                    _state.value.cartFoodList.value.toMutableList().apply {
-                        find { it.foodId == food.foodId }?.also {
-                            it.quantityInCart = updatedQuantity
+                _state.value.cartFoodList.value =
+                    when (updatedQuantity) {
+                        0 -> _state.value.cartFoodList.value.toMutableList().apply { remove(food) }
+                        else -> _state.value.cartFoodList.value.map {
+                            if (it.foodId == food.foodId) {
+                                it.copy(quantityInCart = updatedQuantity)
+                            } else {
+                                it
+                            }
                         }
-                    })
-
+                    }
+                notifyCartAmountChanged()
             } else {
                 //throw error
             }

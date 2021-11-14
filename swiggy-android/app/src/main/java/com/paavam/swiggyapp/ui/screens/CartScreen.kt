@@ -393,7 +393,7 @@ fun ShowItemsInCart(
                 modifier = Modifier
                     .padding(vertical = 10.dp, horizontal = 15.dp),
                 onQuantityChange = { newQuantity ->
-                    cartViewModel.notifyItemChange(food, newQuantity)
+                    cartViewModel.notifyCartItemChange(food, newQuantity)
                 },
                 onCustomizeClick = { }
             )
