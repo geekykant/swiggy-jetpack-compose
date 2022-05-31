@@ -30,7 +30,6 @@ import androidx.navigation.NavController
 import com.paavam.swiggyapp.R
 import com.paavam.swiggyapp.core.data.PreviewData
 import com.paavam.swiggyapp.core.data.model.*
-import com.paavam.swiggyapp.core.data.offer.model.Offer
 import com.paavam.swiggyapp.ui.component.DashedDivider
 import com.paavam.swiggyapp.ui.component.FooterLicenseInfo
 import com.paavam.swiggyapp.ui.component.GrayDivider

@@ -15,6 +15,7 @@ import dagger.hilt.android.components.ActivityRetainedComponent
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import java.util.Collections.emptyList
 
 
 @Module
@@ -39,7 +40,7 @@ class RestaurantViewModel @AssistedInject constructor(
             assistedFactory: Factory,
             restaurantId: Long
         ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
-            override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
                 return assistedFactory.create(restaurantId) as T
             }
         }
@@ -70,6 +71,7 @@ class RestaurantViewModel @AssistedInject constructor(
                 refreshing = _refreshing.value,
                 errorMessage = null
             )
+            onSectionExpanded(31)
         }
     }
 

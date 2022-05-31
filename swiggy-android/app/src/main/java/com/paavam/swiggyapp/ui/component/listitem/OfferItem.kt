@@ -18,7 +18,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.paavam.swiggyapp.core.data.PreviewData
-import com.paavam.swiggyapp.core.data.offer.model.Offer
+import com.paavam.swiggyapp.core.data.model.Offer
 import com.paavam.swiggyapp.ui.component.image.OfferIconWithPlaceholder
 
 @Composable

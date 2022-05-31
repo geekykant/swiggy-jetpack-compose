@@ -18,7 +18,6 @@ import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material.icons.outlined.ThumbUp
 import androidx.compose.runtime.*
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -52,6 +51,7 @@ import com.paavam.swiggyapp.ui.navigation.NavScreen
 import com.paavam.swiggyapp.ui.theme.Typography
 import com.paavam.swiggyapp.ui.utils.addShimmer
 import com.paavam.swiggyapp.ui.utils.addTopBarBottomLine
+import com.paavam.swiggyapp.viewmodel.CartUiState
 import com.paavam.swiggyapp.viewmodel.CartViewModel
 import java.util.*
 import kotlin.math.min
@@ -64,10 +64,11 @@ fun CartScreen(
     outerPadding: PaddingValues
 ) {
     val cartViewModel: CartViewModel = hiltViewModel()
-    val foodsListState = cartViewModel.state.value.initialLoadingStatus.collectAsState(UiState.loading()).value
+    val cartViewState = cartViewModel.state.collectAsState()
 
+    val uiLoadingState = cartViewState.value.uiLoadingState
     ProvideWindowInsets {
-        when (foodsListState) {
+        when (uiLoadingState) {
             is UiState.Loading -> LoadingCartScreen()
             is UiState.Failed -> ErrorCartScreen(
                 outerPaddingValues = outerPadding,
@@ -75,7 +76,6 @@ fun CartScreen(
                     /* Check for internet/error again */
                 })
             is UiState.Success -> SuccessCartScreen(
-                cartViewModel = cartViewModel,
                 navController = navController,
                 outerPaddingValues = outerPadding
             )
@@ -134,42 +134,51 @@ fun ErrorCartScreen(
 @ExperimentalFoundationApi
 @Composable
 fun SuccessCartScreen(
-    cartViewModel: CartViewModel,
     navController: NavController,
     outerPaddingValues: PaddingValues
 ) {
-    val foodsList = cartViewModel.state.value.cartFoodList.collectAsState().value
+    val cartViewModel: CartViewModel = hiltViewModel()
 
-    when (foodsList.isEmpty()) {
-        true -> PlaceholderMessageOutlinedButtonScreen(
-            title = "Good Food Is Always Cooking",
-            subHeading = "Your cart is empty.\nAdd something from the menu",
-            outlinedButtonClick = {
-                /* Open home page */
-                navController.navigate(NavScreen.Home.route)
-            },
-            buttonText = "Browse Restaurants",
-            outerPaddingValues = outerPaddingValues
-        )
-        false -> {
+    val cartUiState = cartViewModel.state.collectAsState()
+    when(cartUiState.value){
+        is CartUiState.NoItemsInCart -> {
+            PlaceholderMessageOutlinedButtonScreen(
+                title = "Good Food Is Always Cooking",
+                subHeading = "Your cart is empty.\nAdd something from the menu",
+                outlinedButtonClick = {
+                    /* Open home page */
+                    navController.navigate(NavScreen.Home.route){
+                        launchSingleTop = true
+                    }
+                },
+                buttonText = "Browse Restaurants",
+                outerPaddingValues = outerPaddingValues
+            )
+        }
+        is CartUiState.HasItemsInCart -> {
             // Scrolling state
             val scrollState = rememberLazyListState()
-            var isScrollStateChanged by remember { mutableStateOf(false) }
-            isScrollStateChanged = scrollState.firstVisibleItemIndex != 0
+            val isScrollStateChanged by remember {
+                derivedStateOf {
+                    scrollState.firstVisibleItemIndex != 0
+                }
+            }
 
+            val cartValues = cartUiState.value as CartUiState.HasItemsInCart
             val position by animateFloatAsState(if (isScrollStateChanged) 0f else -45f)
 
             Box(Modifier.fillMaxSize()) {
                 ShowItemsInCart(
-                    cartViewModel = cartViewModel,
-                    mainRestaurant = cartViewModel.state.value.mainRestaurant.value
-                        ?: throw Exception("Unable to fetch main restaurant"),
+                    viewState = cartUiState.value as CartUiState.HasItemsInCart,
                     scrollState = scrollState
                 )
                 CartTopAppBar(
-                    viewModel = cartViewModel,
-                    foodsList,
-                    onBackClick = { navController.navigate(NavScreen.Home.route) },
+                    viewState = cartValues,
+                    onBackClick = {
+                        navController.navigate(NavScreen.Home.route) {
+                            launchSingleTop = true
+                        }
+                    },
                     modifier = Modifier
                         .graphicsLayer {
                             alpha = min(1f, 1 + (position / 45f))
@@ -184,13 +193,13 @@ fun SuccessCartScreen(
 
 @Composable
 fun CartTopAppBar(
-    viewModel: CartViewModel,
-    foods: List<Food>,
+    viewState: CartUiState.HasItemsInCart,
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val viewState = viewModel.state.collectAsState()
-    val restaurant = viewState.value.mainRestaurant.value
+    val restaurant = viewState.mainRestaurant
+    val foods = viewState.cartFoodList
+    val roundedOfMoneyToPay = viewState.totalAmount?.roundToInt()
 
     TopAppBar(
         title = {
@@ -207,19 +216,17 @@ fun CartTopAppBar(
                             fontWeight = FontWeight.SemiBold,
                             fontSize = 14.sp
                         )
-                        viewState.value.totalAmount?.let {
-                            Text(
-                                text = if (r.isShopClosed) "Closed for delivery"
-                                else
-                                    "${foods.sumOf { it.quantityInCart }} items, To pay: ₹${viewState.value.totalAmount.value?.roundToInt()}",
-                                fontSize = 12.sp,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
-                                color = if (r.isShopClosed) Color.Red else Color(0xD9000000)
-                            )
-                        }
-                    }
 
+                        Text(
+                            text = if (r.isShopClosed) "Closed for delivery"
+                            else
+                                "${foods.sumOf { it.quantityInCart }} items, To pay: ₹${roundedOfMoneyToPay}",
+                            fontSize = 12.sp,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            color = if (r.isShopClosed) Color.Red else Color(0xD9000000)
+                        )
+                    }
                 }
             }
         },
@@ -236,10 +243,10 @@ fun CartTopAppBar(
 
 @Composable
 fun CartBillDetails(
-    cartViewModel: CartViewModel,
+    viewState: CartUiState.HasItemsInCart,
     modifier: Modifier = Modifier
 ) {
-    val cartAmount = cartViewModel.state.value.cartAmount.collectAsState().value
+    val cartAmount = viewState.cartAmount
 
     cartAmount?.let {
         Column(
@@ -334,7 +341,7 @@ fun CartBillDetails(
                     Spacer(modifier = Modifier.height(3.dp))
                 }
                 Text(
-                    "₹${cartAmount.calculateTotalTaxCharges()}",
+                    "₹${cartAmount.getTotalTaxCharges()}",
                     style = Typography.h5
                 )
             }
@@ -369,13 +376,13 @@ fun CartBillDetails(
 @ExperimentalFoundationApi
 @Composable
 fun ShowItemsInCart(
-    cartViewModel: CartViewModel,
-    mainRestaurant: Restaurant,
+    viewState: CartUiState.HasItemsInCart,
     scrollState: LazyListState,
     modifier: Modifier = Modifier
 ) {
-    val cartFoodList =
-        cartViewModel.state.value.cartFoodList.collectAsState().value
+    val cartFoodList = viewState.cartFoodList
+    val cartViewModel : CartViewModel = hiltViewModel()
+    val mainRestaurant = viewState.mainRestaurant ?: throw Exception("Main Restaurant not found")
 
     LazyColumn(
         modifier = modifier.fillMaxSize(),
@@ -409,11 +416,14 @@ fun ShowItemsInCart(
         }
 
         item {
-            val inputText = cartViewModel.userMessageToRestaurant.observeAsState("")
+            var inputMessage by remember { mutableStateOf(viewState.customerOptionalMessageToShopkeeper ?: "") }
             InputMessageField(
-                inputText = inputText.value,
-                onTextChange = { newText -> cartViewModel.onUserMessageToRestaurantChange(newText) },
-                placeholderText = "Any restaurant request? We will try our best to convey it."
+                inputText = inputMessage,
+                onTextChange = { newMessage ->
+                    cartViewModel.setNewCustomerToShopKeeperMessage(newMessage)
+                    inputMessage = newMessage
+                },
+                placeholderText = "Any restaurant request? We will try our best to convey it.",
             )
             GrayDivider(heightDp = 15.dp)
         }
@@ -424,7 +434,7 @@ fun ShowItemsInCart(
         }
 
         item {
-            CartBillDetails(cartViewModel)
+            CartBillDetails(viewState)
             GrayDivider(heightDp = 15.dp)
         }
 

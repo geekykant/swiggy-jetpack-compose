@@ -14,11 +14,11 @@ fun AnimateTextUpDown(message: String, maxLines: Int, modifier: Modifier = Modif
     AnimatedContent(targetState = message,
         transitionSpec = {
             if (targetState > initialState) {
-                slideInVertically({ height -> height }) + fadeIn() with
-                        slideOutVertically({ height -> -height }) + fadeOut()
+                slideInVertically { height -> height } + fadeIn() with
+                        slideOutVertically { height -> -height } + fadeOut()
             } else {
-                slideInVertically({ height -> -height }) + fadeIn() with
-                        slideOutVertically({ height -> height }) + fadeOut()
+                slideInVertically { height -> -height } + fadeIn() with
+                        slideOutVertically { height -> height } + fadeOut()
             }.using(SizeTransform(clip = false))
         }
     ) {

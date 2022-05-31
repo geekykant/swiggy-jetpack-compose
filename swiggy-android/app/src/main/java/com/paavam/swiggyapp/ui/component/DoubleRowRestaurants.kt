@@ -45,7 +45,9 @@ fun DoubleRowRestaurants(
                 r = it,
                 modifier = modifier.fillParentMaxWidth(0.8f),
                 onRestaurantClick = {
-                    mainNavController.navigate(MainNavScreen.Restaurant.route + "/${it.restaurantId}")
+                    mainNavController.navigate(MainNavScreen.Restaurant.route + "/${it.restaurantId}"){
+                        launchSingleTop = true
+                    }
                 }
             )
         }
@@ -79,7 +81,9 @@ fun DoubleRowRectangleRestaurants(
                 modifier = modifier
                     .padding(end = 10.dp),
                 onRestaurantClick = {
-                    mainNavController.navigate(MainNavScreen.Restaurant.route + "/${it.restaurantId}")
+                    mainNavController.navigate(MainNavScreen.Restaurant.route + "/${it.restaurantId}"){
+                        launchSingleTop = true
+                    }
                 }
             )
         }
@@ -105,7 +109,9 @@ fun SingleRowRestaurants(
                     .padding(horizontal = 5.dp)
                     .fillMaxWidth(),
                 onRestaurantClick = {
-                    mainNavController.navigate(MainNavScreen.Restaurant.route + "/${it.restaurantId}")
+                    mainNavController.navigate(MainNavScreen.Restaurant.route + "/${it.restaurantId}"){
+                        launchSingleTop = true
+                    }
                 }
             )
         }

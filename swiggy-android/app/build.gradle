@@ -6,7 +6,7 @@ apply plugin: 'dagger.hilt.android.plugin'
 android {
     compileSdk 30
     buildToolsVersion "30.0.3"
-    compileSdkVersion 31
+    compileSdkVersion 32
 
     defaultConfig {
         minSdk 21
@@ -20,7 +20,7 @@ android {
         vectorDrawables {
             useSupportLibrary true
         }
-        targetSdkVersion 31
+        targetSdkVersion 32
         minSdkVersion 21
     }
 
@@ -54,7 +54,7 @@ android {
     }
     composeOptions {
         kotlinCompilerExtensionVersion compose_version
-        kotlinCompilerVersion kotlin_version
+//        kotlinCompilerVersion kotlin_version
     }
 }
 
@@ -63,7 +63,7 @@ dependencies {
     api project(path: ':repository')
 
     // Worker
-    def work_version = "2.5.0"
+    def work_version = "2.7.1"
     implementation "androidx.work:work-runtime-ktx:$work_version"
     androidTestImplementation "androidx.work:work-testing:$work_version"
     implementation "androidx.work:work-multiprocess:$work_version"
@@ -83,7 +83,7 @@ dependencies {
     implementation "javax.inject:javax.inject:1"
 
     //Accompanist
-    def accompanist_version = '0.20.2'
+    def accompanist_version = '0.23.0'
     implementation "com.google.accompanist:accompanist-systemuicontroller:$accompanist_version"
     implementation "com.google.accompanist:accompanist-insets-ui:$accompanist_version"
     implementation "com.google.accompanist:accompanist-placeholder-material:$accompanist_version"
@@ -93,28 +93,31 @@ dependencies {
     implementation "com.google.accompanist:accompanist-navigation-animation:$accompanist_version"
 
     //compose
-    implementation "androidx.compose.runtime:runtime-livedata:$compose_version"
-    implementation 'androidx.hilt:hilt-navigation-compose:1.0.0-alpha03'
+    implementation "androidx.compose.runtime:runtime-livedata:1.1.1"
+    implementation 'androidx.hilt:hilt-navigation-compose:1.0.0'
+
+    debugImplementation "androidx.compose.ui:ui-tooling:1.1.1"
+    implementation "androidx.compose.ui:ui-tooling-preview:1.1.1"
 
     //ViewModel
-    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.3.1"
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.1"
 
     // Extension
-    def activity_version = '1.3.1'
+    def activity_version = '1.4.0'
     implementation "androidx.activity:activity-ktx:$activity_version"
     implementation "androidx.lifecycle:lifecycle-extensions:2.2.0"
 
     //Hilt
     implementation("com.google.dagger:hilt-android:$hilt_version")
     kapt("com.google.dagger:hilt-android-compiler:$hilt_version")
-    implementation 'androidx.hilt:hilt-navigation-compose:1.0.0-alpha03'
+    implementation 'androidx.hilt:hilt-navigation-compose:1.0.0'
 
     def jetpackHiltVersion = "1.0.0"
     api "androidx.hilt:hilt-work:$jetpackHiltVersion"
     kapt "androidx.hilt:hilt-compiler:$jetpackHiltVersion"
 
     //Room
-    def room_version = "2.4.0-alpha04"
+    def room_version = "2.5.0-alpha01"
     implementation("androidx.room:room-runtime:$room_version")
     annotationProcessor "androidx.room:room-compiler:$room_version"
     kapt("androidx.room:room-compiler:$room_version")
@@ -123,16 +126,16 @@ dependencies {
     // optional - Test helpers
     testImplementation("androidx.room:room-testing:$room_version")
 
-    implementation 'androidx.core:core-ktx:1.6.0'
-    implementation 'androidx.appcompat:appcompat:1.3.1'
-    implementation 'com.google.android.material:material:1.4.0'
-    implementation "androidx.compose.ui:ui:$compose_version"
-    implementation "androidx.compose.material:material:$compose_version"
-    implementation "androidx.compose.ui:ui-tooling:$compose_version"
-    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.3.1'
+    implementation 'androidx.core:core-ktx:1.7.0'
+    implementation 'androidx.appcompat:appcompat:1.4.1'
+    implementation 'com.google.android.material:material:1.6.0'
+    implementation "androidx.compose.ui:ui:1.1.1"
+    implementation "androidx.compose.material:material:1.1.1"
+    implementation "androidx.compose.ui:ui-tooling:1.1.1"
+    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.4.1'
     implementation "androidx.activity:activity-compose:$compose_version"
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
-    androidTestImplementation "androidx.compose.ui:ui-test-junit4:$compose_version"
+    androidTestImplementation "androidx.compose.ui:ui-test-junit4:1.1.1"
 }

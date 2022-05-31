@@ -1,8 +1,8 @@
 package com.paavam.swiggyapp.core.data
 
 import com.paavam.swiggyapp.core.data.model.*
-import com.paavam.swiggyapp.core.data.offer.model.Offer
-import com.paavam.swiggyapp.core.data.offer.model.OfferSnackType
+import com.paavam.swiggyapp.core.data.model.Offer
+import com.paavam.swiggyapp.core.data.model.OfferSnackType
 
 
 object PreviewData {

@@ -58,7 +58,7 @@ fun MainContent(
     mainNavController: NavController
 ) {
     val scrollState = rememberLazyListState()
-    var isScrollStateChanged by remember { mutableStateOf(false) }
+//    var isScrollStateChanged by remember { mutableStateOf(false) }
 
     val homeViewModel: HomeViewModel = hiltViewModel()
     val homeViewState = homeViewModel.state.collectAsState()
@@ -66,7 +66,14 @@ fun MainContent(
 
     Scaffold(
         topBar = {
-            isScrollStateChanged = scrollState.firstVisibleItemScrollOffset != 0
+            val isScrollStateChanged by remember {
+                derivedStateOf {
+                    scrollState.firstVisibleItemScrollOffset != 0
+                }
+            }
+
+//            isScrollStateChanged = scrollState.firstVisibleItemScrollOffset != 0
+
             HomeTopAppBar(
                 isScrollStateChanged,
                 swiggyViewModel,
@@ -202,8 +209,12 @@ fun HomeScreen(
     val quickTiles = homeViewState.quickTiles.collectAsState()
     val announcementMessage = homeViewState.announcementMsg.collectAsState()
 
+    val isRefreshing by remember {
+        mutableStateOf(homeViewState.initialLoadingStatus.value)
+    }
+
     SwipeRefresh(
-        state = rememberSwipeRefreshState(homeViewState.initialLoadingStatus.value is UiState.Loading),
+        state = rememberSwipeRefreshState(isRefreshing is UiState.Loading),
         onRefresh = { homeViewModel.refresh(force = true) },
     ) {
         LazyColumn(
@@ -424,7 +435,9 @@ fun HomeScreen(
                             it,
                             Modifier.fillMaxWidth(),
                             onRestaurantClick = {
-                                mainNavController.navigate(MainNavScreen.Restaurant.route + "/${it.restaurantId}")
+                                mainNavController.navigate(MainNavScreen.Restaurant.route + "/${it.restaurantId}"){
+                                    launchSingleTop = true
+                                }
                             }
                         )
                     }
@@ -538,7 +551,11 @@ fun HomeTopAppBar(
             ) {
                 Column(
                     modifier = Modifier
-                        .clickable { mainNavController.navigate(MainNavScreen.ShowAddresses.route) }
+                        .clickable {
+                            mainNavController.navigate(MainNavScreen.ShowAddresses.route) {
+                                launchSingleTop = true
+                            }
+                        }
                         .padding(0.dp, 8.dp)
                         .weight(0.6f)
                 ) {
@@ -564,7 +581,9 @@ fun HomeTopAppBar(
                 Column(
                     modifier = Modifier
                         .clickable {
-//                            mainNavController.navigate(MainNavScreen.ShowAddresses.route)
+//                            mainNavController.navigate(MainNavScreen.ShowAddresses.route){
+//                        launchSingleTop = true
+//                    }
                         }
                         .padding(5.dp, 15.dp)
                         .weight(0.2f)

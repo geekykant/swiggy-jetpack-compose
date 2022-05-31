@@ -1,4 +1,4 @@
-package com.paavam.swiggyapp.core.data.offer.model
+package com.paavam.swiggyapp.core.data.model
 
 data class Offer(
     val iconUrl: String? = null,

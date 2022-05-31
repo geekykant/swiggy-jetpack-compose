@@ -54,16 +54,16 @@ fun MainNavigation(
         composable(
             MainNavScreen.Restaurant.route + "/{restaurantId}",
 //            arguments = listOf(navArgument("restaurantId") { type = NavType.LongType }),
-            enterTransition = { initial, _ ->
+            enterTransition = {
                 slideInHorizontally(initialOffsetX = { 1000 }, animationSpec = tween(300, easing = LinearEasing))
             },
-            exitTransition = { _, target ->
+            exitTransition = {
                 slideOutHorizontally(targetOffsetX = { -1000 }, animationSpec = tween(300, easing = LinearEasing))
             },
-            popEnterTransition = { initial, _ ->
+            popEnterTransition = {
                 slideInHorizontally(initialOffsetX = { -1000 }, animationSpec = tween(300, easing = LinearEasing))
             },
-            popExitTransition = { _, target ->
+            popExitTransition = {
                 slideOutHorizontally(targetOffsetX = { 1000 }, animationSpec = tween(300, easing = LinearEasing))
             }
         ) {
@@ -90,8 +90,8 @@ fun NavigationSub(
     AnimatedNavHost(
         navController,
         startDestination = NavScreen.Home.route,
-        enterTransition = { _, _ -> fadeIn(animationSpec = tween(300)) },
-        exitTransition = { _, _ -> fadeOut(animationSpec = tween(300)) }
+        enterTransition = { fadeIn(animationSpec = tween(300)) },
+        exitTransition = { fadeOut(animationSpec = tween(300)) }
     ) {
         composable(NavScreen.Home.route) {
             MainContent(

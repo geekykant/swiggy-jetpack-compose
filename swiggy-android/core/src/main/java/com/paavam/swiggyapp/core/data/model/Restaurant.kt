@@ -1,7 +1,5 @@
 package com.paavam.swiggyapp.core.data.model
 
-import com.paavam.swiggyapp.core.data.offer.model.Offer
-
 data class Restaurant(
     val restaurantId: Long,
     val name: String,
