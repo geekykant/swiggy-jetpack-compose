@@ -7,6 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.paavam.swiggyapp.ui.MainActivity
+import com.paavam.swiggyapp.viewmodel.HomeViewModel
 import com.paavam.swiggyapp.viewmodel.RestaurantViewModel
 import dagger.hilt.android.EntryPointAccessors
 

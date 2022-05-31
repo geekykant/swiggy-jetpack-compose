@@ -18,18 +18,20 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.google.accompanist.pager.*
+import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.accompanist.pager.HorizontalPager
+import com.google.accompanist.pager.HorizontalPagerIndicator
+import com.google.accompanist.pager.rememberPagerState
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.paavam.swiggyapp.R
 import com.paavam.swiggyapp.core.data.PreviewData
-import com.paavam.swiggyapp.core.data.model.AddressType
-import com.paavam.swiggyapp.core.data.model.HelloBar
-import com.paavam.swiggyapp.core.data.model.QuickTile
+import com.paavam.swiggyapp.core.data.model.*
 import com.paavam.swiggyapp.core.ui.UiState
 import com.paavam.swiggyapp.lib.LazyHorizontalGrid
 import com.paavam.swiggyapp.lib.items
@@ -45,34 +47,26 @@ import com.paavam.swiggyapp.ui.navigation.MainNavScreen
 import com.paavam.swiggyapp.ui.theme.Typography
 import com.paavam.swiggyapp.ui.utils.addShimmer
 import com.paavam.swiggyapp.ui.utils.gesturesDisabled
+import com.paavam.swiggyapp.viewmodel.HomeUiState
 import com.paavam.swiggyapp.viewmodel.HomeViewModel
 import com.paavam.swiggyapp.viewmodel.SwiggyViewModel
 import kotlinx.coroutines.delay
 
-@OptIn(ExperimentalPagerApi::class)
 @ExperimentalFoundationApi
 @Composable
 fun MainContent(
     outerPadding: PaddingValues,
     swiggyViewModel: SwiggyViewModel,
-    mainNavController: NavController
+    mainNavController: NavController,
+    homeViewModel: HomeViewModel = hiltViewModel()
 ) {
     val scrollState = rememberLazyListState()
-//    var isScrollStateChanged by remember { mutableStateOf(false) }
-
-    val homeViewModel: HomeViewModel = hiltViewModel()
-    val homeViewState = homeViewModel.state.collectAsState()
-    val pagerState = rememberPagerState()
 
     Scaffold(
         topBar = {
             val isScrollStateChanged by remember {
-                derivedStateOf {
-                    scrollState.firstVisibleItemScrollOffset != 0
-                }
+                derivedStateOf { scrollState.firstVisibleItemScrollOffset != 0 }
             }
-
-//            isScrollStateChanged = scrollState.firstVisibleItemScrollOffset != 0
 
             HomeTopAppBar(
                 isScrollStateChanged,
@@ -81,34 +75,38 @@ fun MainContent(
             )
         }
     ) {
-
-        val initialLoadingStatus = homeViewState.value.initialLoadingStatus.collectAsState().value
-
-        when (initialLoadingStatus) {
+        val homeViewState = homeViewModel.state.collectAsState()
+        when (homeViewState.value.uiState) {
             is UiState.Loading -> LoadingHomeScreen()
             is UiState.Failed -> ErrorHomeScreen()
-            is UiState.Success -> HomeScreen(
-                scrollState,
-                outerPadding,
-                mainNavController,
-                homeViewModel,
-                pagerState
-            )
+            is UiState.Success -> {
+                when (homeViewState.value) {
+                    is HomeUiState.SwiggyNotAvailableInArea -> {
+                        /* Show Swiggy awesomeness not available in area screen */
+                    }
+                    is HomeUiState.SwiggyAvailableLoadHomeScreen -> {
+                        SuccessHomeScreen(
+                            scrollState, outerPadding, mainNavController,
+                            homeViewState.value as HomeUiState.SwiggyAvailableLoadHomeScreen
+                        )
+                    }
+                }
+            }
         }
     }
 }
 
 @Composable
 fun ErrorHomeScreen() {
-    //
+    //show error screen
 }
 
+/* Shimmer Effect Loading HomeScreen */
 @Composable
 fun LoadingHomeScreen() {
     Column(
         modifier = Modifier
             .padding(horizontal = 15.dp)
-
     ) {
         GrayDivider(
             modifier = Modifier
@@ -183,39 +181,35 @@ fun LoadingHomeScreen() {
 @OptIn(ExperimentalPagerApi::class)
 @ExperimentalFoundationApi
 @Composable
-fun HomeScreen(
+fun SuccessHomeScreen(
     scrollState: LazyListState, // Higher level is invoked, and reflected throughout
     outerPaddingValues: PaddingValues,
     mainNavController: NavController,
-    homeViewModel: HomeViewModel,
-    pagerState: PagerState
+    homeUiState: HomeUiState.SwiggyAvailableLoadHomeScreen,
+    widgetBottomPadding: Dp = 10.dp
 ) {
-    val homeViewState by homeViewModel.state.collectAsState()
-    val widgetBottomPadding = 10.dp
+    val homeViewModel: HomeViewModel = hiltViewModel()
 
-    val popularCurationsState =
-        homeViewModel.popularCurations.collectAsState(UiState.loading()).value
-
-    val nearbyRestaurantsState =
-        homeViewModel.nearbyRestaurants.collectAsState(UiState.loading()).value
-
+    /**
+     * These few sections are collected as observable state,
+     * so as to display the data only when they are available.
+     * Otherwise Loading Animation will progress for each scroll.
+     */
+    val popularCurationsState = homeViewModel.popularCurations.collectAsState(UiState.loading())
+    val nearbyRestaurantsState = homeViewModel.nearbyRestaurants.collectAsState(UiState.loading())
     val latestOnBlockRestaurantsState =
-        homeViewModel.latestOnBlockRestaurants.collectAsState(UiState.loading()).value
-
+        homeViewModel.latestOnBlockRestaurants.collectAsState(UiState.loading())
     val topOfferRestaurantsState =
-        homeViewModel.topOfferRestaurants.collectAsState(UiState.loading()).value
+        homeViewModel.topOfferRestaurants.collectAsState(UiState.loading())
 
-    val helloBarMessages = homeViewState.helloBarMessages.collectAsState()
-    val quickTiles = homeViewState.quickTiles.collectAsState()
-    val announcementMessage = homeViewState.announcementMsg.collectAsState()
+    val helloBarMessages = homeUiState.helloBarMessages
+    val quickTiles = homeUiState.quickTiles
+    val announcementMessage = homeUiState.announcementMsg
 
-    val isRefreshing by remember {
-        mutableStateOf(homeViewState.initialLoadingStatus.value)
-    }
-
+    val isRefreshing by remember { mutableStateOf(homeUiState.uiState) }
     SwipeRefresh(
         state = rememberSwipeRefreshState(isRefreshing is UiState.Loading),
-        onRefresh = { homeViewModel.refresh(force = true) },
+        onRefresh = { homeViewModel.refresh() },
     ) {
         LazyColumn(
             modifier = Modifier
@@ -225,10 +219,13 @@ fun HomeScreen(
         ) {
             // Top announcements section
             item {
-                TopHelloBar(helloBarMessages.value)
-                if (announcementMessage.value.isNotBlank()) {
+                TopHelloBar(helloBarMessages)
+            }
+
+            item {
+                if (announcementMessage.isNotBlank()) {
                     AnnouncementHeading(
-                        message = announcementMessage.value,
+                        message = announcementMessage,
                         modifier = Modifier.padding(bottom = widgetBottomPadding),
                     )
                 }
@@ -237,7 +234,7 @@ fun HomeScreen(
             //Categories or Quick Tiles
             item {
                 QuickTilesList(
-                    quickTiles.value,
+                    quickTiles,
                     modifier = Modifier
                         .fillMaxWidth()
                 )
@@ -277,19 +274,18 @@ fun HomeScreen(
                     showSeeAllIcon = false
                 )
                 SingleRowRestaurants(
-                    homeViewState.topPicksRestaurants.value,
+                    homeUiState.topPicksRestaurants,
                     paddingValues = PaddingValues(horizontal = 15.dp),
                     mainNavController
                 )
             }
 
-            item {
-                when (popularCurationsState) {
-                    is UiState.Success -> {
-                        val cuisineList = popularCurationsState.data
-                        SectionHeading(
-                            title = "Popular Curations"
-                        )
+            when (popularCurationsState.value) {
+                is UiState.Success -> {
+                    item {
+                        val cuisineList =
+                            (popularCurationsState.value as UiState.Success<List<Cuisine>>).data
+                        SectionHeading(title = "Popular Curations")
                         LazyHorizontalGrid(
                             cells = GridCells.Fixed(2),
                             modifier = Modifier
@@ -310,13 +306,17 @@ fun HomeScreen(
                             }
                         }
                     }
-                    else -> {
-                        /* Do something  */
-                    }
+                }
+                is UiState.Loading -> {
+                    item { ShowCircularBottomProgress() }
+                    return@LazyColumn
+                }
+                is UiState.Failed -> {
+                    /* Do something  */
                 }
             }
 
-            when (latestOnBlockRestaurantsState) {
+            when (latestOnBlockRestaurantsState.value) {
                 is UiState.Success -> {
                     item {
                         Column(
@@ -329,7 +329,7 @@ fun HomeScreen(
                                 showSeeAllIcon = false
                             )
                             DoubleRowRectangleRestaurants(
-                                spotlightRestaurants = latestOnBlockRestaurantsState.data,
+                                spotlightRestaurants = (latestOnBlockRestaurantsState.value as UiState.Success<List<Restaurant>>).data,
                                 paddingValues = PaddingValues(horizontal = 15.dp),
                                 modifier = Modifier.fillParentMaxWidth(0.45f),
                                 mainNavController = mainNavController
@@ -342,11 +342,11 @@ fun HomeScreen(
                     return@LazyColumn
                 }
                 is UiState.Failed -> {
-                    // do something
+                    // Throw/Collect Errors
                 }
             }
 
-            when (topOfferRestaurantsState) {
+            when (topOfferRestaurantsState.value) {
                 is UiState.Success -> {
                     item {
                         SectionHeading(
@@ -359,7 +359,7 @@ fun HomeScreen(
                             }
                         )
                         DoubleRowRestaurants(
-                            spotlightRestaurants = topOfferRestaurantsState.data,
+                            spotlightRestaurants = (topOfferRestaurantsState.value as UiState.Success<List<Restaurant>>).data,
                             mainNavController = mainNavController
                         )
                     }
@@ -383,6 +383,7 @@ fun HomeScreen(
                 ) {
                     SectionHeading("Today's Featured")
 
+                    val pagerState = rememberPagerState()
                     HorizontalPager(
                         count = bannersUrls.size,
                         state = pagerState,
@@ -414,28 +415,26 @@ fun HomeScreen(
                 }
             }
 
-
-            item {
-                SectionHeading(
-                    "All Restaurants Nearby",
-                    "Discover unique tastes near you",
-                    R.drawable.ic_shopicon,
-                    showSeeAllIcon = true,
-                    seeAllOnClick = {
-
-                    }
-                )
-            }
-
-
-            when (nearbyRestaurantsState) {
+            when (nearbyRestaurantsState.value) {
                 is UiState.Success -> {
-                    items(items = nearbyRestaurantsState.data) {
+                    item {
+                        SectionHeading(
+                            "All Restaurants Nearby",
+                            "Discover unique tastes near you",
+                            R.drawable.ic_shopicon,
+                            showSeeAllIcon = true,
+                            seeAllOnClick = {
+
+                            }
+                        )
+                    }
+
+                    items(items = (nearbyRestaurantsState.value as UiState.Success<List<Restaurant>>).data) {
                         RestaurantItem(
                             it,
                             Modifier.fillMaxWidth(),
                             onRestaurantClick = {
-                                mainNavController.navigate(MainNavScreen.Restaurant.route + "/${it.restaurantId}"){
+                                mainNavController.navigate(MainNavScreen.Restaurant.route + "/${it.restaurantId}") {
                                     launchSingleTop = true
                                 }
                             }
@@ -506,7 +505,7 @@ fun TopHelloBar(contentList: List<HelloBar>, modifier: Modifier = Modifier) {
 
     if (helloCount == 0) return
 
-    LaunchedEffect(true) {
+    LaunchedEffect(1) {
         while (true) {
             delay(3000) // set here your delay between animations
             i = ((i + 1) % helloCount)

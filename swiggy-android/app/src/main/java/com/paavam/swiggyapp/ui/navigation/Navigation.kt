@@ -1,15 +1,18 @@
 package com.paavam.swiggyapp.ui.navigation
 
-import androidx.compose.animation.*
-import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.AnimatedContentScope
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.*
+import androidx.compose.material.Divider
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.composable
@@ -44,27 +47,43 @@ fun MainNavigation(
             }
         }
         composable(MainNavScreen.ShowAddresses.route) {
-            Text(
-                text = "Hello!",
-                style = Typography.h2,
-                modifier = Modifier.fillMaxSize()
-            )
+            /* Address Screen - Configure with local Room Database */
+            Column(
+                modifier = Modifier.padding(15.dp)
+            ) {
+                Text(
+                    text = "Address Page",
+                    style = Typography.h2,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Divider(
+                    modifier = Modifier
+                        .padding(vertical = 10.dp)
+                        .height(5.dp)
+                )
+                Text(
+                    text = "Here you can add a page to add address book and store them locally in Room database. \n" +
+                            "This will be sent to server corresponding to every order.",
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+
         }
 
         composable(
             MainNavScreen.Restaurant.route + "/{restaurantId}",
 //            arguments = listOf(navArgument("restaurantId") { type = NavType.LongType }),
             enterTransition = {
-                slideInHorizontally(initialOffsetX = { 1000 }, animationSpec = tween(300, easing = LinearEasing))
+                slideIntoContainer(AnimatedContentScope.SlideDirection.Left, animationSpec = tween(700))
             },
             exitTransition = {
-                slideOutHorizontally(targetOffsetX = { -1000 }, animationSpec = tween(300, easing = LinearEasing))
+                slideOutOfContainer(AnimatedContentScope.SlideDirection.Left, animationSpec = tween(700))
             },
             popEnterTransition = {
-                slideInHorizontally(initialOffsetX = { -1000 }, animationSpec = tween(300, easing = LinearEasing))
+                slideIntoContainer(AnimatedContentScope.SlideDirection.Right, animationSpec = tween(700))
             },
             popExitTransition = {
-                slideOutHorizontally(targetOffsetX = { 1000 }, animationSpec = tween(300, easing = LinearEasing))
+                slideOutOfContainer(AnimatedContentScope.SlideDirection.Right, animationSpec = tween(700))
             }
         ) {
             it.arguments?.getString("restaurantId")?.toLong()?.let { restaurantId ->

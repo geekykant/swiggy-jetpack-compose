@@ -25,10 +25,18 @@ class HomeViewModel @Inject constructor(
     @RemoteRepository private val cuisineRepository: SwiggyCuisineRepository,
     @RemoteRepository private val propsRepository: SwiggyPropsRepository
 ) : ViewModel() {
-    private val _state = MutableStateFlow(HomeViewState())
-    val state: StateFlow<HomeViewState> get() = _state
+    private val _state = MutableStateFlow(HomeViewModelState(
+        swiggyAvailableInArea = true,
+        uiLoadingState = UiState.loading())
+    )
 
-    private val refreshing = MutableStateFlow(false)
+    val state = _state
+        .map { it.getUiState() }
+        .stateIn(
+            viewModelScope,
+            SharingStarted.Eagerly,
+            _state.value.getUiState()
+        )
 
     val nearbyRestaurants: SharedFlow<UiState<List<Restaurant>>> = restaurantRepository
         .fetchRestaurantsList()
@@ -52,7 +60,7 @@ class HomeViewModel @Inject constructor(
             }
         }.onStart {
             emit(UiState.loading())
-//            delay(3800)
+            delay(6000)
         }
         .shareIn(viewModelScope, SharingStarted.WhileSubscribed())
 
@@ -90,10 +98,7 @@ class HomeViewModel @Inject constructor(
         val announcementFlow: SharedFlow<String> =
             flowOf(
                 UiState.success(
-                    listOf(
-                        "",
-                        "As per state mandates, we will be operational till 8:00 PM"
-                    ).random()
+                    listOf("", "As per state mandates, we will be operational till 8:00 PM").random()
                 )
             ).map { it.data }.shareIn(viewModelScope, SharingStarted.WhileSubscribed())
 
@@ -117,38 +122,78 @@ class HomeViewModel @Inject constructor(
                     topPicksRestsState is ResponseResult.Success &&
                             helloBarMessagesState is ResponseResult.Success
                             && quickTilesState is ResponseResult.Success -> {
-                        _state.value.helloBarMessages.value = helloBarMessagesState.data
-                        _state.value.quickTiles.value = quickTilesState.data
-                        _state.value.announcementMsg.value = msg
-                        _state.value.topPicksRestaurants.value = topPicksRestsState.data
-                        _state.value.initialLoadingStatus.value = UiState.success("success")
+
+                        _state.update { state ->
+                            state.copy(
+                                helloBarMessages = helloBarMessagesState.data,
+                                quickTiles = quickTilesState.data,
+                                announcementMsg = msg,
+                                topPicksRestaurants = topPicksRestsState.data,
+                                uiLoadingState = UiState.success("success")
+                            )
+                        }
                     }
                     else -> {
-                        _state.value.initialLoadingStatus.value = UiState.failed("failed")
+                        _state.update { state -> state.copy(uiLoadingState = UiState.failed("Failed retrieving!")) }
                     }
                 }
-            }.also {
-                refreshing.value = false
             }
         }
     }
 
-    fun refresh(force: Boolean = true) {
-        viewModelScope.launch {
-            runCatching {
-                _state.value.initialLoadingStatus.value = UiState.loading()
-                delay(3000)
-                prepareHomeData()
-            }
-        }
+    fun refresh() {
+        _state.update { it.copy(uiLoadingState = UiState.loading()) }
+        prepareHomeData()
     }
 }
 
-data class HomeViewState(
-    var helloBarMessages: MutableStateFlow<List<HelloBar>> = MutableStateFlow(emptyList()),
-    var quickTiles: MutableStateFlow<List<QuickTile>> = MutableStateFlow(emptyList()),
-    var announcementMsg: MutableStateFlow<String> = MutableStateFlow(""),
-    var topPicksRestaurants: MutableStateFlow<List<Restaurant>> = MutableStateFlow(emptyList()),
-    val initialLoadingStatus: MutableStateFlow<UiState<String>> = MutableStateFlow(UiState.loading()),
+sealed interface HomeUiState {
+    val uiState: UiState<String>
+    val errorMessages: List<String>
+
+    data class SwiggyNotAvailableInArea(
+        override val errorMessages: List<String>,
+        override val uiState: UiState<String>
+    ): HomeUiState
+
+    data class SwiggyAvailableLoadHomeScreen(
+        override val uiState: UiState<String>,
+        override val errorMessages: List<String>,
+        val helloBarMessages: List<HelloBar>,
+        val quickTiles: List<QuickTile>,
+        val announcementMsg: String,
+        val topPicksRestaurants: List<Restaurant>,
+    ): HomeUiState
+
+}
+
+private data class HomeViewModelState(
+    val swiggyAvailableInArea: Boolean,
+    val uiLoadingState: UiState<String>,
+    var helloBarMessages: List<HelloBar> = emptyList(),
+    var quickTiles: List<QuickTile> = emptyList(),
+    var announcementMsg: String = "",
+    var topPicksRestaurants: List<Restaurant> = emptyList(),
+    val initialLoadingStatus: UiState<String> = UiState.loading(),
     val errorMessage: String? = null
-)
+){
+    fun getUiState(): HomeUiState =
+        when(swiggyAvailableInArea){
+            true -> {
+                HomeUiState.SwiggyAvailableLoadHomeScreen(
+                    uiState = uiLoadingState,
+                    errorMessages = emptyList(),
+                    helloBarMessages = helloBarMessages,
+                    quickTiles = quickTiles,
+                    announcementMsg = announcementMsg,
+                    topPicksRestaurants = topPicksRestaurants
+                )
+            }
+            false -> {
+                HomeUiState.SwiggyNotAvailableInArea(
+                    uiState = uiLoadingState,
+                    errorMessages = listOf("Swiggy is Not available in your area. Wait for the awesomeness. We will be there!")
+                )
+            }
+        }
+}

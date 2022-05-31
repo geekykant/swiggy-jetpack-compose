@@ -12,18 +12,18 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.paavam.swiggyapp.core.data.PreviewData
 import com.paavam.swiggyapp.ui.component.listitem.CuisineItem
 import com.paavam.swiggyapp.ui.component.listitem.RecentSearchItem
 import com.paavam.swiggyapp.ui.component.text.SectionHeading
+import com.paavam.swiggyapp.ui.theme.DividerGreyColor
 import com.paavam.swiggyapp.ui.theme.Prox
 import com.paavam.swiggyapp.ui.theme.SwiggyTheme
 import com.paavam.swiggyapp.ui.utils.noRippleClickable
@@ -33,7 +33,7 @@ import com.paavam.swiggyapp.viewmodel.SearchViewModel
 fun SearchScreen(
     outerPadding: PaddingValues,
     modifier: Modifier = Modifier,
-    searchViewModel: SearchViewModel = viewModel()
+    searchViewModel: SearchViewModel = hiltViewModel()
 ) {
     LazyColumn(
         modifier = modifier
@@ -57,11 +57,11 @@ fun SearchScreen(
         item {
             fun prepareRecentSearches() =
                 listOf("Pizza Hut", "Chicking", "Aryaas", "Admans Pizza", "Westleys Restocafe")
-            RecentSearchesComposable(prepareRecentSearches(), searchViewModel)
+            RecentSearchesComposable(prepareRecentSearches())
             Divider(
                 modifier = modifier
                     .height(10.dp),
-                color = Color(0xD000000)
+                color = DividerGreyColor
             )
         }
 
@@ -94,7 +94,7 @@ fun SearchScreen(
             Divider(
                 modifier = modifier
                     .height(10.dp),
-                color = Color(0xD000000)
+                color = DividerGreyColor
             )
         }
 
@@ -136,7 +136,8 @@ fun SearchBar(
                 )
         },
         colors = TextFieldDefaults.textFieldColors(
-            focusedIndicatorColor = MaterialTheme.colors.onSurface.copy(alpha = TextFieldDefaults.UnfocusedIndicatorLineOpacity)
+            focusedIndicatorColor = MaterialTheme.colors.onSurface.copy(0.5f),
+            backgroundColor = MaterialTheme.colors.background.copy(alpha = 0.1f)
         ),
         maxLines = 1
     )
@@ -145,7 +146,7 @@ fun SearchBar(
 @Composable
 fun RecentSearchesComposable(
     recentSearchesList: List<String>,
-    searchViewModel: SearchViewModel
+    searchViewModel: SearchViewModel = hiltViewModel()
 ) {
     val showFullList = remember { mutableStateOf(false) }
 

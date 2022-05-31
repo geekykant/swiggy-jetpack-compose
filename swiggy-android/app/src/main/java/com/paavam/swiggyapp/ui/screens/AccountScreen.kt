@@ -33,21 +33,23 @@ fun AccountScreen(
     outerPadding: PaddingValues
 ) {
     val viewModel: AccountViewModel = hiltViewModel()
-    val userDetailsState = viewModel.state.value.user.value
+    val userDetailsState = viewModel.state.collectAsState()
 
     ProvideWindowInsets {
-        when (userDetailsState) {
+        when (userDetailsState.value.uiLoadingState) {
             is UiState.Loading -> LoadingAccountScreen()
             is UiState.Failed -> ErrorAccountScreen(
                 outerPaddingValues = outerPadding,
                 onRetryClick = {
                     /* Check for internet/error again */
                 })
-            is UiState.Success -> SuccessAccountScreen(
-                user = userDetailsState.data,
-                viewModel = viewModel,
-                outerPaddingValues = outerPadding
-            )
+            is UiState.Success -> userDetailsState.value.user?.let {
+                SuccessAccountScreen(
+                    user = it,
+                    viewModel = viewModel,
+                    outerPaddingValues = outerPadding
+                )
+            }
         }
     }
 }
@@ -94,7 +96,7 @@ fun ShowItemsInAccount(
                 modifier = Modifier.padding(vertical = 15.dp)
             ) {
                 Text(
-                    text = user.fullName.toUpperCase(),
+                    text = user.fullName.uppercase(),
                     style = Typography.h2
                 )
                 Spacer(Modifier.height(10.dp))

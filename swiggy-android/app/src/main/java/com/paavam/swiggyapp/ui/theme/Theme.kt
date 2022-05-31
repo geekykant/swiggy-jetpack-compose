@@ -25,7 +25,7 @@ val DarkColorPalette = darkColors(
 @Composable
 fun SwiggyTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    content: @Composable() () -> Unit
+    content: @Composable () -> Unit
 ) {
     val colors = if (darkTheme) DarkColorPalette else LightColorPalette
 
