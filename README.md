@@ -12,6 +12,3 @@ This is a clone to demonstrate the power of Jetpack compose, which is the modern
     <td><img src="https://user-images.githubusercontent.com/27401142/172794741-06173a81-a127-4fb9-b4f5-cbbc236534d0.png"  width=100% width=25% ></td>  
   </tr>
 </table>
-
-### Demo
-![ezgif com-gif-maker](https://user-images.githubusercontent.com/27401142/172794058-89190103-1f33-4c02-b82b-8cac7b23bba1.gif)
