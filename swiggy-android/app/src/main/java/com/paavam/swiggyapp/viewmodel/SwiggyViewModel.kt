@@ -17,7 +17,7 @@ class SwiggyViewModel @Inject constructor(
     private val _viewState = MutableStateFlow(SwiggyAppState())
     val viewState: StateFlow<SwiggyAppState> get() = _viewState
 
-    private val _askAddressModal = MutableStateFlow(false)
+    private val _askAddressModal = MutableStateFlow(true)
     val askAddressModal: StateFlow<Boolean> get() = _askAddressModal
 
 //    private val _defaultAddress =

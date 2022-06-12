@@ -4,8 +4,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.paavam.swiggyapp.core.data.PreviewData
+import com.paavam.swiggyapp.core.data.model.MainSectionFoods
 import com.paavam.swiggyapp.core.data.model.Restaurant
 import com.paavam.swiggyapp.core.data.model.RestaurantFoodModel
+import com.paavam.swiggyapp.core.data.model.SubSectionsFoods
 import dagger.Module
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -14,6 +16,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ActivityRetainedComponent
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.Collections.emptyList
 
@@ -72,6 +75,25 @@ class RestaurantViewModel @AssistedInject constructor(
                 errorMessage = null
             )
             onSectionExpanded(31)
+        }
+    }
+
+    fun onQuantityIncreased(newQuantity: Int, foodId: Long) {
+        //bad implementation
+        _state.update {
+            it.copy(
+                restaurantFoods = _state.value.restaurantFoods.also { foodmodel ->
+                    foodmodel?.mainFoodSections?.forEach { section ->
+                        if (section is SubSectionsFoods) {
+                            section.foodList.find { f -> f.foodId == foodId }.also { f -> f?.quantityInCart = newQuantity }
+                        } else if (section is MainSectionFoods) {
+                            section.subFoodSections.orEmpty().forEach { sub ->
+                                sub.foodList.find { f -> f.foodId == foodId }.also { f -> f?.quantityInCart = newQuantity }
+                            }
+                        }
+                    }
+                }
+            )
         }
     }
 

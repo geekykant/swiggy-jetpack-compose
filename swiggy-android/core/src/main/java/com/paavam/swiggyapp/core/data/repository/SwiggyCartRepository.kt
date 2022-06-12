@@ -8,9 +8,9 @@ import javax.inject.Singleton
 @Singleton
 interface SwiggyCartRepository {
 
-    fun fetchUsersCartFoods(): Flow<ResponseResult<List<Food>>>
+    suspend fun fetchUsersCartFoods(): Flow<ResponseResult<List<Food>>>
 
-    fun fetchUsersCartFoodById(foodId: String): Flow<ResponseResult<Food>>
+    suspend fun fetchUsersCartFoodById(foodId: String): Flow<ResponseResult<Food>>
 
     suspend fun addUsersCartFood(food: Food): ResponseResult<String>
 

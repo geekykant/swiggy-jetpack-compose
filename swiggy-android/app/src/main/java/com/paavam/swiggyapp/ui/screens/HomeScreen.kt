@@ -33,8 +33,8 @@ import com.paavam.swiggyapp.R
 import com.paavam.swiggyapp.core.data.PreviewData
 import com.paavam.swiggyapp.core.data.model.*
 import com.paavam.swiggyapp.core.ui.UiState
-import com.paavam.swiggyapp.lib.LazyHorizontalGrid
-import com.paavam.swiggyapp.lib.items
+import com.paavam.swiggyapp.ui.component.lib.LazyHorizontalGrid
+import com.paavam.swiggyapp.ui.component.lib.items
 import com.paavam.swiggyapp.ui.component.*
 import com.paavam.swiggyapp.ui.component.anim.AnimateTextUpDown
 import com.paavam.swiggyapp.ui.component.image.ImageWithPlaceholder

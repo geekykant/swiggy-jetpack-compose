@@ -7,34 +7,38 @@ import com.paavam.swiggyapp.core.data.repository.SwiggyCartRepository
 import com.paavam.swiggyapp.data.local.dao.CartDao
 import com.paavam.swiggyapp.data.local.entity.CartEntity
 import com.paavam.swiggyapp.data.local.entity.EntityFoodType
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class SwiggyLocalCartRepository @Inject constructor(
     private val cartDao: CartDao
 ) : SwiggyCartRepository {
 
-    override fun fetchUsersCartFoods(): Flow<ResponseResult<List<Food>>> {
-        return cartDao
-            .getAllCartItems()
-            .map { foods ->
-                foods.map {
-                    Food(
-                        it.foodId,
-                        it.foodName,
-                        FoodType.valueOf(it.foodType.toString()),
-                        null,
-                        it.price,
-                        it.foodContents,
-                        it.imageUrl,
-                        it.quantityInCart
-                    )
-                }
-            }.transform { foods -> emit(ResponseResult.success(foods)) }
-            .catch { emit(ResponseResult.success(emptyList())) }
+    override suspend fun fetchUsersCartFoods(): Flow<ResponseResult.Success<List<Food>>> {
+        return withContext(Dispatchers.IO){
+            cartDao
+                .getAllCartItems()
+                .map { foods ->
+                    foods.map {
+                        Food(
+                            it.foodId,
+                            it.foodName,
+                            FoodType.valueOf(it.foodType.toString()),
+                            null,
+                            it.price,
+                            it.foodContents,
+                            it.imageUrl,
+                            it.quantityInCart
+                        )
+                    }
+                }.transform { foods -> emit(ResponseResult.success(foods)) }
+                .catch { emit(ResponseResult.success(emptyList())) }
+        }
     }
 
-    override fun fetchUsersCartFoodById(foodId: String): Flow<ResponseResult<Food>> = flow {
+    override suspend fun fetchUsersCartFoodById(foodId: String): Flow<ResponseResult<Food>> = flow {
          cartDao
             .getCartItemById(foodId.toLong())
             .map {

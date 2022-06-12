@@ -28,6 +28,7 @@ import com.paavam.swiggyapp.ui.utils.UiUtils
 fun FoodItem(
     food: Food,
     isShopClosed: Boolean,
+    onQuantityChange: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -109,8 +110,8 @@ fun FoodItem(
                     .fillMaxWidth(0.75f)
                     .align(Alignment.BottomCenter)
                     .alpha(if (isShopClosed) 0f else 1f),
-                onQuantityChange = {
-                    food.quantityInCart = it
+                onQuantityChange = { newQuantity ->
+                    onQuantityChange(newQuantity)
                 }
             )
         }

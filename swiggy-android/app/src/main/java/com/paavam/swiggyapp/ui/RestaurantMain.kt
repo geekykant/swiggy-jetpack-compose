@@ -50,11 +50,10 @@ import java.util.*
 
 @Composable
 fun RestaurantMain(
-    restaurantId: Long,
-    mainNavController: NavController
+    mainNavController: NavController,
+    viewModel: RestaurantViewModel
 ) {
     SwiggyTheme {
-        val viewModel = RestaurantViewModel(restaurantId = restaurantId)
         val scrollState = rememberLazyListState()
         var isScrollStateChanged by remember { mutableStateOf(false) }
 
@@ -157,6 +156,7 @@ fun FoodSectionListView(
                             foodList = section.foodList,
                             onArrowClick = { viewModel.onSectionExpanded(section.subSectionId) },
                             expanded = expandedState.value.contains(section.subSectionId),
+                            viewModel = viewModel,
                             isShopClosed = r.isShopClosed,
                         )
                     }
@@ -170,6 +170,7 @@ fun FoodSectionListView(
                     section.subFoodSections.orEmpty().forEach { sub ->
                         state.value.restaurant?.let { r ->
                             ExpandableSectionFoods(
+                                viewModel = viewModel,
                                 sectionTitle = sub.getSubName(),
                                 foodList = sub.foodList,
                                 onArrowClick = { viewModel.onSectionExpanded(sub.subSectionId) },
@@ -194,6 +195,7 @@ fun SectionFoodsComposable(
     onArrowClick: () -> Unit,
     expanded: Boolean,
     isShopClosed: Boolean,
+    viewModel: RestaurantViewModel,
     modifier: Modifier = Modifier
 ) {
     val arrowRotationDegree by animateFloatAsState(
@@ -224,7 +226,10 @@ fun SectionFoodsComposable(
             foodList.orEmpty().forEach { food ->
                 FoodItem(
                     food = food,
-                    isShopClosed = isShopClosed
+                    isShopClosed = isShopClosed,
+                    onQuantityChange = { newQuantity ->
+                        viewModel.onQuantityIncreased(newQuantity, food.foodId)
+                    }
                 )
             }
         }
@@ -233,6 +238,7 @@ fun SectionFoodsComposable(
 
 @Composable
 fun ExpandableSectionFoods(
+    viewModel: RestaurantViewModel,
     sectionTitle: String,
     foodList: List<Food>,
     onArrowClick: () -> Unit,
@@ -283,7 +289,10 @@ fun ExpandableSectionFoods(
             foodList.forEach {
                 FoodItem(
                     food = it,
-                    isShopClosed = isShopClosed
+                    isShopClosed = isShopClosed,
+                    onQuantityChange = { newQuantity ->
+                        viewModel.onQuantityIncreased(newQuantity, it.foodId)
+                    }
                 )
             }
         }
@@ -710,7 +719,9 @@ fun BottomQuickMenu(modifier: Modifier = Modifier) {
 fun FoodItemPreview() {
     FoodItem(
         food = PreviewData.prepareRestaurantFoods()[0],
-        isShopClosed = true
+        isShopClosed = true,
+        onQuantityChange = {
+        }
     )
 }
 

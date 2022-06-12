@@ -2,25 +2,27 @@ package com.paavam.swiggyapp.di
 
 import android.app.Application
 import com.paavam.swiggyapp.data.local.SwiggyDatabase
+import com.paavam.swiggyapp.data.local.dao.CartDao
+import com.paavam.swiggyapp.data.local.dao.UserAddressDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
-@Module
 @InstallIn(SingletonComponent::class)
+@Module
 class DatabaseModule {
-
     @Singleton
     @Provides
-    fun provideDatabase(application: Application) = SwiggyDatabase.getInstance(application)
+    fun provideDatabase(application: Application) : SwiggyDatabase =
+        SwiggyDatabase.getInstance(application)
 
-    @Singleton
     @Provides
-    fun provideUserAddressDao(database: SwiggyDatabase) = database.getUserAddressDao()
+    fun provideUserAddressDao(database: SwiggyDatabase) : UserAddressDao =
+        database.getUserAddressDao()
 
-    @Singleton
     @Provides
-    fun provideCartDao(database: SwiggyDatabase) = database.getFoodCartDao()
+    fun provideCartDao(database: SwiggyDatabase): CartDao =
+        database.getFoodCartDao()
 }

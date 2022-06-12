@@ -1,4 +1,4 @@
-package com.paavam.swiggyapp.lib
+package com.paavam.swiggyapp.ui.component.lib
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.*

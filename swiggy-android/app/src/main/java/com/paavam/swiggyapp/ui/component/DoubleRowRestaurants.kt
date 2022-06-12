@@ -13,8 +13,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.paavam.swiggyapp.core.data.model.Restaurant
-import com.paavam.swiggyapp.lib.LazyHorizontalGrid
-import com.paavam.swiggyapp.lib.items
+import com.paavam.swiggyapp.ui.component.lib.LazyHorizontalGrid
+import com.paavam.swiggyapp.ui.component.lib.items
 import com.paavam.swiggyapp.ui.component.listitem.RestaurantItem
 import com.paavam.swiggyapp.ui.component.listitem.RestaurantItemLarge
 import com.paavam.swiggyapp.ui.component.listitem.RestaurantItemSquare

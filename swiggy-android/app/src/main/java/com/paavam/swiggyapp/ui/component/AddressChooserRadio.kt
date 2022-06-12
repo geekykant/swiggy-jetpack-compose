@@ -1,4 +1,4 @@
-package com.paavam.swiggyapp.lib
+package com.paavam.swiggyapp.ui.component
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background

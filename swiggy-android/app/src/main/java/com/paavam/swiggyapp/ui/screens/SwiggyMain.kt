@@ -23,7 +23,7 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import com.paavam.swiggyapp.R
-import com.paavam.swiggyapp.lib.AddressChooserRadio
+import com.paavam.swiggyapp.ui.component.AddressChooserRadio
 import com.paavam.swiggyapp.ui.navigation.MainNavigation
 import com.paavam.swiggyapp.ui.navigation.NavScreen
 import com.paavam.swiggyapp.ui.theme.SwiggyTheme
@@ -38,7 +38,7 @@ import java.util.*
 @Composable
 fun SwiggyMain() {
     SwiggyTheme {
-        val swiggyViewModel = hiltViewModel<SwiggyViewModel>()
+        val swiggyViewModel: SwiggyViewModel = hiltViewModel()
 
         val sheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden)
         val context = LocalContext.current
@@ -158,7 +158,8 @@ fun AddressPickBottomSheet(
          * Choose Address from User addresses
          */
         val selectedId = remember { mutableStateOf(-1) }
-        val addressList = viewModel.viewState.value.userAddressList
+        val addressListState = viewModel.viewState.collectAsState()
+        val addressList =addressListState.value.userAddressList
 
         Column(
             modifier = Modifier.padding(horizontal = 15.dp, vertical = 0.dp)

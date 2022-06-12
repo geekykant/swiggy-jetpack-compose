@@ -13,7 +13,6 @@ import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import javax.inject.Qualifier
 
 @Module
@@ -31,7 +30,6 @@ interface RepositoryModule {
     @RemoteRepository
     fun providesCuisineRepository(impl: SwiggyRemoteCuisineRepository): SwiggyCuisineRepository
 
-    @ExperimentalCoroutinesApi
     @Binds
     @LocalRepository
     fun swiggyLocalCartRepository(impl: SwiggyLocalCartRepository): SwiggyCartRepository

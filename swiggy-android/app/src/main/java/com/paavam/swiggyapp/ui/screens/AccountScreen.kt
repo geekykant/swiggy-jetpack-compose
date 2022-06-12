@@ -46,7 +46,6 @@ fun AccountScreen(
             is UiState.Success -> userDetailsState.value.user?.let {
                 SuccessAccountScreen(
                     user = it,
-                    viewModel = viewModel,
                     outerPaddingValues = outerPadding
                 )
             }
@@ -57,7 +56,6 @@ fun AccountScreen(
 @Composable
 fun SuccessAccountScreen(
     user: UserProfile,
-    viewModel: AccountViewModel,
     outerPaddingValues: PaddingValues
 ) {
     val scrollState = rememberLazyListState()

@@ -9,6 +9,7 @@ import com.paavam.swiggyapp.core.data.model.Restaurant
 import com.paavam.swiggyapp.core.data.repository.SwiggyCartRepository
 import com.paavam.swiggyapp.core.data.repository.SwiggyRestaurantRepository
 import com.paavam.swiggyapp.core.ui.UiState
+import com.paavam.swiggyapp.di.LocalRepository
 import com.paavam.swiggyapp.di.RemoteRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
@@ -19,7 +20,7 @@ import kotlin.math.roundToInt
 
 @HiltViewModel
 class CartViewModel @Inject constructor(
-    @RemoteRepository private val cartRepository: SwiggyCartRepository,
+    @LocalRepository private val cartRepository: SwiggyCartRepository,
     @RemoteRepository private val restaurantRepository: SwiggyRestaurantRepository
 ) : ViewModel() {
     private val _state = MutableStateFlow(CartViewModelState(uiLoadingState = UiState.loading()))

@@ -20,6 +20,7 @@ import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import com.paavam.swiggyapp.ui.RestaurantMain
 import com.paavam.swiggyapp.ui.screens.*
 import com.paavam.swiggyapp.ui.theme.Typography
+import com.paavam.swiggyapp.viewmodel.RestaurantViewModel
 import com.paavam.swiggyapp.viewmodel.SwiggyViewModel
 
 @OptIn(ExperimentalAnimationApi::class)
@@ -88,8 +89,8 @@ fun MainNavigation(
         ) {
             it.arguments?.getString("restaurantId")?.toLong()?.let { restaurantId ->
                 RestaurantMain(
-                    restaurantId = restaurantId,
-                    mainNavController = mainNavController
+                    mainNavController = mainNavController,
+                    viewModel = RestaurantViewModel(restaurantId = restaurantId)
                 )
             }
         }
